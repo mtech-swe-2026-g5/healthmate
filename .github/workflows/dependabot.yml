@@ -1,8 +1,8 @@
 name: Dependabot
 on:
-  push:
+  pull_request:
     branches:
-      - dependabot/**
+      - main
 
 permissions:
   pull-requests: write
@@ -27,6 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - if: ${{ github.actor == 'dependabot[bot]'}}
-        run: gh pr merge --merge
+        run: gh pr merge --merge ${{ github.event.pull_request.number }}
         env:
           GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
