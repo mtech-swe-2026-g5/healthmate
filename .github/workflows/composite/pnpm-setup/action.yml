@@ -14,9 +14,10 @@ runs:
         node-version: ${{ inputs.node-version }}
     - name: Setup pnpm
       uses: pnpm/action-setup@v6
-      cache: pnpm
       with:
         run_install: false
+        cache: true
     - name: Install Dependencies
-      run: pnpm install
+      run: |
+        pnpm install
 
