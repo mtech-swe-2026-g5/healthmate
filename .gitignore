@@ -66,3 +66,5 @@ next-env.d.ts
 .idea/**/copilot.data.migration.*.xml
 .idea/copilotDiffState.xml
 
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
