@@ -14,7 +14,8 @@ describe('RootLayout', () => {
         render(
             <RootLayout>
                 <div>test child</div>
-            </RootLayout>
+            </RootLayout>,
+            {container: document.documentElement}
         );
         expect(screen.getByText('test child')).toBeDefined();
     });
