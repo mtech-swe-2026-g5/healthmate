@@ -18,6 +18,8 @@ runs:
         run_install: false
         cache: true
     - name: Install Dependencies
+      shell: bash
       run: |
         pnpm install
+        
 
