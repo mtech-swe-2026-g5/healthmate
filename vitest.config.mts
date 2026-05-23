@@ -6,6 +6,19 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     watch: false,
+    coverage: {
+      provider: 'v8',
+      enabled: true,
+      thresholds: {
+        branches: 90,
+        lines: 90
+      },
+      reportOnFailure: true,
+    },
+    reporters: ['junit'],
+    outputFile: {
+      junit: './build/junit-report.xml'
+    }
   },
   resolve: {
     tsconfigPaths: true,
