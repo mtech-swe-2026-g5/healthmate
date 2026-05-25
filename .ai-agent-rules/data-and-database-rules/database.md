@@ -14,13 +14,14 @@
 
 ```
 healthmate/
+├── prisma.config.ts        # Prisma CLI config (datasource URL, seed, migrations)
 ├── prisma/
 │   ├── schema.prisma       # Database schema definition
 │   ├── migrations/         # Migration files (auto-generated)
 │   └── seed.ts            # Seed data script
 └── src/
     └── lib/
-        ├── prisma.ts      # Prisma client singleton
+        ├── prisma.ts      # Prisma client singleton (with @prisma/adapter-pg)
         └── db.ts          # Database utilities (optional)
 ```
 
@@ -44,11 +45,27 @@ healthmate/
 - **Pooling**: Vercel handles connection pooling via their Postgres driver
 
 ```prisma
-// prisma/schema.prisma
+// prisma/schema.prisma (Prisma 7 — URL moved to prisma.config.ts)
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
 }
+```
+
+```typescript
+// prisma.config.ts
+import 'dotenv/config';
+import { defineConfig, env } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  migrations: {
+    path: 'prisma/migrations',
+    seed: 'tsx prisma/seed.ts',
+  },
+  datasource: {
+    url: env('DATABASE_URL'),
+  },
+});
 ```
 
 ## Prisma Schema Organization
@@ -281,21 +298,32 @@ pnpm exec prisma migrate dev --name update
 pnpm exec prisma migrate dev --name fix
 ```
 
-## Prisma Client Setup
+## Prisma Client Setup (v7 — Driver Adapter)
 
 ```typescript
-// lib/prisma.ts
+// src/lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+function createPrismaClient() {
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
   });
+
+  return new PrismaClient({
+    adapter,
+    log:
+      process.env.NODE_ENV === 'development'
+        ? ['query', 'error', 'warn']
+        : ['error'],
+  });
+}
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 ```
@@ -351,20 +379,24 @@ const total = await prisma.appointment.count();
 
 ## Seed Data
 
-### Configure in package.json
+### Configure in prisma.config.ts
 
-```json
-{
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  }
-}
+Seed is configured in `prisma.config.ts` (not `package.json` in Prisma 7):
+
+```typescript
+// prisma.config.ts
+export default defineConfig({
+  migrations: {
+    seed: 'tsx prisma/seed.ts',
+  },
+  // ...
+});
 ```
 
 ### Run Seed
 
 ```bash
-pnpm exec prisma db seed
+pnpm db:seed
 ```
 
 ## Best Practices Summary

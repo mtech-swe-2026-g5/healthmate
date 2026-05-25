@@ -153,19 +153,27 @@ pnpm dev                # http://localhost:3000
 | Command | Purpose |
 |---------|---------|
 | `pnpm dev` | Start development server |
-| `pnpm build` | Production build |
+| `pnpm build` | Production build (includes `prisma generate`) |
 | `pnpm start` | Run production server |
 | `pnpm lint` | Run ESLint |
 | `pnpm test` | Run Vitest (unit + integration tests) |
+| `pnpm db:migrate` | Create & apply migration |
+| `pnpm db:migrate:deploy` | Apply pending migrations (production) |
+| `pnpm db:push` | Sync schema without migration (prototyping) |
+| `pnpm db:seed` | Run seed script |
+| `pnpm db:studio` | Open Prisma Studio GUI |
+| `pnpm db:reset` | Reset database & reseed |
 
 ### Database Workflow
 
 ```bash
-pnpm exec prisma migrate dev --name description   # Create migration
-pnpm exec prisma db seed                            # Seed data
-pnpm exec prisma studio                             # GUI browser
-pnpm exec prisma generate                           # Regenerate client
+pnpm db:migrate -- --name description   # Create migration
+pnpm db:seed                             # Seed data
+pnpm db:studio                           # GUI browser
+pnpm exec prisma generate               # Regenerate client
 ```
+
+> **Prisma 7**: Database URL is configured in `prisma.config.ts` (not in `schema.prisma`). PrismaClient requires a driver adapter (`@prisma/adapter-pg`).
 
 ### Git Workflow
 
@@ -184,7 +192,11 @@ pnpm exec prisma generate                           # Regenerate client
 - Dependabot auto-updates enabled
 - `.env` / `.env.sample` created
 - AI agent coding rules configured in `.ai-agent-rules/`
-- **Not yet implemented**: auth, booking, dashboards, database, API routes, reminders, analytics
+- Prisma 7 + PostgreSQL schema configured (`prisma/schema.prisma`, `prisma.config.ts`)
+- Database models defined: User, Account, Session, Patient, Doctor, Schedule, Appointment, Reminder
+- Prisma client singleton at `src/lib/prisma.ts` with `@prisma/adapter-pg`
+- Seed script at `prisma/seed.ts` with demo data
+- **Not yet implemented**: auth, booking, dashboards, API routes, reminders, analytics
 
 ---
 
