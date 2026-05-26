@@ -39,6 +39,11 @@ jobs:
         with:
           app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
+      - name: set github author
+        run: |
+          git config user.name "bits-semantic-release-bot[bot]"
+          git config user.email "bits-semantic-release-bot[bot]@users.noreply.github.com"
+        shell: bash
       - uses: ./.github/workflows/composite/release
         with:
           dry_run: false
