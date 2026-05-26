@@ -16,18 +16,15 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout with full history
+        uses: actions/checkout@v6
         with:
           fetch-depth: '0'
-      - uses: actions/create-github-app-token@v2
-        id: app-token
+      - uses: ./.github/workflows/composite/semantic-release-prepare
+        id: prepare
         with:
           app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
-      - name: set github author
-        run: |
-          git config user.name "bits-semantic-release-bot[bot]"
-          git config user.email "bits-semantic-release-bot[bot]@users.noreply.github.com"
       - uses: ./.github/workflows/composite/release
         with:
-          github_token: ${{ steps.app-token.outputs.token }}
+          github_token: ${{ steps.prepare.outputs.token }}

@@ -1,0 +1,29 @@
+name: Build Checks
+description: Run lint, test, upload report, and build
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: "22"
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js and pnpm
+      uses: ./.github/workflows/composite/pnpm-setup
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Lint
+      run: pnpm lint
+      shell: bash
+    - name: Test
+      run: pnpm test
+      shell: bash
+    - name: Upload Test Report
+      uses: mikepenz/action-junit-report@v6
+      if: success() || failure()
+      with:
+        report_paths: '**/build/junit-report.xml'
+    - name: Build
+      run: pnpm build
+      shell: bash
+
