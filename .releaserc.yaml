@@ -1,0 +1,17 @@
+debug: true
+repositoryUrl: https://github.com/mtech-swe-2026-g5/healthmate
+branches:
+  - name: main
+success: []
+fail: []
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/changelog"
+  - "@semantic-release/github"
+  - - "@semantic-release/exec"
+    - prepareCmd: "sed -i 's/\"version\": \".*\"/\"version\": \"${nextRelease.version}\"/g' package.json"
+  - - "@semantic-release/git"
+    - assets:
+        - package.json
+        - CHANGELOG.md
