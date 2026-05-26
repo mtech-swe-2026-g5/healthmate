@@ -2,6 +2,7 @@ debug: true
 repositoryUrl: https://github.com/mtech-swe-2026-g5/healthmate
 branches:
   - name: main
+  - name: ci/semantic-release
 success: []
 fail: []
 plugins:
