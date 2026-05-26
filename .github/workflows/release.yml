@@ -15,9 +15,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/workflows/composite/build-checks
+  semantic-release-dry-run:
+    name: Semantic Release Dry Run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout with full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: '0'
+      - uses: ./.github/workflows/composite/semantic-release-prepare
+        id: prepare
+        with:
+          app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
+      - uses: ./.github/workflows/composite/release
+        with:
+          github_token: ${{ steps.prepare.outputs.token }}
   semantic-release:
     name: Semantic Release
-    needs: [ release-checks ]
+    needs: [ release-checks, semantic-release-dry-run ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
