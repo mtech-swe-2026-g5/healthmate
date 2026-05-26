@@ -7,7 +7,7 @@ inputs:
   dry_run:
     description: Run Semantic Release in dry-run mode
     required: false
-    default: true
+    default: true #explicitly default to true to prevent accidental releases during testing
 outputs:
   new_release_published:
     description: Indicates if a new release was published

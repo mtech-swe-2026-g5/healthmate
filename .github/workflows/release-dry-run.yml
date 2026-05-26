@@ -1,0 +1,33 @@
+name: Semantic Release Dry Run
+on:
+  push:
+    branches-ignore:
+      - main
+    paths-ignore:
+      - '**/*.md'
+  workflow_dispatch:
+
+jobs:
+  semantic-release:
+    name: Semantic Release Dry Run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: '0'
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
+      - name: set github author
+        run: |
+          git config user.name "bits-semantic-release-bot[bot]"
+          git config user.email "bits-semantic-release-bot[bot]@users.noreply.github.com"
+      - uses: ./.github/workflows/composite/release
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
