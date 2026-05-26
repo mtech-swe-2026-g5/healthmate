@@ -24,6 +24,7 @@ runs:
       id: semantic_release
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_ACTION: true
       with:
         semantic_version: 24.2.1
         extra_plugins: |
