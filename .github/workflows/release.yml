@@ -67,6 +67,7 @@ jobs:
           app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
       - uses: ./.github/workflows/composite/release
+        id: semantic_release
         with:
           dry_run: false
           github_token: ${{ steps.prepare.outputs.token }}
