@@ -27,21 +27,21 @@ HealthMate aims to simplify how clinics manage appointments end to end—from pa
 | Styling | [Tailwind CSS](https://tailwindcss.com) 4 |
 | Linting | [ESLint](https://eslint.org) (Next.js config) |
 | Runtime | [Node.js](https://nodejs.org) 24.14.1 |
-| Package manager | npm |
+| Package manager | pnpm |
 
 ## Prerequisites
 
 Before you begin, install:
 
 - **Node.js** 24.14.1
-- **npm** (included with Node.js)
+- **pnpm** (included with Node.js)
 - **Git**
 
 Check your versions:
 
 ```bash
 node -v
-npm -v
+pnpm -v
 git --version
 ```
 
@@ -63,7 +63,7 @@ Replace `<repository-url>` with your Git remote URL (for example, `https://githu
 From the project root:
 
 ```bash
-npm install
+pnpm install
 ```
 
 This installs Next.js, React, Tailwind CSS, TypeScript, and other dependencies listed in `package.json`.
@@ -71,7 +71,7 @@ This installs Next.js, React, Tailwind CSS, TypeScript, and other dependencies l
 ### 3. Start the development server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 The app runs at [http://localhost:3000](http://localhost:3000). Open that URL in your browser to view the coming-soon home page.
@@ -83,8 +83,8 @@ The dev server reloads automatically when you edit files (for example, `app/page
 To verify a production build locally:
 
 ```bash
-npm run build
-npm run start
+pnpm run build
+pnpm run start
 ```
 
 Then open [http://localhost:3000](http://localhost:3000) again.
@@ -93,10 +93,10 @@ Then open [http://localhost:3000](http://localhost:3000) again.
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start the development server |
-| `npm run build` | Create an optimized production build |
-| `npm run start` | Run the production server (after `build`) |
-| `npm run lint` | Run ESLint |
+| `pnpm run dev` | Start the development server |
+| `pnpm run build` | Create an optimized production build |
+| `pnpm run start` | Run the production server (after `build`) |
+| `pnpm run lint` | Run ESLint |
 
 ## Project structure (overview)
 
