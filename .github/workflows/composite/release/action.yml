@@ -1,0 +1,42 @@
+name: Semantic Release
+description: Semantic Release Workflow
+inputs:
+  github_token:
+    description: GitHub token for authentication
+    required: true
+  dry_run:
+    description: Run Semantic Release in dry-run mode
+    required: false
+    default: true #explicitly default to true to prevent accidental releases during testing
+outputs:
+  new_release_published:
+    description: Indicates if a new release was published
+    value: ${{ steps.semantic_release.outputs.new_release_published }}
+  new_release_version:
+    description: The version of the new release, if published
+    value: ${{ steps.semantic_release.outputs.new_release_version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v6
+      id: semantic_release
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        GITHUB_ACTION: true
+      with:
+        semantic_version: 24.2.1
+        extra_plugins: |
+          @semantic-release/changelog
+          @semantic-release/git
+          @semantic-release/exec
+        dry_run: ${{ inputs.dry_run }}
+    - name: Show Release Output
+      if: ${{ steps.semantic_release.outputs.new_release_published == 'true' }}
+      shell: bash
+      run: |
+        echo "New Release Version: ${{ steps.semantic_release.outputs.new_release_version }}"
+        
+        
+
