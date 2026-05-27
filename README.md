@@ -77,6 +77,7 @@ pnpm install
 
 ```bash
 cp .env.sample .env
+pnpm install
 ```
 
 Edit `.env` and set at least:

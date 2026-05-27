@@ -1,0 +1,24 @@
+debug: true
+repositoryUrl: https://github.com/mtech-swe-2026-g5/healthmate
+branches:
+  - name: main
+  - name: ci/semantic-release
+success: []
+fail: []
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/changelog"
+  - "@semantic-release/github"
+  - - "@semantic-release/exec"
+    - prepareCmd: "sed -i 's/\"version\": \".*\"/\"version\": \"${nextRelease.version}\"/g' package.json"
+  - - "@semantic-release/git"
+    - assets:
+        - package.json
+        - CHANGELOG.md
+      gitAuthor:
+        name: "bits-semantic-release-bot[bot]"
+        email: "bits-semantic-release-bot[bot]@users.noreply.github.com"
+      gitCommitter:
+        name: "bits-semantic-release-bot[bot]"
+        email: "bits-semantic-release-bot[bot]@users.noreply.github.com"

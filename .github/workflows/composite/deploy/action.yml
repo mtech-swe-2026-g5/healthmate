@@ -1,0 +1,29 @@
+name: Deploy to Vercel
+description: Build and deploy to Vercel for preview or production
+inputs:
+  vercel-token:
+    description: Vercel token
+    required: true
+  vercel-org-id:
+    description: Vercel organization ID
+    required: true
+  vercel-project-id:
+    description: Vercel project ID
+    required: true
+outputs:
+  deployment-url:
+    description: URL returned by Vercel deploy
+    value: ${{ steps.deploy.outputs.deployment-url }}
+runs:
+  using: composite
+  steps:
+    - name: Setup runtime and dependencies
+      uses: ./.github/workflows/composite/pnpm-setup
+    - id: deploy
+      name: Deploy
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.vercel-token }}
+        VERCEL_ORG_ID: ${{ inputs.vercel-org-id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel-project-id }}
+      run: bash ci/deploy-vercel.sh
