@@ -24,4 +24,3 @@ runs:
         # A placeholder URL is enough — generate does not connect to the DB.
         DATABASE_URL: postgresql://ci:ci@localhost:5432/healthmate?sslmode=disable
       run: pnpm install
-

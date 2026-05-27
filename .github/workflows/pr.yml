@@ -4,6 +4,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   build:
@@ -14,9 +15,9 @@ jobs:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/healthmate?sslmode=disable
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/workflows/composite/pnpm-setup
+      - uses: ./.github/actions/pnpm-setup
       - run: pnpm db:check
       - run: pnpm lint
       - run: pnpm test
-      - uses: ./.github/workflows/composite/upload-test-report
+      - uses: ./.github/actions/upload-test-report
       - run: pnpm build
