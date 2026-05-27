@@ -6,10 +6,11 @@
 
 PR workflow (`.github/workflows/pr.yml`) runs on every pull request:
 1. **Checkout** code
-2. **Setup** pnpm + Node.js 22
-3. **Lint** — `pnpm lint`
-4. **Test** — `pnpm test` (Vitest, JUnit report uploaded)
-5. **Build** — `pnpm build`
+2. **Setup** pnpm + Node.js 22 (sets `DATABASE_URL` placeholder for `prisma generate` on install)
+3. **Database schema check** — `pnpm db:check` (`prisma validate` + `prisma format --check`; no live DB)
+4. **Lint** — `pnpm lint`
+5. **Test** — `pnpm test` (Vitest, JUnit report uploaded)
+6. **Build** — `pnpm build` (`prisma generate` + Next.js build)
 
 Dependabot workflow auto-merges after CI passes.
 

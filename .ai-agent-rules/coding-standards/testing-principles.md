@@ -18,7 +18,7 @@
 
 ### What to Test
 ✅ **Always Test:**
-- Business logic (appointment conflict detection, scheduling algorithms)
+- Business logic (validation rules, conflict detection, scheduling algorithms)
 - Data transformations and utilities
 - Custom hooks with complex logic
 - API endpoints and Server Actions
@@ -47,14 +47,14 @@ __tests__/
 ├── app/
 │   └── layout.test.tsx
 ├── features/
-│   ├── appointments/
+│   ├── [feature-name]/
 │   │   ├── components/
-│   │   │   └── booking-form.test.tsx
+│   │   │   └── [component-name].test.tsx
 │   │   ├── hooks/
-│   │   │   └── use-appointments.test.ts
+│   │   │   └── use-[hook-name].test.ts
 │   │   └── services/
 │   │       └── actions.test.ts
-│   └── doctors/
+│   └── [other-feature-name]/
 │       └── services/
 │           └── queries.test.ts
 └── lib/
@@ -63,7 +63,7 @@ __tests__/
 
 ### Naming Convention
 - Test files: `*.test.ts` or `*.test.tsx`
-- Test suites: `describe('ComponentName', () => {})`
+- Test suites: `describe('[ComponentName]', () => {})`
 - Test cases: `it('should do something', () => {})`
 
 ## Testing Patterns
@@ -72,13 +72,13 @@ __tests__/
 ```typescript
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { BookingForm } from '@/features/appointments';
+import { FeatureForm } from '@/features/[feature-name]';
 
-describe('BookingForm', () => {
-  it('should render doctor and time slot fields', () => {
-    render(<BookingForm />);
-    expect(screen.getByLabelText(/doctor/i)).toBeDefined();
-    expect(screen.getByLabelText(/time/i)).toBeDefined();
+describe('[ComponentName]', () => {
+  it('should render required form fields', () => {
+    render(<FeatureForm />);
+    expect(screen.getByLabelText(/name/i)).toBeDefined();
+    expect(screen.getByLabelText(/date/i)).toBeDefined();
   });
 });
 ```
@@ -87,13 +87,13 @@ describe('BookingForm', () => {
 ```typescript
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { useAppointments } from '@/features/appointments';
+import { useFeatureData } from '@/features/[feature-name]';
 
-describe('useAppointments', () => {
-  it('should return appointments for a patient', async () => {
-    const { result } = renderHook(() => useAppointments('patient-1'));
+describe('use[HookName]', () => {
+  it('should return data for a given resource id', async () => {
+    const { result } = renderHook(() => useFeatureData('resource-1'));
     await waitFor(() => {
-      expect(result.current.appointments).toBeDefined();
+      expect(result.current.items).toBeDefined();
     });
   });
 });
@@ -102,12 +102,12 @@ describe('useAppointments', () => {
 ### Testing Server Actions
 ```typescript
 import { describe, expect, it } from 'vitest';
-import { bookAppointmentAction } from '@/features/appointments';
+import { createFeatureAction } from '@/features/[feature-name]';
 
-describe('bookAppointmentAction', () => {
-  it('should create a new appointment', async () => {
-    const data = { doctorId: 'doc-1', dateTime: new Date(), patientId: 'pat-1' };
-    const result = await bookAppointmentAction(data);
+describe('createFeatureAction', () => {
+  it('should create a new resource', async () => {
+    const data = { resourceId: 'res-1', ownerId: 'owner-1', scheduledAt: new Date() };
+    const result = await createFeatureAction(data);
     expect(result.success).toBe(true);
   });
 });
@@ -116,19 +116,19 @@ describe('bookAppointmentAction', () => {
 ### Testing Services / Business Logic
 ```typescript
 import { describe, expect, it } from 'vitest';
-import { hasSchedulingConflict } from '@/features/appointments';
+import { hasResourceConflict } from '@/features/[feature-name]';
 
-describe('hasSchedulingConflict', () => {
-  it('should detect overlapping appointments', () => {
+describe('hasResourceConflict', () => {
+  it('should detect overlapping time ranges', () => {
     const existing = { start: new Date('2026-06-01T10:00'), end: new Date('2026-06-01T10:30') };
     const proposed = { start: new Date('2026-06-01T10:15'), end: new Date('2026-06-01T10:45') };
-    expect(hasSchedulingConflict(existing, proposed)).toBe(true);
+    expect(hasResourceConflict(existing, proposed)).toBe(true);
   });
 
-  it('should allow back-to-back appointments', () => {
+  it('should allow adjacent non-overlapping ranges', () => {
     const existing = { start: new Date('2026-06-01T10:00'), end: new Date('2026-06-01T10:30') };
     const proposed = { start: new Date('2026-06-01T10:30'), end: new Date('2026-06-01T11:00') };
-    expect(hasSchedulingConflict(existing, proposed)).toBe(false);
+    expect(hasResourceConflict(existing, proposed)).toBe(false);
   });
 });
 ```
@@ -197,6 +197,7 @@ describe('hasSchedulingConflict', () => {
 - Shared mutable state between tests
 - Over-mocking (mock only what's necessary)
 - Testing the framework itself
+- Hard-coding domain-specific feature or route names in agent rule examples (use `[feature-name]`, `[component-name]` placeholders)
 
 ✅ **Prefer:**
 - Testing user-facing behavior
@@ -205,3 +206,4 @@ describe('hasSchedulingConflict', () => {
 - Isolated, independent tests
 - Minimal, boundary-level mocking
 - Testing your code, not libraries
+- Generic example names in docs and rules so implementations are not assumed

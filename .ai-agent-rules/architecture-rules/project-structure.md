@@ -8,7 +8,7 @@
 
 ### Root Level
 ```
-healthmate/
+[project-name]/
 ├── .ai-agent-rules/      # AI agent coding rules
 ├── .github/               # GitHub workflows, Dependabot config
 │   └── workflows/
@@ -37,9 +37,8 @@ healthmate/
 ```
 src/
 ├── app/                    # Next.js App Router pages and layouts
-│   ├── (auth)/            # Route group: authentication pages
-│   ├── (dashboard)/       # Route group: authenticated app
-│   ├── (marketing)/       # Route group: public pages (landing, about)
+│   ├── ([route-group])/   # Route group (layout wrapper, no URL segment)
+│   ├── ([route-group])/   # Repeat per logical section of the app
 │   ├── api/               # API routes (REST endpoints)
 │   ├── error.tsx          # Global error boundary
 │   ├── favicon.ico
@@ -55,12 +54,7 @@ src/
 │   ├── site.ts          # Site metadata, URLs, navigation
 │   └── constants.ts     # Global constants
 ├── features/             # Feature modules (main development area)
-│   ├── appointments/     # Appointment booking & management
-│   ├── auth/             # Authentication & user management
-│   ├── doctors/          # Doctor profiles & schedule management
-│   ├── patients/         # Patient registration & profiles
-│   ├── reminders/        # SMS/email reminder system
-│   ├── analytics/        # Appointment trends & reporting
+│   ├── [feature-name]/  # One folder per feature (repeat as needed)
 │   └── shared/           # Cross-feature domain code
 ├── hooks/                # Global hooks (truly universal)
 │   ├── use-media-query.ts
@@ -71,7 +65,7 @@ src/
 │   ├── prisma.ts        # Prisma client setup
 │   └── utils.ts         # General utilities (cn, formatters)
 ├── middleware/           # Middleware utilities
-│   ├── auth.ts          # Authentication middleware helpers
+│   ├── [middleware].ts  # Middleware helpers (e.g. session, rate limit)
 │   └── rate-limit.ts    # Rate limiting utilities
 └── types/                # Global TypeScript types
     ├── global.d.ts      # Global type augmentations
@@ -115,11 +109,11 @@ features/[feature-name]/
 Each feature MUST expose a deliberate public API through `index.ts`:
 
 ```typescript
-// features/appointments/index.ts
-export { BookingForm, AppointmentCard, AppointmentList } from './components';
-export { useBookAppointment, useAppointments } from './hooks';
-export { bookAppointmentAction, cancelAppointmentAction } from './services';
-export type { Appointment, BookingInput } from './types';
+// features/[feature-name]/index.ts
+export { FeatureComponent, FeatureList } from './components';
+export { useFeatureData, useFeatureMutation } from './hooks';
+export { createFeatureAction, updateFeatureAction } from './services';
+export type { FeatureEntity, FeatureInput } from './types';
 ```
 
 ### Importing from Features
@@ -128,47 +122,28 @@ Always import from the feature's public API, never from internal paths:
 
 ```typescript
 // ✅ Correct
-import { BookingForm, useAppointments } from '@/features/appointments';
-import { DoctorSchedule } from '@/features/doctors';
+import { FeatureComponent, useFeatureData } from '@/features/[feature-name]';
+import { OtherFeatureComponent } from '@/features/[other-feature-name]';
 
 // ❌ Incorrect
-import { BookingForm } from '@/features/appointments/components/booking-form';
-import { useAppointments } from '@/features/appointments/hooks/use-appointments';
+import { FeatureComponent } from '@/features/[feature-name]/components/feature-component';
+import { useFeatureData } from '@/features/[feature-name]/hooks/use-feature-data';
 ```
 
-## HealthMate Feature Modules
+## Feature Module Guidelines
 
-### `features/appointments/`
-- Booking flow (select doctor, time slot, confirm)
-- Appointment listing and filtering
-- Cancellation and rescheduling logic
-- Conflict detection (double-booking prevention)
+### `features/[feature-name]/`
 
-### `features/auth/`
-- Patient sign-up and login
-- Doctor/admin login
-- Session management
-- Password reset flow
+Each feature folder represents one cohesive domain capability. When defining a new feature:
 
-### `features/doctors/`
-- Doctor profiles and specializations
-- Schedule/availability management
-- Dashboard with daily/weekly view
+- Give it a clear, focused responsibility (one primary user-facing capability)
+- Keep UI, hooks, services, and types inside that folder
+- Expose only what other features or routes need via `index.ts`
+- Document non-obvious business rules in the feature README or inline where needed
 
-### `features/patients/`
-- Patient registration and profile management
-- Appointment history
-- Medical record references
+### `features/shared/`
 
-### `features/reminders/`
-- SMS reminder integration
-- Email reminder integration
-- Reminder scheduling and templates
-
-### `features/analytics/`
-- Appointment trend reports
-- No-show tracking
-- Clinic utilization metrics
+Use for code shared across multiple features (domain types, validators, mappers). Do not use `shared` as a dumping ground for unrelated utilities—those belong in `lib/`.
 
 ## Next.js App Router Structure
 
@@ -176,46 +151,27 @@ import { useAppointments } from '@/features/appointments/hooks/use-appointments'
 
 ```
 app/
-├── (auth)/                   # Route group: auth pages
+├── ([route-group])/          # Route group (no URL segment; shared layout)
 │   ├── layout.tsx
-│   ├── sign-in/
-│   │   └── page.tsx         # /sign-in
-│   ├── sign-up/
-│   │   └── page.tsx         # /sign-up
-│   └── forgot-password/
-│       └── page.tsx
-├── (dashboard)/              # Route group: authenticated app
-│   ├── layout.tsx           # Dashboard layout (sidebar, nav)
-│   ├── dashboard/
-│   │   └── page.tsx         # /dashboard
-│   ├── appointments/
-│   │   ├── page.tsx         # /appointments (list)
-│   │   ├── new/
-│   │   │   └── page.tsx     # /appointments/new (booking)
-│   │   └── [id]/
-│   │       └── page.tsx     # /appointments/:id (detail)
-│   ├── doctors/
-│   │   ├── page.tsx         # /doctors (list)
-│   │   └── [id]/
-│   │       └── page.tsx     # /doctors/:id (profile/schedule)
-│   ├── patients/
-│   │   └── page.tsx         # /patients
-│   └── settings/
-│       └── page.tsx         # /settings
-├── (marketing)/              # Route group: public pages
+│   └── [page-name]/
+│       └── page.tsx         # /[page-name]
+├── ([route-group])/          # Another route group (repeat as needed)
 │   ├── layout.tsx
-│   └── page.tsx             # / (landing page)
+│   ├── [page-name]/
+│   │   └── page.tsx         # /[page-name]
+│   └── [feature-name]/      # Feature routes (repeat per feature)
+│       ├── page.tsx         # /[feature-name] (list)
+│       ├── new/
+│       │   └── page.tsx     # /[feature-name]/new (create)
+│       └── [id]/
+│           └── page.tsx     # /[feature-name]/:id (detail)
 ├── api/                      # REST API routes
-│   ├── appointments/
-│   │   ├── route.ts         # GET/POST /api/appointments
+│   ├── [feature-name]/
+│   │   ├── route.ts         # GET/POST /api/[feature-name]
 │   │   └── [id]/
-│   │       └── route.ts     # GET/PUT/DELETE /api/appointments/:id
-│   ├── doctors/
-│   │   └── route.ts
-│   ├── health/
-│   │   └── route.ts         # Health check endpoint
-│   └── reminders/
-│       └── route.ts
+│   │       └── route.ts     # GET/PUT/DELETE /api/[feature-name]/:id
+│   └── [system-endpoint]/
+│       └── route.ts         # Ops/diagnostic endpoint (e.g. health check)
 ├── error.tsx
 ├── globals.css
 ├── layout.tsx
@@ -239,15 +195,15 @@ app/
 Keep routes thin, delegate to feature services:
 
 ```typescript
-// app/api/appointments/route.ts
+// app/api/[feature-name]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getAppointments, createAppointment } from '@/features/appointments';
+import { getFeatureItems, createFeatureItem } from '@/features/[feature-name]';
 import { handleApiError } from '@/lib/errors';
 
 export async function GET(request: NextRequest) {
   try {
-    const appointments = await getAppointments();
-    return NextResponse.json(appointments);
+    const items = await getFeatureItems();
+    return NextResponse.json(items);
   } catch (error) {
     return handleApiError(error);
   }
@@ -256,8 +212,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const appointment = await createAppointment(body);
-    return NextResponse.json(appointment, { status: 201 });
+    const item = await createFeatureItem(body);
+    return NextResponse.json(item, { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }
@@ -274,7 +230,7 @@ export async function POST(request: NextRequest) {
 
 ### File Structure
 ```
-healthmate/
+[project-name]/
 ├── .env                   # Local development (gitignored)
 ├── .env.sample            # Template with all required variables
 └── .env.test              # Test environment (optional)
@@ -288,15 +244,11 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 # Database
 DATABASE_URL=
 
-# Authentication (when configured)
-# AUTH_SECRET=
+# Secrets (when configured)
+# APP_SECRET=
 
-# Email / SMS Reminders (when configured)
-# SMTP_HOST=
-# SMTP_PORT=
-# SMTP_USER=
-# SMTP_PASSWORD=
-# SMS_API_KEY=
+# External integrations (when configured)
+# INTEGRATION_API_KEY=
 ```
 
 ### Best Practices
