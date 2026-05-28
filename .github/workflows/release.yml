@@ -82,7 +82,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - uses: ./.github/actions/deploy
+        id: deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Add Vercel URL to Step Summary
+        run: |
+          echo "Deployed to Vercel: ${{ steps.deploy.outputs.deployment-url }}" >> $GITHUB_STEP_SUMMARY
