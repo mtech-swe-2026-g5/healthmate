@@ -9,9 +9,12 @@ runs:
   using: composite
   steps:
     - name: Setup Node.js and pnpm
-      uses: ./.github/workflows/composite/pnpm-setup
+      uses: ./.github/actions/pnpm-setup
       with:
         node-version: ${{ inputs.node-version }}
+    - name: DB Check
+      run: pnpm db:check
+      shell: bash
     - name: Lint
       run: pnpm lint
       shell: bash

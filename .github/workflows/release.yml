@@ -12,17 +12,19 @@ jobs:
   release-checks:
     name: Release Checks
     runs-on: ubuntu-latest
+    env:
+      # Used by prisma.config.ts, prisma generate, and build (no live DB required).
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/healthmate?sslmode=disable
+    permissions:
+      contents: read
+      checks: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: ./.github/workflows/composite/semantic-release-prepare
-        id: prepare
-        with:
-          app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: ./.github/workflows/composite/build-checks
+      - uses: ./.github/actions/build-checks
   semantic-release-dry-run:
     name: Semantic Release Dry Run
     runs-on: ubuntu-latest
@@ -36,12 +38,12 @@ jobs:
         with:
           fetch-depth: '0'
           persist-credentials: false
-      - uses: ./.github/workflows/composite/semantic-release-prepare
+      - uses: ./.github/actions/semantic-release-prepare
         id: prepare
         with:
           app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: ./.github/workflows/composite/release
+      - uses: ./.github/actions/release
         with:
           github_token: ${{ steps.prepare.outputs.token }}
   semantic-release:
@@ -61,12 +63,12 @@ jobs:
         with:
           fetch-depth: '0'
           persist-credentials: false
-      - uses: ./.github/workflows/composite/semantic-release-prepare
+      - uses: ./.github/actions/semantic-release-prepare
         id: prepare
         with:
           app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: ./.github/workflows/composite/release
+      - uses: ./.github/actions/release
         id: semantic_release
         with:
           dry_run: false
@@ -79,14 +81,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - uses: ./.github/workflows/composite/semantic-release-prepare
-        id: prepare
-        with:
-          app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
-          private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: ./.github/workflows/composite/deploy
+      - uses: ./.github/actions/deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}

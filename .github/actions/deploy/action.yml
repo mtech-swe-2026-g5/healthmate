@@ -18,7 +18,7 @@ runs:
   using: composite
   steps:
     - name: Setup runtime and dependencies
-      uses: ./.github/workflows/composite/pnpm-setup
+      uses: ./.github/actions/pnpm-setup
     - id: deploy
       name: Deploy
       shell: bash

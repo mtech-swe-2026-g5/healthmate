@@ -21,11 +21,11 @@ jobs:
         with:
           fetch-depth: '0'
           persist-credentials: false
-      - uses: ./.github/workflows/composite/semantic-release-prepare
+      - uses: ./.github/actions/semantic-release-prepare
         id: prepare
         with:
           app-id: ${{ vars.SEMANTIC_RELEASE_BOT_APP_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
-      - uses: ./.github/workflows/composite/release
+      - uses: ./.github/actions/release
         with:
           github_token: ${{ steps.prepare.outputs.token }}

@@ -1,9 +1,0 @@
-name: Upload Test Reports
-description: Publish Vitest JUnit XML results to the GitHub Checks UI
-runs:
-  using: composite
-  steps:
-    - uses: mikepenz/action-junit-report@v6
-      if: success() || failure()
-      with:
-        report_paths: "**/build/junit-report.xml"
