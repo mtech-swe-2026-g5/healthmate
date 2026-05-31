@@ -1,0 +1,10 @@
+// Database schema is added incrementally via migrations as features are implemented.
+// Run: pnpm db:migrate -- --name <descriptive_name>
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
