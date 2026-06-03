@@ -261,7 +261,7 @@ This document is the **definitive reference** for all design and development dec
 
 ### Framework & Tooling
 - **Styling**: Tailwind CSS 4 — utility-first; define design tokens in `@theme inline` within `globals.css`
-- **Icons**: Material Symbols or Lucide — **consistent stroke weight** (prefer `stroke-width: 1.5` or `2` across the app; do not mix filled and outlined arbitrarily)
+- **Icons**: [react-icons](https://react-icons.github.io/react-icons/) (prefer `react-icons/md` for Material-style icons) — use consistent sizing via `className`; do not mix unrelated icon families arbitrarily
 - **Components**: Server Components by default; Client Components only for interactivity
 
 ### Interactions & Motion
