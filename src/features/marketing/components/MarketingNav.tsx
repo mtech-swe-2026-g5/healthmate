@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
-import { marketingNavLinks, siteConfig } from '@/config/site';
+import { BrandMark } from '@/components/ui/BrandMark';
+import { authRoutes, marketingNavLinks } from '@/config/site';
 import {
   marketingBrandLink,
   marketingButtonContainer,
@@ -16,9 +17,7 @@ export function MarketingNav() {
       <div
         className={`${marketingContainerClass} flex h-16 items-center justify-between`}
       >
-        <Link href="/" className={marketingBrandLink}>
-          {siteConfig.brandMark} {siteConfig.name}
-        </Link>
+        <BrandMark className={marketingBrandLink} />
 
         <div className="hidden items-center gap-hm-xl md:flex">
           {marketingNavLinks.map((link) => (
@@ -35,14 +34,17 @@ export function MarketingNav() {
         </div>
 
         <div className="flex items-center gap-hm-md">
-          <button type="button" className={`${marketingButtonLogin} hidden sm:inline-flex`}>
+          <Link
+            href={authRoutes.login}
+            className={`${marketingButtonLogin} hidden sm:inline-flex`}
+          >
             <span className="relative z-10 transition-all duration-200 ease-in-out group-hover:tracking-wide">
               Log in
             </span>
-          </button>
-          <button type="button" className={marketingButtonContainer}>
+          </Link>
+          <Link href={authRoutes.register} className={marketingButtonContainer}>
             Get Started
-          </button>
+          </Link>
         </div>
       </div>
     </nav>

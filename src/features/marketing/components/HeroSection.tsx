@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MdArrowForward, MdCheckCircle } from 'react-icons/md';
 
+import { authRoutes } from '@/config/site';
 import { AppIcon } from '@/components/ui/AppIcon';
 import {
   marketingButtonPrimary,
@@ -31,9 +32,12 @@ export function HeroSection() {
               by surgical precision.
             </p>
             <div className="flex flex-col items-center justify-center gap-hm-md sm:flex-row lg:justify-start">
-              <button type="button" className={`${marketingButtonPrimary} w-full sm:w-auto`}>
+              <Link
+                href={authRoutes.register}
+                className={`${marketingButtonPrimary} w-full sm:w-auto`}
+              >
                 Book an Appointment
-              </button>
+              </Link>
               <Link href="#for-doctors" className={marketingTextLink}>
                 For Doctors
                 <AppIcon icon={MdArrowForward} className={marketingTextLinkIcon} />

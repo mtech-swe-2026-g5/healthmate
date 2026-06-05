@@ -1,10 +1,14 @@
 export const siteConfig = {
   name: 'HealthMate',
-  brandMark: '🩺',
   title: 'HealthMate | Healthcare Scheduling, Finally Effortless',
   description:
     'The intelligent appointment platform that bridges the gap between patient expectations and clinical efficiency.',
   copyrightYear: 2026,
+} as const;
+
+export const authRoutes = {
+  login: '/login',
+  register: '/register',
 } as const;
 
 export const marketingNavLinks = [

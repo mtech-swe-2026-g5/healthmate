@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { MdLanguage, MdVerifiedUser } from 'react-icons/md';
 
 import { AppIcon } from '@/components/ui/AppIcon';
+import { BrandMark } from '@/components/ui/BrandMark';
 import {
   footerDoctorLinks,
   footerLegalLinks,
@@ -27,9 +28,7 @@ export function MarketingFooter() {
       <MarketingContainer className="py-hm-xxl">
         <div className="grid grid-cols-1 gap-hm-xl sm:grid-cols-2 lg:grid-cols-5 lg:gap-hm-xl">
           <div className="space-y-hm-md sm:col-span-2 lg:col-span-2">
-            <Link href="/" className={marketingBrandLink}>
-              {siteConfig.brandMark} {siteConfig.name}
-            </Link>
+            <BrandMark className={marketingBrandLink} />
             <p className="max-w-md font-literata text-body-md text-on-surface-variant">
               Leading the transition to intelligent, patient-first healthcare scheduling
               since {siteConfig.copyrightYear}.

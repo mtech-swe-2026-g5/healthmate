@@ -1,0 +1,1 @@
+export { registerPatient } from './registration';

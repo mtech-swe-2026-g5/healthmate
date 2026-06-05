@@ -8,3 +8,102 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// ============================================
+// RBAC Foundation
+// ============================================
+
+model Role {
+  id          Int      @id @default(autoincrement()) @db.SmallInt
+  name        String   @unique @db.VarChar(50)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  users       User[]
+
+  @@map("roles")
+}
+
+// ============================================
+// Authentication — email/password identity
+// ============================================
+
+model User {
+  id            String   @id @default(uuid()) @db.Uuid
+  roleId        Int      @map("role_id") @db.SmallInt
+  email         String   @unique @db.VarChar(255)
+  passwordHash  String   @map("password_hash")
+  emailVerified Boolean  @default(false) @map("email_verified")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  role                    Role                     @relation(fields: [roleId], references: [id])
+  patient                 Patient?
+  emailVerificationTokens EmailVerificationToken[]
+  refreshTokens           RefreshToken[]
+
+  @@index([email])
+  @@index([roleId])
+  @@map("users")
+}
+
+// ============================================
+// Patient profile (1:1 with User)
+// ============================================
+
+model Patient {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @unique @map("user_id") @db.Uuid
+  firstName         String   @map("first_name") @db.VarChar(100)
+  lastName          String   @map("last_name") @db.VarChar(100)
+  dateOfBirth       DateTime @map("date_of_birth") @db.Date
+  gender            String?  @db.VarChar(20)
+  phoneNumber       String?  @map("phone_number") @db.VarChar(20)
+  profilePictureUrl String?  @map("profile_picture_url")
+  bloodGroup        String?  @map("blood_group") @db.VarChar(5)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("patients")
+}
+
+// ============================================
+// Email Verification Tokens
+// Provisioned now; feature logic deferred.
+// ============================================
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz()
+  usedAt    DateTime? @map("used_at") @db.Timestamptz()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+// ============================================
+// Refresh Tokens
+// Provisioned now; feature logic deferred.
+// ============================================
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz()
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}

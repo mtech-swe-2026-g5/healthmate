@@ -32,8 +32,12 @@ describe('LandingPage', () => {
         name: /healthcare scheduling, finally effortless/i,
       }),
     ).toBeDefined();
-    expect(screen.getByRole('button', { name: /book an appointment/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /get started/i })).toBeDefined();
+    expect(
+      screen.getByRole('link', { name: /book an appointment/i }).getAttribute('href'),
+    ).toBe('/register');
+    expect(
+      screen.getByRole('link', { name: /get started/i }).getAttribute('href'),
+    ).toBe('/register');
   });
 
   it('renders feature and footer sections', () => {

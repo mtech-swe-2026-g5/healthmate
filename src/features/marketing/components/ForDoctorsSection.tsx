@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { MdCheckCircle } from 'react-icons/md';
 
+import { authRoutes } from '@/config/site';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { marketingButtonContainerLg } from '@/features/marketing/constants/interaction-styles';
 import {
@@ -15,7 +17,7 @@ export function ForDoctorsSection() {
     <section id="for-doctors" className="overflow-hidden py-hm-xxl scroll-mt-20">
       <MarketingContainer>
         <div className="flex flex-col items-center gap-hm-xxl rounded-xl border border-outline-variant/30 bg-surface-container-low p-hm-lg md:p-hm-xxl lg:flex-row">
-          <div className="w-full space-y-hm-md lg:w-1/2">
+          <div className="w-full space-y-hm-xl gap-12 lg:w-1/2">
             <span className="font-dm-sans text-label-md font-bold uppercase tracking-widest text-primary">
               Practitioner Focus
             </span>
@@ -30,9 +32,9 @@ export function ForDoctorsSection() {
                 </li>
               ))}
             </ul>
-            <button type="button" className={marketingButtonContainerLg}>
+            <Link href={authRoutes.login} className={marketingButtonContainerLg}>
               View Doctor Features
-            </button>
+            </Link>
           </div>
 
           <div className="relative w-full lg:w-1/2">

@@ -313,6 +313,65 @@ body {
   transform: scale(0.96);
 }
 
+/* ── Auth pages: floating labels, split layout ──────────────── */
+
+.auth-body-bg {
+  background-color: #f8f7f5;
+  background-image: radial-gradient(circle at 2px 2px, #e5e7eb 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+.floating-label-group {
+  position: relative;
+}
+
+.floating-label-group input:focus ~ label,
+.floating-label-group input:not(:placeholder-shown) ~ label {
+  top: 0;
+  left: 12px;
+  font-size: 12px;
+  color: var(--color-primary-container);
+  background-color: white;
+  padding: 0 4px;
+  transform: translateY(-50%);
+}
+
+.floating-label-group label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  transition: all 0.2s ease-out;
+  pointer-events: none;
+  color: var(--color-outline);
+}
+
+.floating-label-group.has-error input ~ label {
+  color: var(--color-error);
+}
+
+.floating-label-group.has-error input:focus ~ label,
+.floating-label-group.has-error input:not(:placeholder-shown) ~ label {
+  color: var(--color-error);
+}
+
+.auth-custom-shadow {
+  box-shadow: 0px 4px 20px rgba(26, 107, 114, 0.08);
+}
+
+.auth-pattern-bg {
+  background-color: var(--color-primary);
+  background-image:
+    linear-gradient(30deg, #004248 12%, transparent 12.5%, transparent 87%, #004248 87.5%, #004248),
+    linear-gradient(150deg, #004248 12%, transparent 12.5%, transparent 87%, #004248 87.5%, #004248),
+    linear-gradient(30deg, #004248 12%, transparent 12.5%, transparent 87%, #004248 87.5%, #004248),
+    linear-gradient(150deg, #004248 12%, transparent 12.5%, transparent 87%, #004248 87.5%, #004248),
+    linear-gradient(60deg, var(--color-primary-container) 25%, transparent 25.5%, transparent 75%, var(--color-primary-container) 75%, var(--color-primary-container)),
+    linear-gradient(60deg, var(--color-primary-container) 25%, transparent 25.5%, transparent 75%, var(--color-primary-container) 75%, var(--color-primary-container));
+  background-size: 80px 140px;
+  background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marketing-landing .bento-card,
   .marketing-landing .bento-card:hover,

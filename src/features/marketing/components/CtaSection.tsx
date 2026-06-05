@@ -1,4 +1,6 @@
-import { siteConfig } from '@/config/site';
+import Link from 'next/link';
+
+import { authRoutes, siteConfig } from '@/config/site';
 import {
   marketingButtonCtaFilled,
   marketingButtonCtaOutline,
@@ -19,12 +21,12 @@ export function CtaSection() {
             most critical operations.
           </p>
           <div className="flex flex-col justify-center gap-hm-md sm:flex-row">
-            <button type="button" className={marketingButtonCtaFilled}>
+            <Link href={authRoutes.register} className={marketingButtonCtaFilled}>
               Start Free Trial
-            </button>
-            <button type="button" className={marketingButtonCtaOutline}>
+            </Link>
+            <Link href={authRoutes.login} className={marketingButtonCtaOutline}>
               Schedule Demo
-            </button>
+            </Link>
           </div>
         </div>
       </MarketingContainer>
