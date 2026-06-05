@@ -5,7 +5,7 @@ HealthMate is a clinic appointment scheduling system for patients and doctors. I
 **Course project**: Agile Software Processes — BITS M.Tech, Semester 1  
 **Repository**: [github.com/mtech-swe-2026-g5/healthmate](https://github.com/mtech-swe-2026-g5/healthmate)
 
-The app is in early development. The public home page is a pre-launch “coming soon” screen; database tooling and project conventions are in place for feature work.
+The app is in early development. The public home page is a marketing landing site (Clinical Precision design system); database tooling and project conventions are in place for booking and auth features.
 
 ---
 
@@ -127,7 +127,7 @@ Migration SQL is stored under `prisma/migrations/` after you run `db:migrate`. C
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the coming-soon home page.
+Open [http://localhost:3000](http://localhost:3000) for the marketing landing page.
 
 ### 6. (Optional) Production build
 
@@ -167,7 +167,15 @@ healthmate/
 │   └── seed.ts             # Seed script
 ├── prisma.config.ts        # Prisma CLI config (URL, migrations path, seed)
 ├── src/
-│   ├── app/                # Next.js App Router (layout, pages, styles)
+│   ├── app/
+│   │   ├── (marketing)/    # Public landing page (/)
+│   │   ├── layout.tsx      # Root layout (fonts, globals)
+│   │   └── globals.css     # Design tokens and shared styles
+│   ├── config/
+│   │   └── site.ts         # Site name, nav, and footer links
+│   ├── components/ui/      # Shared UI (icons, share button)
+│   ├── features/
+│   │   └── marketing/      # Landing sections and content constants
 │   └── lib/
 │       └── prisma.ts       # Prisma client singleton (PostgreSQL adapter)
 ├── __tests__/              # Vitest tests
@@ -178,15 +186,14 @@ healthmate/
 └── README.md
 ```
 
-Target layout for upcoming features (see `.ai-agent-rules/architecture-rules/project-structure.md`):
+Additional routes and modules planned (see `.ai-agent-rules/architecture-rules/project-structure.md`):
 
 ```
 src/
 ├── app/(auth)/             # Sign-in
 ├── app/(dashboard)/        # Authenticated app
 ├── app/api/                # REST endpoints
-├── features/               # Feature modules (appointments, auth, doctors, …)
-├── components/
+├── features/               # appointments, auth, doctors, patients, …
 ├── hooks/
 └── middleware/
 ```
@@ -198,7 +205,8 @@ src/
 ### Done
 
 - Next.js 16 project with App Router under `src/app/`
-- Responsive “coming soon” landing page describing planned features
+- Marketing landing page at `/` (`src/app/(marketing)/`, `src/features/marketing/`) — hero, platform features, capabilities bento, how-it-works, for-doctors, CTA, and footer (Clinical Precision tokens in `globals.css`)
+- **react-icons** for UI icons; share-site control in the footer
 - **pnpm** workspace, **Vitest**, and **ESLint** configured
 - **GitHub Actions**: Prisma schema check → lint → test → build on every PR
 - **Dependabot** for dependency updates
