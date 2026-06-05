@@ -51,7 +51,7 @@
     "tsx": "^4.22.3",
     "typescript": "^6",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   },
   "packageManager": "pnpm@11.2.2+sha224.501681044e3f471e4d3d2c50d6a231e2e3822a7f"
 }
