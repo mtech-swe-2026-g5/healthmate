@@ -189,6 +189,37 @@
   padding-inline: var(--spacing-margin-mobile);
 }
 
+/* Responsive typography — scales down on mobile/tablet */
+@utility text-display-responsive {
+  font-size: clamp(2rem, 4vw + 0.5rem, var(--text-display-lg));
+  line-height: 1.15;
+  letter-spacing: var(--text-display-lg--letter-spacing);
+  font-weight: var(--text-display-lg--font-weight);
+}
+
+@utility text-headline-responsive {
+  font-size: clamp(1.5rem, 2.5vw + 0.5rem, var(--text-headline-lg));
+  line-height: 1.25;
+  letter-spacing: var(--text-headline-lg--letter-spacing);
+  font-weight: var(--text-headline-lg--font-weight);
+}
+
+@utility section-py {
+  padding-block: var(--spacing-hm-lg);
+}
+
+@media (min-width: 640px) {
+  .section-py {
+    padding-block: var(--spacing-hm-xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-py {
+    padding-block: var(--spacing-hm-xxl);
+  }
+}
+
 body {
   background-color: var(--color-surface);
   color: var(--color-on-surface);
@@ -319,7 +350,54 @@ body {
   background-color: #f8f7f5;
   background-image: radial-gradient(circle at 2px 2px, #e5e7eb 1px, transparent 0);
   background-size: 40px 40px;
+  /* cover the full page so background shows even on tall content */
+  background-attachment: fixed;
 }
+
+/*
+ * Auth shell
+ *
+ * Flex centering on ALL screen sizes so the card is always centred in the
+ * available viewport — both login (short) and register (tall) pages.
+ *
+ * Native page scrolling is guaranteed because auth/layout.tsx injects:
+ *   html { height: auto !important }
+ *   body { display: block !important }
+ * …which turns body into a plain block container. This auth shell (a block
+ * child of body) can then grow beyond 100dvh freely; when it does, the
+ * browser shows the page scroll bar. Short content (login) stays centred
+ * within the shell's min-height; tall content (register) overflows and
+ * the whole page scrolls.
+ */
+.auth-page-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  padding: var(--spacing-hm-md);
+  padding-bottom: calc(var(--spacing-hm-lg) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 640px) {
+  .auth-page-shell {
+    padding: var(--spacing-hm-lg);
+    padding-bottom: calc(var(--spacing-hm-lg) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-page-shell {
+    padding: var(--spacing-hm-xl);
+  }
+}
+
+/* Compatibility stubs */
+.auth-page-center  { display: contents; }
+.auth-form-panel   { width: 100%; }
+.auth-brand-sticky { display: block; }
 
 .floating-label-group {
   position: relative;
