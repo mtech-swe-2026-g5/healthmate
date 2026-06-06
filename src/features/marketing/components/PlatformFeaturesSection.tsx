@@ -5,10 +5,10 @@ import { MarketingContainer } from './MarketingContainer';
 
 export function PlatformFeaturesSection() {
   return (
-    <section id="features" className="scroll-mt-20 section-py">
+    <section id="features" className="scroll-mt-20 py-hm-xxl">
       <MarketingContainer>
-        <div className="mb-hm-lg sm:mb-hm-xxl text-center">
-          <h2 className="mb-hm-md font-dm-sans text-headline-responsive text-on-surface">
+        <div className="mb-hm-xxl text-center">
+          <h2 className="mb-hm-md font-dm-sans text-headline-lg text-on-surface">
             Built for patients and clinics
           </h2>
           <p className="mx-auto max-w-3xl font-literata text-body-md text-on-surface-variant">
@@ -21,7 +21,7 @@ export function PlatformFeaturesSection() {
           {platformFeatures.map((feature) => (
             <article
               key={feature.title}
-              className="bento-card rounded-xl border border-outline-variant bg-white p-hm-md sm:p-hm-lg"
+              className="bento-card rounded-xl border border-outline-variant bg-white p-hm-lg"
             >
               <AppIcon
                 icon={feature.icon}

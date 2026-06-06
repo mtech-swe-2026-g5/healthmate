@@ -4,10 +4,10 @@ import { MarketingContainer } from './MarketingContainer';
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="scroll-mt-20 bg-surface-container-highest section-py">
+    <section id="how-it-works" className="scroll-mt-20 bg-surface-container-highest py-hm-xxl">
       <MarketingContainer>
-        <div className="mb-hm-lg sm:mb-hm-xxl text-center">
-          <h2 className="mb-hm-md font-dm-sans text-headline-responsive text-on-surface">
+        <div className="mb-hm-xxl text-center">
+          <h2 className="mb-hm-md font-dm-sans text-headline-lg text-on-surface">
             Simplicity in Three Acts
           </h2>
         </div>

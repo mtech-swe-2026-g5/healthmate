@@ -6,7 +6,7 @@ import { bentoFeatures } from '@/features/marketing/constants/landing-content';
 import { MarketingContainer } from './MarketingContainer';
 
 const bentoCardBase =
-  'bento-card flex h-full flex-col items-center justify-center text-center rounded-xl border border-outline-variant p-hm-md sm:p-hm-lg';
+  'bento-card flex h-full flex-col items-center justify-center text-center rounded-xl border border-outline-variant p-hm-lg';
 
 type BentoCardContentProps = {
   icon: IconType;
@@ -50,10 +50,10 @@ export function FeatureGridSection() {
   const { large, accent, small } = bentoFeatures;
 
   return (
-    <section id="capabilities" className="scroll-mt-20 section-py">
+    <section id="capabilities" className="scroll-mt-20 py-hm-xxl">
       <MarketingContainer>
-        <div className="mb-hm-lg sm:mb-hm-xxl text-center">
-          <h2 className="mb-hm-md font-dm-sans text-headline-responsive text-on-surface">
+        <div className="mb-hm-xxl text-center">
+          <h2 className="mb-hm-md font-dm-sans text-headline-lg text-on-surface">
             Engineered for Medical Excellence
           </h2>
           <p className="mx-auto max-w-3xl font-literata text-body-md text-on-surface-variant">

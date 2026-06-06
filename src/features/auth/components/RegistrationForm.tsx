@@ -71,9 +71,9 @@ export function RegistrationForm() {
       )}
 
       {/* Brand anchor */}
-      <div className="mb-[var(--spacing-hm-md)] sm:mb-[var(--spacing-hm-xl)]">
-        <BrandMark variant="badge" href="/" className="mb-[var(--spacing-hm-md)] sm:mb-[var(--spacing-hm-lg)]" />
-        <h1 className="font-dm-sans text-headline-responsive text-[var(--color-on-surface)] mb-[var(--spacing-hm-xs)]">
+      <div className="mb-[var(--spacing-hm-xl)]">
+        <BrandMark variant="badge" href="/" className="mb-[var(--spacing-hm-lg)]" />
+        <h1 className="font-dm-sans text-headline-lg text-[var(--color-on-surface)] mb-[var(--spacing-hm-xs)]">
           Create your account
         </h1>
         <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
@@ -84,12 +84,12 @@ export function RegistrationForm() {
       {/* Registration form */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-[var(--spacing-hm-md)] sm:space-y-[var(--spacing-hm-lg)]"
+        className="space-y-[var(--spacing-hm-lg)]"
         noValidate
         aria-label="Patient registration form"
       >
         {/* Name row */}
-        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] sm:grid-cols-2">
           <FloatingField
             id="firstName"
             label="First name"
@@ -153,7 +153,7 @@ export function RegistrationForm() {
         </FloatingField>
 
         {/* Password row */}
-        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] sm:grid-cols-2">
           <FloatingField
             id="password"
             label="Password"
@@ -226,7 +226,7 @@ export function RegistrationForm() {
         </div>
 
         {/* Gender + DOB */}
-        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] sm:grid-cols-2">
           <SelectField
             id="gender"
             label="Gender"
@@ -275,7 +275,7 @@ export function RegistrationForm() {
         </div>
 
         {/* Phone + Blood group */}
-        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-[var(--spacing-hm-md)] sm:grid-cols-2">
           <FloatingField
             id="phoneNumber"
             label="Phone number"
@@ -333,7 +333,7 @@ export function RegistrationForm() {
         </button>
       </form>
 
-      <div className="mt-[var(--spacing-hm-lg)] sm:mt-[var(--spacing-hm-xl)] text-center">
+      <div className="mt-[var(--spacing-hm-xl)] text-center">
         <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
           Already have an account?{' '}
           <Link

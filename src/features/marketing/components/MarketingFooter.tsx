@@ -25,8 +25,8 @@ export function MarketingFooter() {
       id="about"
       className="w-full scroll-mt-20 border-t border-outline-variant bg-surface-container-highest"
     >
-      <MarketingContainer className="py-hm-lg sm:py-hm-xl md:py-hm-xxl">
-        <div className="grid grid-cols-1 gap-hm-lg sm:grid-cols-2 sm:gap-hm-xl lg:grid-cols-5 lg:gap-hm-xl">
+      <MarketingContainer className="py-hm-xxl">
+        <div className="grid grid-cols-1 gap-hm-xl sm:grid-cols-2 lg:grid-cols-5 lg:gap-hm-xl">
           <div className="space-y-hm-md sm:col-span-2 lg:col-span-2">
             <BrandMark className={marketingBrandLink} />
             <p className="max-w-md font-literata text-body-md text-on-surface-variant">
@@ -46,7 +46,7 @@ export function MarketingFooter() {
           <FooterLinkColumn title="Legal" links={footerLegalLinks} />
         </div>
 
-        <div className="mt-hm-lg sm:mt-hm-xxl flex flex-col items-center justify-between gap-hm-md border-t border-outline-variant pt-hm-md sm:pt-hm-lg sm:flex-row">
+        <div className="mt-hm-xxl flex flex-col items-center justify-between gap-hm-md border-t border-outline-variant pt-hm-lg sm:flex-row">
           <p className="text-center font-dm-sans text-label-md text-on-surface-variant sm:text-left">
             © {siteConfig.copyrightYear} {siteConfig.name}. All rights reserved.
           </p>

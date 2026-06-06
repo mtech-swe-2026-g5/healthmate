@@ -14,14 +14,14 @@ import { MarketingContainer } from './MarketingContainer';
 
 export function ForDoctorsSection() {
   return (
-    <section id="for-doctors" className="overflow-hidden section-py scroll-mt-20">
+    <section id="for-doctors" className="overflow-hidden py-hm-xxl scroll-mt-20">
       <MarketingContainer>
-        <div className="flex flex-col items-center gap-hm-lg sm:gap-hm-xxl rounded-xl border border-outline-variant/30 bg-surface-container-low p-hm-md sm:p-hm-lg md:p-hm-xxl lg:flex-row">
-          <div className="w-full space-y-hm-md sm:space-y-hm-lg lg:w-1/2">
+        <div className="flex flex-col items-center gap-hm-xxl rounded-xl border border-outline-variant/30 bg-surface-container-low p-hm-lg md:p-hm-xxl lg:flex-row">
+          <div className="w-full space-y-hm-xl gap-12 lg:w-1/2">
             <span className="font-dm-sans text-label-md font-bold uppercase tracking-widest text-primary">
               Practitioner Focus
             </span>
-            <h2 className="font-dm-sans text-display-responsive text-on-surface">
+            <h2 className="font-dm-sans text-display-lg text-on-surface">
               Control your practice, not just your calendar.
             </h2>
             <ul className="space-y-hm-md">
@@ -32,10 +32,7 @@ export function ForDoctorsSection() {
                 </li>
               ))}
             </ul>
-            <Link
-              href={authRoutes.login}
-              className={`${marketingButtonContainerLg} w-full sm:w-auto`}
-            >
+            <Link href={authRoutes.login} className={marketingButtonContainerLg}>
               View Doctor Features
             </Link>
           </div>

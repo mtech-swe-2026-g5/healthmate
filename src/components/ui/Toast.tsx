@@ -39,7 +39,7 @@ export function Toast({
     <div
       role="status"
       aria-live="polite"
-      className={`fixed inset-x-4 top-4 z-50 flex items-center gap-3 rounded-lg border px-4 py-3 shadow-sm transition-opacity duration-300 sm:inset-x-auto sm:right-6 sm:top-6 sm:max-w-md ${
+      className={`fixed top-6 right-6 z-50 flex items-center gap-3 rounded-lg border px-5 py-3 shadow-sm transition-opacity duration-300 ${
         visible ? 'opacity-100' : 'opacity-0'
       } ${VARIANT_STYLES[variant]}`}
     >

@@ -15,18 +15,18 @@ import { MarketingContainer } from './MarketingContainer';
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden section-py md:pb-32 md:pt-32">
+    <section className="relative overflow-hidden pb-hm-xxl pt-hm-xxl md:pb-32 md:pt-32">
       <MarketingContainer>
-        <div className="grid grid-cols-1 items-center gap-hm-lg md:gap-hm-xxl lg:grid-cols-2">
-          <div className="space-y-hm-md sm:space-y-hm-lg text-center lg:text-left">
+        <div className="grid grid-cols-1 items-center gap-hm-xxl lg:grid-cols-2">
+          <div className="space-y-hm-lg text-center lg:text-left">
             <span className="inline-block rounded-full bg-secondary-container px-hm-md py-hm-xs font-dm-sans text-label-sm uppercase tracking-wide text-on-secondary-container">
               New: HIPAA-Ready Analytics
             </span>
-            <h1 className="font-dm-sans text-display-responsive text-on-surface">
+            <h1 className="font-dm-sans text-display-lg leading-tight text-on-surface md:text-[56px]">
               Healthcare scheduling,{' '}
               <span className="italic text-primary-container">finally effortless.</span>
             </h1>
-            <p className="mx-auto max-w-2xl font-literata text-body-md sm:text-body-lg text-on-surface-variant lg:mx-0">
+            <p className="mx-auto max-w-2xl font-literata text-body-lg text-on-surface-variant lg:mx-0">
               The intelligent appointment platform that bridges the gap between patient
               expectations and clinical efficiency. Experience warm, human-centric care powered
               by surgical precision.
@@ -45,8 +45,8 @@ export function HeroSection() {
             </div>
           </div>
 
-          <div className="relative w-full max-w-xl mx-auto lg:max-w-none lg:pl-hm-xl">
-            <div className="rounded-xl border border-outline-variant bg-white p-hm-sm shadow-lg transition-transform duration-500 ease-in-out md:rotate-2 md:hover:rotate-0 md:hover:shadow-xl md:p-hm-md">
+          <div className="relative lg:pl-hm-xl">
+            <div className="rotate-2 rounded-xl border border-outline-variant bg-white p-hm-sm shadow-lg transition-transform duration-500 ease-in-out hover:rotate-0 hover:shadow-xl md:p-hm-md">
               <Image
                 src={HERO_DASHBOARD_IMAGE}
                 alt="HealthMate dashboard showing a calendar view with patient appointment cards"
