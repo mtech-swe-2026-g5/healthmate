@@ -86,10 +86,11 @@ Edit `.env` and set at least:
 |----------|---------|
 | `DATABASE_URL` | PostgreSQL connection string (required for Prisma CLI and the app) |
 | `NEXT_PUBLIC_APP_URL` | Public app URL (default: `http://localhost:3000`) |
+| `AUTH_SECRET` | Auth.js session/JWT signing secret — generate with `openssl rand -base64 32` |
+| `AUTH_URL` | Auth.js base URL (default: `http://localhost:3000`) |
 
-Optional (for auth and reminders, when implemented):
+Optional (for reminders, when implemented):
 
-- `AUTH_SECRET`, `AUTH_URL` — Auth.js session signing
 - SMTP / SMS variables — reminder delivery
 
 See `.env.sample` for the full template and comments.
@@ -213,19 +214,35 @@ src/
 - **Environment templates**: `.env.sample` (and local `.env`, gitignored) with `DATABASE_URL` and auth placeholders
 - **Prisma 7 scaffolding**: empty schema, `prisma.config.ts`, `src/lib/prisma.ts`, `prisma/migrations/`, and `db:*` scripts
 - **AI agent rules** in `.ai-agent-rules/` (architecture, database, auth, testing, DevOps)
-- **Authentication** documented (credentials-first; OAuth deferred); implementation pending
+- **Authentication** — Auth.js (NextAuth v5) credentials login/logout with role-based session:
+  - **JWT session strategy** (no Prisma adapter): the current schema uses a custom
+    `User`/`Role` model that the adapter's expected `Session`/`Account` tables do not
+    match, so sessions are stateless JWTs in HTTP-only cookies. The `RefreshToken`
+    table is not used — Auth.js manages token lifetime itself.
+  - One rolling JWT replaces a separate access/refresh token pair (no refresh
+    endpoint or `refresh_tokens` table). **Remember me** maps the story's
+    lifetimes onto it: checked → 7 days, unchecked → 30 minutes (env-tunable via
+    `AUTH_SESSION_MAX_AGE_SECONDS` / `AUTH_SESSION_MAX_AGE_SHORT_SECONDS`).
+  - Inactive accounts (`users.is_active = false`) are rejected at sign-in.
+  - `middleware.ts` guards centrally: pages redirect to `/login`, protected API
+    routes return `401`.
+  - Edge-safe split config (`src/lib/auth.config.ts` for middleware,
+    `src/lib/auth.ts` for the Node runtime with the Credentials provider).
+  - Route protection via `src/middleware.ts`; protected pages re-check `auth()`.
+  - Patient login is the active flow; the doctor role toggle is wired through and
+    enforced (role-specific dashboards come later).
 
 ### In progress / next up
 
-- Add domain models to `prisma/schema.prisma` and run the initial migration against a real database
-- Implement Auth.js with credentials provider and role-based access
+- Add remaining domain models to `prisma/schema.prisma`
+- Doctor dashboard and role-specific landing pages
 - Feature modules: appointments, doctors, patients, reminders, analytics
 
 ### Not yet implemented
 
-- User sign-in and session handling
 - Appointment booking, dashboards, and REST/API routes
 - SMS/email reminders and analytics
+- Forgot-password and OAuth (deferred per auth rules)
 
 For more detail, see [`.ai-agent-rules/architecture-rules/tech-stack.md`](.ai-agent-rules/architecture-rules/tech-stack.md) and [`.ai-agent-rules/authentication-security-rules/auth-security.md`](.ai-agent-rules/authentication-security-rules/auth-security.md).
 
