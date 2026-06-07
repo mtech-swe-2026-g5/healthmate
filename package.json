@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "postbuild": "if [ \"$VERCEL\" = '1' ]; then prisma migrate deploy; fi",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
