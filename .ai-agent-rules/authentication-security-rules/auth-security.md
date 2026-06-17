@@ -6,6 +6,47 @@
 
 **Deferred (not initial release):** OAuth providers (Google, GitHub, etc.). OAuth adds provider apps, redirect URIs, and extra failure modes; password auth is simpler to design, test, and ship when time to market matters.
 
+## Implemented decisions (v1) — read before changing auth
+
+The reference snippets further down show *both* a database-session/PrismaAdapter
+setup and a JWT setup. The shipped implementation made these concrete choices;
+keep them consistent:
+
+- **JWT session strategy, no PrismaAdapter.** The schema's custom `User`/`Role`
+  models (`roleId` Int, `passwordHash` non-null, lowercase role names) do not
+  match the adapter's expected `User`/`Session`/`Account` shapes, so sessions are
+  stateless JWTs in HTTP-only cookies. The `RefreshToken` (and `Session`) tables
+  are **not** used — Auth.js manages token lifetime. Adding the adapter later
+  would require adapter-shaped tables.
+- **Roles are lowercase strings from the `roles` table** (`patient`, `doctor`,
+  `admin`) — not a Prisma enum. Session/JWT carry `user.id`, `user.role` (name),
+  and `user.roleId` (the `role_id` the story asks for); see
+  `src/types/next-auth.d.ts`.
+- **Split config for edge compatibility:** `src/lib/auth.config.ts` (edge-safe:
+  session, pages, `authorized`/`jwt`/`session` callbacks, no Node deps) is used by
+  `src/middleware.ts`; `src/lib/auth.ts` spreads it and adds the Credentials
+  provider (bcrypt + Prisma, Node runtime) plus a custom `jwt.encode`.
+- **Credentials verification** lives in `src/features/auth/services/login.ts`
+  (`verifyUserCredentials`), returning `null` for every failure (unknown email,
+  inactive account, wrong password, role mismatch) so sign-in shows one generic
+  error.
+- **One rolling JWT replaces the story's access + refresh tokens.** There is no
+  separate refresh token, refresh endpoint, or `refresh_tokens`/`Session` table
+  usage — Auth.js silently re-issues the session JWT on activity. The story's
+  lifetimes are mapped onto that single token via "remember me" (custom
+  `jwt.encode`), with values read from env (`AUTH_SESSION_MAX_AGE_SECONDS`,
+  `AUTH_SESSION_MAX_AGE_SHORT_SECONDS`):
+    - remember me **on** → 7 days (the story's refresh-token horizon)
+    - remember me **off** → 30 minutes (the story's access-token lifetime)
+- **`is_active` is enforced** in `verifyUserCredentials` — inactive users cannot
+  sign in (returns the same generic `null`).
+- **Route protection is centralised in `src/middleware.ts`:** protected pages
+  redirect to `/login`; protected API routes (anything under `/api` except
+  `/api/auth/*`) return `401 { error: 'Unauthorized' }`. There is no `authorized`
+  callback in `auth.config.ts`.
+- **Routes:** sign-in is `/login` (not `/sign-in`); post-login redirect and the
+  protected landing is `/dashboard`. Public pages: `/`, `/login`, `/register`.
+
 ## Must-have vs good-to-have
 
 | Capability | Priority | Initial release |

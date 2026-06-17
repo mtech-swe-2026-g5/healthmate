@@ -88,3 +88,47 @@ export const registrationApiSchema = z.object({
 });
 
 export type RegistrationApiInput = z.infer<typeof registrationApiSchema>;
+
+/**
+ * Roles selectable from the login screen's role toggle. `admin` is not a
+ * self-service login surface, so it is excluded from the client schema.
+ */
+export const LOGIN_ROLES = ['patient', 'doctor'] as const;
+
+/**
+ * Client-side login schema. Password complexity is intentionally NOT
+ * re-validated here — failed sign-ins must return a single generic error so
+ * we never reveal which field was wrong.
+ */
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+  // Always supplied by the form (checkbox + role toggle have defaultValues),
+  // so they are required here to keep the resolver input/output types aligned.
+  rememberMe: z.boolean(),
+  role: z.enum(LOGIN_ROLES),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
+
+/**
+ * Server-side schema for Auth.js `authorize`. Credentials arrive as strings
+ * over the wire, so `rememberMe` is parsed from its string form (avoiding
+ * `z.coerce.boolean`, which treats the string "false" as true).
+ */
+export const credentialsAuthorizeSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+  role: z.enum(['patient', 'doctor', 'admin']).optional(),
+  rememberMe: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((value) => value === true || value === 'true'),
+});
+
+export type CredentialsAuthorizeInput = z.infer<
+  typeof credentialsAuthorizeSchema
+>;
