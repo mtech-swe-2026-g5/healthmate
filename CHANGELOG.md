@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.0.0...v1.0.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* Sprint1/HAS3 - Responsiveness UI fixes ([#18](https://github.com/mtech-swe-2026-g5/healthmate/issues/18)) ([df4136c](https://github.com/mtech-swe-2026-g5/healthmate/commit/df4136c3e4c379a4412c86fb6a1ba908d4e39e5d))
+
 # 1.0.0 (2026-05-26)
 
 
