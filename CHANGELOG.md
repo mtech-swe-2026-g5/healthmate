@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.0.1...v1.1.0) (2026-06-17)
+
+
+### Features
+
+* implemention of login and logout using nextAuth ([#19](https://github.com/mtech-swe-2026-g5/healthmate/issues/19)) ([56192ca](https://github.com/mtech-swe-2026-g5/healthmate/commit/56192cabee688bb06849d16040a452bcc27fec7b))
+
 ## [1.0.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.0.0...v1.0.1) (2026-06-07)
 
 
