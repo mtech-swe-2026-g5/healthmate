@@ -19,7 +19,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/healthmate?sslmode=disable
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/build-checks
   merge:
     name: Auto Merge
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]'}}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: gh pr merge --squash ${{ github.event.pull_request.number }}
         env:
           GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"

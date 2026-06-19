@@ -14,5 +14,5 @@ jobs:
       # Used by prisma.config.ts, prisma generate, and build (no live DB required).
       DATABASE_URL: postgresql://ci:ci@localhost:5432/healthmate?sslmode=disable
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/build-checks

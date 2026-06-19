@@ -21,7 +21,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: ./.github/actions/build-checks
@@ -34,7 +34,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout with full history
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: '0'
           persist-credentials: false
@@ -59,7 +59,7 @@ jobs:
       new_release_version: ${{ steps.semantic_release.outputs.new_release_version }}
     steps:
       - name: Checkout with full history
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: '0'
           persist-credentials: false
@@ -80,7 +80,7 @@ jobs:
     if: ${{ needs.semantic-release.outputs.new_release_published == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - uses: ./.github/actions/deploy
         id: deploy
         with:
