@@ -1,4 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next/image', () => ({
@@ -61,6 +62,22 @@ describe('LandingPage', () => {
     expect(screen.getByText(/HIPAA COMPLIANT/i)).toBeDefined();
     expect(screen.getByText(/© 2026 HealthMate/i)).toBeDefined();
     expect(screen.getByText(/Trusted by 200\+ clinics nationwide/i)).toBeDefined();
+  });
+
+  it('opens and closes the mobile navigation menu', async () => {
+    const user = userEvent.setup();
+    render(<LandingPage />);
+
+    await user.click(screen.getByRole('button', { name: /open menu/i }));
+
+    const mobileMenu = document.getElementById('mobile-nav-menu');
+    expect(mobileMenu).toBeDefined();
+    expect(screen.getByRole('button', { name: /^close menu$/i })).toBeDefined();
+
+    await user.click(
+      screen.getByRole('button', { name: /dismiss navigation menu/i }),
+    );
+    expect(document.getElementById('mobile-nav-menu')).toBeNull();
   });
 
   it('shows sign-in actions when logged out', () => {
