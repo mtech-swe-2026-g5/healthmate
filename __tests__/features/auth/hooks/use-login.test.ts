@@ -18,7 +18,6 @@ vi.mock('next-auth/react', () => ({
 const VALID_DATA = {
   email: 'jane@example.com',
   password: 'Secure1!pass',
-  role: 'patient' as const,
   rememberMe: true,
 };
 
@@ -39,7 +38,6 @@ describe('useLogin', () => {
     expect(mockSignIn).toHaveBeenCalledWith('credentials', {
       email: 'jane@example.com',
       password: 'Secure1!pass',
-      role: 'patient',
       rememberMe: 'true',
       redirect: false,
     });

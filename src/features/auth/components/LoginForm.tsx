@@ -9,7 +9,7 @@ import { MdVisibility, MdVisibilityOff, MdWarning } from 'react-icons/md';
 import { BrandMark } from '@/components/ui/BrandMark';
 import { Toast } from '@/components/ui/Toast';
 
-import { loginSchema, LOGIN_ROLES } from '../types';
+import { loginSchema } from '../types';
 import type { LoginInput } from '../types';
 import { useLogin } from '../hooks';
 
@@ -22,11 +22,6 @@ const INPUT_FOCUS =
 const INPUT_NORMAL = `${INPUT_BASE} border-[var(--color-outline-variant)] ${INPUT_FOCUS}`;
 const INPUT_ERROR = `${INPUT_BASE} border-[var(--color-error)] focus:ring-[var(--color-error)]/20 focus:border-[var(--color-error)]`;
 
-const ROLE_LABELS: Record<(typeof LOGIN_ROLES)[number], string> = {
-  patient: 'Patient',
-  doctor: 'Doctor',
-};
-
 function inputClass(hasError: boolean) {
   return hasError ? INPUT_ERROR : INPUT_NORMAL;
 }
@@ -35,23 +30,14 @@ export function LoginForm() {
   const { toast, setToast, submitLogin } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
 
-  const [selectedRole, setSelectedRole] =
-    useState<(typeof LOGIN_ROLES)[number]>('patient');
-
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { role: 'patient', rememberMe: false },
+    defaultValues: { rememberMe: false },
   });
-
-  const handleRoleChange = (role: (typeof LOGIN_ROLES)[number]) => {
-    setSelectedRole(role);
-    setValue('role', role, { shouldValidate: true });
-  };
 
   const onSubmit = async (data: LoginInput) => {
     await submitLogin(data);
@@ -76,33 +62,6 @@ export function LoginForm() {
         <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
           Access your healthcare dashboard securely.
         </p>
-      </div>
-
-      {/* Role toggle */}
-      <div
-        role="radiogroup"
-        aria-label="Account type"
-        className="inline-flex p-1 bg-[var(--color-surface-container)] rounded-full mb-[var(--spacing-hm-xl)] w-fit"
-      >
-        {LOGIN_ROLES.map((role) => {
-          const isActive = selectedRole === role;
-          return (
-            <button
-              key={role}
-              type="button"
-              role="radio"
-              aria-checked={isActive}
-              onClick={() => handleRoleChange(role)}
-              className={`px-[var(--spacing-hm-xl)] py-2 rounded-full font-dm-sans text-label-md transition-all duration-200 ${
-                isActive
-                  ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                  : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]'
-              }`}
-            >
-              {ROLE_LABELS[role]}
-            </button>
-          );
-        })}
       </div>
 
       {/* Login form */}

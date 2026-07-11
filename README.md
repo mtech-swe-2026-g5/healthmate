@@ -229,8 +229,11 @@ src/
   - Edge-safe split config (`src/lib/auth.config.ts` for middleware,
     `src/lib/auth.ts` for the Node runtime with the Credentials provider).
   - Route protection via `src/middleware.ts`; protected pages re-check `auth()`.
-  - Patient login is the active flow; the doctor role toggle is wired through and
-    enforced (role-specific dashboards come later).
+  - A single login form serves everyone; the user's role is derived from their
+    account after authentication (no patient/doctor selector). Role-specific
+    dashboards come later.
+  - Navbar and landing CTAs are session-aware: signed-in users see a **Dashboard**
+    link + **Log out** (the same `MarketingNav` is reused on the dashboard).
 
 ### In progress / next up
 

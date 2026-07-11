@@ -1,1 +1,1 @@
-export { LandingPage } from './components';
+export { LandingPage, MarketingNav } from './components';

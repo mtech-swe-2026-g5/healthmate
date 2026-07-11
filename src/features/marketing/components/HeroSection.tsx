@@ -13,7 +13,11 @@ import { HERO_DASHBOARD_IMAGE } from '@/features/marketing/constants/landing-con
 
 import { MarketingContainer } from './MarketingContainer';
 
-export function HeroSection() {
+type HeroSectionProps = {
+  isLoggedIn?: boolean;
+};
+
+export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden pb-hm-xxl pt-hm-xxl md:pb-32 md:pt-32">
       <MarketingContainer>
@@ -33,10 +37,10 @@ export function HeroSection() {
             </p>
             <div className="flex flex-col items-center justify-center gap-hm-md sm:flex-row lg:justify-start">
               <Link
-                href={authRoutes.register}
+                href={isLoggedIn ? '/dashboard' : authRoutes.register}
                 className={`${marketingButtonPrimary} w-full sm:w-auto`}
               >
-                Book an Appointment
+                {isLoggedIn ? 'Go to Dashboard' : 'Book an Appointment'}
               </Link>
               <Link href="#for-doctors" className={marketingTextLink}>
                 For Doctors

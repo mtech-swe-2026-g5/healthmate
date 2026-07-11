@@ -33,28 +33,11 @@ describe('LoginForm', () => {
     expect(screen.getByRole('checkbox', { name: /remember me/i })).toBeDefined();
   });
 
-  it('renders the Patient/Doctor role toggle with Patient selected by default', () => {
+  it('does not render a doctor/patient role selector', () => {
     render(<LoginForm />);
 
-    const patient = screen.getByRole('radio', { name: /patient/i });
-    const doctor = screen.getByRole('radio', { name: /doctor/i });
-
-    expect(patient.getAttribute('aria-checked')).toBe('true');
-    expect(doctor.getAttribute('aria-checked')).toBe('false');
-  });
-
-  it('switches the active role when Doctor is clicked', async () => {
-    const user = userEvent.setup();
-    render(<LoginForm />);
-
-    await user.click(screen.getByRole('radio', { name: /doctor/i }));
-
-    expect(
-      screen.getByRole('radio', { name: /doctor/i }).getAttribute('aria-checked'),
-    ).toBe('true');
-    expect(
-      screen.getByRole('radio', { name: /patient/i }).getAttribute('aria-checked'),
-    ).toBe('false');
+    expect(screen.queryByRole('radio', { name: /patient/i })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /doctor/i })).toBeNull();
   });
 
   it('renders the submit button and sign-up link', () => {
@@ -90,14 +73,13 @@ describe('LoginForm', () => {
     expect(mockSubmitLogin).not.toHaveBeenCalled();
   });
 
-  it('submits valid credentials with the selected role and remember me', async () => {
+  it('submits valid credentials with remember me', async () => {
     const user = userEvent.setup();
     render(<LoginForm />);
 
     await user.type(screen.getByLabelText(/email address/i), 'jane@example.com');
     await user.type(document.getElementById('password') as HTMLInputElement, 'Secret1!');
     await user.click(screen.getByRole('checkbox', { name: /remember me/i }));
-    await user.click(screen.getByRole('radio', { name: /doctor/i }));
     await user.click(screen.getByRole('button', { name: /log in/i }));
 
     expect(mockSubmitLogin).toHaveBeenCalledTimes(1);
@@ -105,7 +87,6 @@ describe('LoginForm', () => {
       expect.objectContaining({
         email: 'jane@example.com',
         password: 'Secret1!',
-        role: 'doctor',
         rememberMe: true,
       }),
     );

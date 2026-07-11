@@ -18,6 +18,15 @@ export const SESSION_MAX_AGE_SHORT =
   Number(process.env.AUTH_SESSION_MAX_AGE_SHORT_SECONDS) || THIRTY_MINUTES;
 
 /**
+ * Session lifetime for a login, driven by the "remember me" choice:
+ * opted in (or unset) → long horizon; opted out → short. Used by the custom
+ * `jwt.encode` in `auth.ts` to set each token's `maxAge`.
+ */
+export function resolveSessionMaxAge(rememberMe: boolean | undefined): number {
+  return rememberMe === false ? SESSION_MAX_AGE_SHORT : SESSION_MAX_AGE;
+}
+
+/**
  * Edge-safe Auth.js configuration shared by the middleware and the full
  * Node runtime instance. It must not import anything that depends on Node
  * APIs (bcrypt, Prisma), so the Credentials provider lives in `auth.ts`.

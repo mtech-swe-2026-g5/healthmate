@@ -1,4 +1,4 @@
-export { RegistrationForm, LoginForm } from './components';
+export { RegistrationForm, LoginForm, LogoutButton } from './components';
 export { registerPatient, verifyUserCredentials, requireRole } from './services';
 export type { AuthenticatedUser } from './services';
 export { useRegistration, useLogin } from './hooks';
@@ -7,7 +7,6 @@ export {
   registrationApiSchema,
   loginSchema,
   credentialsAuthorizeSchema,
-  LOGIN_ROLES,
 } from './types';
 export type {
   RegistrationInput,
