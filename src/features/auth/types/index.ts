@@ -3,7 +3,6 @@ export {
   registrationApiSchema,
   loginSchema,
   credentialsAuthorizeSchema,
-  LOGIN_ROLES,
 } from './schemas';
 
 export type {

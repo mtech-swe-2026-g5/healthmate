@@ -3,17 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { loginSchema, credentialsAuthorizeSchema } from '@/features/auth/types/schemas';
 
 describe('loginSchema', () => {
-  it('accepts valid credentials with role and rememberMe', () => {
+  it('accepts valid credentials with rememberMe', () => {
     const result = loginSchema.safeParse({
       email: 'jane@example.com',
       password: 'anything',
-      role: 'patient',
       rememberMe: false,
     });
 
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.role).toBe('patient');
       expect(result.data.rememberMe).toBe(false);
     }
   });
@@ -32,15 +30,7 @@ describe('loginSchema', () => {
     const result = loginSchema.safeParse({
       email: 'jane@example.com',
       password: '',
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects an unknown role', () => {
-    const result = loginSchema.safeParse({
-      email: 'jane@example.com',
-      password: 'x',
-      role: 'admin',
+      rememberMe: false,
     });
     expect(result.success).toBe(false);
   });
@@ -51,7 +41,6 @@ describe('credentialsAuthorizeSchema', () => {
     const result = credentialsAuthorizeSchema.safeParse({
       email: 'jane@example.com',
       password: 'x',
-      role: 'patient',
       rememberMe: 'true',
     });
 

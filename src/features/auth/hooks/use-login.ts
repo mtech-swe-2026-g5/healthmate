@@ -27,7 +27,6 @@ export function useLogin() {
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        role: data.role,
         rememberMe: String(data.rememberMe),
         redirect: false,
       });
