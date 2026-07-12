@@ -8,7 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const connectionString =
     process.env.DATABASE_URL ??
-    'postgresql://localhost:5432/healthmate?sslmode=disable';
+    'postgresql://postgres@localhost:5432/healthmate?sslmode=disable';
 
   const adapter = new PrismaPg({
     connectionString,

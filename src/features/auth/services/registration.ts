@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { registrationApiSchema } from '../types';
 import type { RegistrationApiInput } from '../types';
 
-const BCRYPT_SALT_ROUNDS = 10;
+export const BCRYPT_SALT_ROUNDS = 10;
 
 export async function registerPatient(data: RegistrationApiInput) {
   const validated = registrationApiSchema.parse(data);
