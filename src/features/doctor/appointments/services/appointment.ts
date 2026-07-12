@@ -19,15 +19,12 @@ export async function getAppointmentsByDoctor(request: GetWeeklyAppointmentsRequ
 }
 
 async function getAppointmentsFor(validatedRequest: GetWeeklyAppointmentsRequest): Promise<AppointmentEntity[]> {
-    const startDate = moment().year(validatedRequest.year).week(validatedRequest.week).startOf('week').toDate();
-    const endDate = moment().year(validatedRequest.year).week(validatedRequest.week).endOf('week').toDate();
-
     return prisma.appointment.findMany({
         where: {
             doctorId: validatedRequest.doctorId,
             startTime: {
-                gte: startDate,
-                lt: endDate,
+                gte: validatedRequest.startDate,
+                lt: validatedRequest.endDate,
             },
         },
         include: {
@@ -64,7 +61,7 @@ function mapToResponse(appointments: AppointmentEntity[]) {
 }
 
 function toHateosResponse(validatedRequest: GetWeeklyAppointmentsRequest, mappedAppointments: Appointment[]): AppointmentsResponse {
-    const currentWeek = moment().year(validatedRequest.year).week(validatedRequest.week);
+    const currentWeek = moment(validatedRequest.startDate);
     const prevWeek = currentWeek.clone().subtract(1, 'week');
     const nextWeek = currentWeek.clone().add(1, 'week');
 
@@ -73,9 +70,9 @@ function toHateosResponse(validatedRequest: GetWeeklyAppointmentsRequest, mapped
     return {
         _metadata: {
             links: {
-                self: `${baseUrl}?year=${validatedRequest.year}&week=${validatedRequest.week}`,
-                prevWeek: `${baseUrl}?year=${prevWeek.year()}&week=${prevWeek.week()}`,
-                nextWeek: `${baseUrl}?year=${nextWeek.year()}&week=${nextWeek.week()}`,
+                self: `${baseUrl}?startDate=${validatedRequest.startDate.toISOString()}&endDate=${validatedRequest.endDate.toISOString()}`,
+                prevWeek: `${baseUrl}?startDate=${prevWeek.startOf('week').toISOString()}&endDate=${prevWeek.endOf('week').toISOString()}`,
+                nextWeek: `${baseUrl}?startDate=${nextWeek.startOf('week').toISOString()}&endDate=${nextWeek.endOf('week').toISOString()}`,
             },
         },
         appointments: mappedAppointments,

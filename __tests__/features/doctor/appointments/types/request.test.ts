@@ -1,210 +1,73 @@
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+
 import {getWeeklyAppointmentsSchema} from '@/features/doctor/appointments/types/request';
 
 describe('getWeeklyAppointmentsSchema', () => {
     const validDoctorId = '550e8400-e29b-41d4-a716-446655440000';
+    const validStartDate = new Date('2026-07-01T00:00:00.000Z');
+    const validEndDate = new Date('2026-07-31T23:59:59.999Z');
 
-    describe('Valid Inputs', () => {
-        it('should validate correct weekly appointment request', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(true);
+    it('validates a correct date range request', () => {
+        const result = getWeeklyAppointmentsSchema.safeParse({
+            doctorId: validDoctorId,
+            startDate: validStartDate,
+            endDate: validEndDate,
         });
 
-        it('should validate week 1 of year', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 1,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(true);
-        });
-
-        it('should validate week 52 of year', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 52,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(true);
-        });
-
-        it('should validate year 2000', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2000,
-                week: 10,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(true);
-        });
+        expect(result.success).toBe(true);
     });
 
-    describe('Invalid Doctor ID', () => {
-        it('should reject invalid UUID format', () => {
-            const data = {
-                doctorId: 'not-a-uuid',
-                year: 2026,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
+    it('rejects an invalid doctor id', () => {
+        const result = getWeeklyAppointmentsSchema.safeParse({
+            doctorId: 'not-a-uuid',
+            startDate: validStartDate,
+            endDate: validEndDate,
         });
 
-        it('should reject missing doctorId', () => {
-            const data = {
-                year: 2026,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.issues.some((issue) => issue.path.includes('doctorId'))).toBe(true);
+        }
     });
 
-    describe('Invalid Year', () => {
-        it('should reject year before 2000', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 1999,
-                week: 23,
-            };
+    it('rejects invalid date formats', () => {
+        const result = getWeeklyAppointmentsSchema.safeParse({
+            doctorId: validDoctorId,
+            startDate: '2026-07-01',
+            endDate: '2026-07-31',
+        } as never);
 
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
-
-        it('should reject non-integer year', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026.5,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
-
-        it('should reject missing year', () => {
-            const data = {
-                doctorId: validDoctorId,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.issues.some((issue) => issue.path.includes('startDate'))).toBe(true);
+            expect(result.error.issues.some((issue) => issue.path.includes('endDate'))).toBe(true);
+        }
     });
 
-    describe('Invalid Week', () => {
-        it('should reject week 0', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 0,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
+    it('rejects a range where startDate is after endDate', () => {
+        const result = getWeeklyAppointmentsSchema.safeParse({
+            doctorId: validDoctorId,
+            startDate: validEndDate,
+            endDate: validStartDate,
         });
 
-        it('should reject week 54', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 54,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
-
-        it('should reject non-integer week', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 23.5,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
-
-        it('should reject negative week', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: -5,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
-
-        it('should reject missing week', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.issues.some((issue) => issue.path.includes('startDate'))).toBe(true);
+            expect(result.error.issues.some((issue) => issue.message.includes('Start date must be before or equal to end date'))).toBe(true);
+        }
     });
 
-    describe('Error Details', () => {
-        it('should have correct error for invalid week', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 2026,
-                week: 54,
-            };
+    it('rejects a missing endDate', () => {
+        const result = getWeeklyAppointmentsSchema.safeParse({
+            doctorId: validDoctorId,
+            startDate: validStartDate,
+        } as never);
 
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues.some(issue => issue.path.includes('week'))).toBe(true);
-            }
-        });
-
-        it('should have correct error for invalid year', () => {
-            const data = {
-                doctorId: validDoctorId,
-                year: 1999,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues.some(issue => issue.path.includes('year'))).toBe(true);
-            }
-        });
-
-        it('should have correct error for invalid doctorId', () => {
-            const data = {
-                doctorId: 'invalid',
-                year: 2026,
-                week: 23,
-            };
-
-            const result = getWeeklyAppointmentsSchema.safeParse(data);
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues.some(issue => issue.path.includes('doctorId'))).toBe(true);
-            }
-        });
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.issues.some((issue) => issue.path.includes('endDate'))).toBe(true);
+        }
     });
 });
 

@@ -1,17 +1,19 @@
-import {describe, expect, it, vi, beforeEach, afterEach} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {getAppointmentsByDoctor} from '@/features/doctor/appointments/services/appointment';
 import {GetWeeklyAppointmentsRequest} from '@/features/doctor/appointments/types/request';
-import moment from 'moment';
 import {
-    mockPatient1,
-    mockDoctor1,
     mockAppointment1,
-    mockPatient2,
+    mockAppointment2,
+    mockDoctor1,
     mockDoctor2,
-    mockAppointment2
+    mockPatient1,
+    mockPatient2
 } from "@test/features/doctor/appointments/services/appointment.mock";
 import {Prisma} from "@prisma/client";
 import {DefaultArgs} from "@prisma/client/runtime/client";
+import {prisma} from "@/lib/prisma";
+import {faker} from "@faker-js/faker/locale/en";
+import moment from "moment";
 
 const errorDoctor = faker.string.uuid();
 
@@ -39,15 +41,12 @@ vi.mock('@/lib/prisma', () => {
     };
 });
 
-import {prisma} from "@/lib/prisma";
-import {faker} from "@faker-js/faker/locale/en";
-
 
 describe('getAppointmentsByDoctor', () => {
     const validRequest: GetWeeklyAppointmentsRequest = {
         doctorId: mockDoctor1.userId,
-        year: 2026,
-        week: 23,
+        startDate: new Date('2026-06-01T00:00:00.000Z'),
+        endDate: new Date('2026-06-30T23:59:59.999Z'),
     };
 
     beforeEach(() => {
@@ -63,8 +62,8 @@ describe('getAppointmentsByDoctor', () => {
         it('should return empty appointments array when there are no appointments', async () => {
             const nonExistingRequest: GetWeeklyAppointmentsRequest = {
                 doctorId: faker.string.uuid(),
-                year: 2026,
-                week: 23,
+                startDate: new Date('2026-06-01T00:00:00.000Z'),
+                endDate: new Date('2026-06-30T23:59:59.999Z'),
             };
             const result = await getAppointmentsByDoctor(nonExistingRequest);
             expect(result?.appointments).toHaveLength(0);
@@ -72,16 +71,14 @@ describe('getAppointmentsByDoctor', () => {
 
         it('should filter appointments by request', async () => {
             await getAppointmentsByDoctor(validRequest);
-            const startDate = moment().year(validRequest.year).week(validRequest.week).startOf('week').toDate();
-            const endDate = moment().year(validRequest.year).week(validRequest.week).endOf('week').toDate();
             expect(prisma.appointment.findMany)
                 .toHaveBeenCalledWith(
                     {
                         where: {
                             doctorId: validRequest.doctorId,
                             startTime: {
-                                gte: startDate,
-                                lt: endDate,
+                                gte: validRequest.startDate,
+                                lt: validRequest.endDate,
                             },
                         },
                         include: {
@@ -139,51 +136,54 @@ describe('getAppointmentsByDoctor', () => {
             const result = await getAppointmentsByDoctor(validRequest);
             expect(result?._metadata.links.self).toBeDefined();
             expect(result?._metadata.links.self).toContain('/api/doctor/appointments');
-            expect(result?._metadata.links.self).toContain('week=23');
-            expect(result?._metadata.links.self).toContain('year=2026');
+            expect(result?._metadata.links.self).toContain(`startDate=${validRequest.startDate.toISOString()}`);
+            expect(result?._metadata.links.self).toContain(`endDate=${validRequest.endDate.toISOString()}`);
         });
 
         it('should include previous week link in metadata', async () => {
             const result = await getAppointmentsByDoctor(validRequest);
             expect(result?._metadata.links.prevWeek).toBeDefined();
             expect(result?._metadata.links.prevWeek).toContain('/api/doctor/appointments');
-            expect(result?._metadata.links.prevWeek).toContain('week=22');
-            expect(result?._metadata.links.prevWeek).toContain('year=2026');
+            expect(result?._metadata.links.prevWeek).toContain('startDate=');
+            expect(result?._metadata.links.prevWeek).toContain('endDate=');
         });
 
         it('should include next week link in metadata', async () => {
             const result = await getAppointmentsByDoctor(validRequest);
             expect(result?._metadata.links.nextWeek).toBeDefined();
             expect(result?._metadata.links.nextWeek).toContain('/api/doctor/appointments');
-            expect(result?._metadata.links.nextWeek).toContain('week=24');
-            expect(result?._metadata.links.nextWeek).toContain('year=2026');
+            expect(result?._metadata.links.nextWeek).toContain('startDate=');
+            expect(result?._metadata.links.nextWeek).toContain('endDate=');
         });
 
-        it('should handle year rollover for previous week when on week 1', async () => {
+        it('should handle previous week rollover in metadata', async () => {
 
             const requestWeek1 = {
                 doctorId: mockDoctor1.userId,
-                year: 2026,
-                week: 1,
+                startDate: new Date('2026-01-01T00:00:00.000Z'),
+                endDate: new Date('2026-01-07T23:59:59.999Z'),
             };
 
             await getAppointmentsByDoctor(requestWeek1);
             const result = await getAppointmentsByDoctor(requestWeek1);
-            expect(result?._metadata.links.prevWeek).toContain('year=2025');
-            expect(result?._metadata.links.prevWeek).toContain('week=52');
+            expect(result?._metadata.links.prevWeek).toContain('/api/doctor/appointments');
+            expect(result?._metadata.links.prevWeek).toContain('startDate=');
+            expect(result?._metadata.links.prevWeek).toContain('endDate=');
         });
 
-        it('should handle year rollover for next week when on last week of year', async () => {
+        it('should handle next week rollover in metadata', async () => {
 
             const requestWeek53 = {
                 doctorId: mockDoctor1.userId,
-                year: 2025,
-                week: 52,
+                startDate: new Date('2025-12-24T00:00:00.000Z'),
+                endDate: new Date('2025-12-31T23:59:59.999Z'),
             };
 
             const result = await getAppointmentsByDoctor(requestWeek53);
 
-            expect(result?._metadata.links.nextWeek).toContain('year=2026');
+            expect(result?._metadata.links.nextWeek).toContain('/api/doctor/appointments');
+            expect(result?._metadata.links.nextWeek).toContain('startDate=');
+            expect(result?._metadata.links.nextWeek).toContain('endDate=');
         });
     });
 
@@ -192,8 +192,8 @@ describe('getAppointmentsByDoctor', () => {
         it('should throw error when database query fails', async () => {
             const errorRequest = {
                 doctorId: errorDoctor,
-                year: 2025,
-                week: 52,
+                startDate: new Date('2026-06-01T00:00:00.000Z'),
+                endDate: new Date('2026-06-30T23:59:59.999Z'),
             };
             await expect(getAppointmentsByDoctor(errorRequest)).rejects.toThrow(
                 'Database connection failed'
@@ -204,19 +204,19 @@ describe('getAppointmentsByDoctor', () => {
             const {ZodError} = await import('zod');
             const invalidRequest = {
                 doctorId: 'not-a-uuid',
-                year: 2026,
-                week: 23,
+                startDate: new Date('2026-06-01T00:00:00.000Z'),
+                endDate: new Date('2026-06-30T23:59:59.999Z'),
             };
 
             await expect(getAppointmentsByDoctor(invalidRequest)).rejects.toThrow(ZodError);
         });
 
-        it('should throw ZodError when week is out of range', async () => {
+        it('should throw ZodError when endDate is invalid', async () => {
             const {ZodError} = await import('zod');
             const invalidRequest = {
                 doctorId: mockDoctor1.userId,
-                year: 2026,
-                week: 54,
+                startDate: new Date('2026-06-30T23:59:59.999Z'),
+                endDate: new Date('2026-06-01T00:00:00.000Z'),
             };
 
             await expect(getAppointmentsByDoctor(invalidRequest)).rejects.toThrow(ZodError);
@@ -235,8 +235,8 @@ describe('getAppointmentsByDoctor', () => {
 
             const request = {
                 doctorId: mockDoctor2.userId,
-                year: 2026,
-                week: 23,
+                startDate: new Date('2026-06-01T00:00:00.000Z'),
+                endDate: new Date('2026-06-30T23:59:59.999Z'),
             };
             const result = await getAppointmentsByDoctor(request);
             expect(result?.appointments).toHaveLength(1);
