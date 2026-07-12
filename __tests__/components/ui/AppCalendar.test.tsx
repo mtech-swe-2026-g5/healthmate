@@ -68,14 +68,14 @@ describe('AppCalendar', () => {
         ];
 
         const {container} = render(
-            <AppCalendar className="calendar-shell" events={events} allowEventCreation={false}/>,
+            <AppCalendar isLoading className="calendar-shell" events={events} allowEventCreation={false}/>,
         );
 
         const calendar = container.querySelector('[data-testid="app-calendar"]');
 
         expect(calendar).not.toBeNull();
         expect(calendar?.parentElement).toBe(container.firstElementChild);
-        expect((calendar?.parentElement as HTMLElement | null)?.className).toBe('calendar-shell');
+        expect((calendar?.parentElement as HTMLElement | null)?.className).toBe('calendar-shell loading');
         const calendarProps = getCalendarProps();
 
         expect(calendarProps.events).toEqual(events);
@@ -83,11 +83,9 @@ describe('AppCalendar', () => {
         expect(calendarProps.onSelectSlot).toBeUndefined();
     });
 
-    it('adds a new event when a free slot is selected', async () => {
-        render(<AppCalendar allowEventCreation onSchedule={(start, end) => ({
-            id: 'custom-id',
-            title: `Visit ${start.toISOString()} ${end.toISOString()}`
-        })}/>);
+    it('should call back the onSchedule function when an event is scheduled', async () => {
+        const onSchedule = vi.fn();
+        render(<AppCalendar isLoading allowEventCreation onSchedule={onSchedule}/>);
 
         const slot = {
             start: new Date('2026-07-12T11:00:00.000Z'),
@@ -99,72 +97,43 @@ describe('AppCalendar', () => {
         });
 
         await waitFor(() => {
-            expect(getCalendarProps().events).toHaveLength(1);
+            expect(onSchedule).toHaveBeenCalledWith(slot.start, slot.end);
         });
-
-        expect(getCalendarProps().events?.[0]).toMatchObject({
-            id: 'custom-id',
-            title: expect.stringContaining('Visit'),
-            start: slot.start,
-            end: slot.end,
-        });
+        onSchedule.mockClear();
+        const {container} = render(
+            <AppCalendar isLoading={false} className="calendar-shell" allowEventCreation={false}/>,
+        );
+        const calendar = container.querySelector('[data-testid="app-calendar"]');
+        expect((calendar?.parentElement as HTMLElement | null)?.className).toBe('calendar-shell ');
+        expect(onSchedule).not.toHaveBeenCalled();
     });
 
-    it('uses the default scheduler when no onSchedule callback is provided', async () => {
-        mockState.prompt.mockReturnValueOnce('');
-        render(<AppCalendar allowEventCreation/>);
-
-        const slot = {
-            start: new Date('2026-07-12T12:00:00.000Z'),
-            end: new Date('2026-07-12T12:45:00.000Z'),
-        };
-
-        act(() => {
-            getCalendarProps().onSelectSlot?.(slot);
-        });
-
-        await waitFor(() => {
-            expect(mockState.prompt).toHaveBeenCalledWith(
-                expect.stringContaining('Provide a name for the event to be scheduled between'),
-                'New Event',
-            );
-        });
-
-        expect(mockState.uuidV4).toHaveBeenCalledTimes(1);
-        expect(getCalendarProps().events).toHaveLength(1);
-        expect(getCalendarProps().events?.[0]).toMatchObject({
-            id: 'generated-event-id',
-            title: 'New Event',
-            start: slot.start,
-            end: slot.end,
-        });
-    });
 
     it.each([
         {
             name: 'normalizes an array range',
             range: [
-                new Date('2026-07-12T09:15:00.000Z'),
-                new Date('2026-07-13T10:30:00.000Z'),
+                new Date('2026-07-12T09:15:00'),
+                new Date('2026-07-13T10:30:00'),
             ] as Date[],
-            expectedStart: '2026-07-12T00:00:00.000Z',
-            expectedEnd: '2026-07-13T23:59:59.999Z',
+            expectedStart: new Date('2026-07-12T00:00:00'),
+            expectedEnd: new Date('2026-07-13T23:59:59'),
         },
         {
             name: 'normalizes a start/end range object',
             range: {
-                start: new Date('2026-07-14T13:45:00.000Z'),
-                end: new Date('2026-07-16T08:20:00.000Z'),
+                start: new Date('2026-07-14T13:45:00'),
+                end: new Date('2026-07-16T08:20:00'),
             },
-            expectedStart: '2026-07-14T00:00:00.000Z',
-            expectedEnd: '2026-07-16T23:59:59.999Z',
+            expectedStart: new Date('2026-07-14T00:00:00'),
+            expectedEnd: new Date('2026-07-16T23:59:59'),
         },
     ])(
         'calls onRangeChange when the calendar range changes and %s',
         ({range, expectedStart, expectedEnd}) => {
             const onRangeChange = vi.fn();
 
-            render(<AppCalendar onRangeChange={onRangeChange}/>);
+            render(<AppCalendar isLoading onRangeChange={onRangeChange}/>);
 
             act(() => {
                 getCalendarProps().onRangeChange?.(range);
@@ -179,7 +148,7 @@ describe('AppCalendar', () => {
     );
 
     it('does nothing when the calendar range changes and no onRangeChange handler is provided', () => {
-        render(<AppCalendar/>);
+        render(<AppCalendar isLoading/>);
 
         expect(() => {
             act(() => {
@@ -207,6 +176,7 @@ describe('AppCalendar', () => {
 
         render(
             <AppCalendar
+                isLoading
                 events={events}
                 allowEventCreation
                 allowOverlap
@@ -226,7 +196,6 @@ describe('AppCalendar', () => {
         });
 
         expect(mockState.alert).not.toHaveBeenCalled();
-        expect(getCalendarProps().events).toHaveLength(2);
     });
 
     it.each([
@@ -237,7 +206,6 @@ describe('AppCalendar', () => {
                 end: new Date('2026-07-12T10:45:00.000Z'),
             },
             shouldAlert: false,
-            expectedEventCount: 2,
             expectedScheduleCalls: 1,
         },
         {
@@ -247,7 +215,6 @@ describe('AppCalendar', () => {
                 end: new Date('2026-07-12T10:30:00.000Z'),
             },
             shouldAlert: true,
-            expectedEventCount: 1,
             expectedScheduleCalls: 0,
         },
         {
@@ -257,12 +224,11 @@ describe('AppCalendar', () => {
                 end: new Date('2026-07-12T09:30:00.000Z'),
             },
             shouldAlert: true,
-            expectedEventCount: 1,
             expectedScheduleCalls: 0,
         },
     ])(
         '$name',
-        ({slot, shouldAlert, expectedEventCount, expectedScheduleCalls}) => {
+        ({slot, shouldAlert, expectedScheduleCalls}) => {
             const events: AppCalendarEvent[] = [
                 {
                     id: 'existing-event',
@@ -275,6 +241,7 @@ describe('AppCalendar', () => {
 
             render(
                 <AppCalendar
+                    isLoading
                     events={events}
                     allowEventCreation
                     allowOverlap={false}
@@ -291,18 +258,7 @@ describe('AppCalendar', () => {
             if (shouldAlert) {
                 expect(mockState.alert).toHaveBeenCalledWith('Cannot schedule overlap events.');
             }
-            expect(getCalendarProps().events).toHaveLength(expectedEventCount);
         },
     );
-
-    it('alerts the event title when an appointment is selected', () => {
-        render(<AppCalendar events={[]}/>);
-
-        act(() => {
-            getCalendarProps().onSelectEvent?.({title: 'Dental checkup'});
-        });
-
-        expect(mockState.alert).toHaveBeenCalledWith('Dental checkup');
-    });
 });
 

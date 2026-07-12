@@ -3,13 +3,13 @@
 import './AppCalendar.css'
 import {Calendar, Event, momentLocalizer, Views} from 'react-big-calendar'
 import moment from 'moment'
-import {v4 as uuidV4} from "uuid";
-import {useCallback, useState} from "react";
+import {useCallback} from "react";
 
 const localizer = momentLocalizer(moment)
 
-type OnScheduleCallback = (startDate: Date, endDate: Date) => OnScheduleCallbackResult;
+type OnScheduleCallback = (startDate: Date, endDate: Date) => void;
 type OnRangeChangeCallback = (startDate: Date, endDate: Date) => void;
+type OnEventSelectCallback = (event: AppCalendarEvent) => void;
 
 export interface OnScheduleCallbackResult {
     id: string;
@@ -22,31 +22,27 @@ export interface AppCalendarEvent extends Event {
 }
 
 export interface AppCalendarProps {
+    isLoading: boolean;
     events?: AppCalendarEvent[];
     allowOverlap?: boolean;
     allowEventCreation?: boolean;
     onSchedule?: OnScheduleCallback;
+    onEventSelect?: OnEventSelectCallback;
     onRangeChange?: OnRangeChangeCallback;
     className?: string;
 }
 
-const defaultOnSchedule: OnScheduleCallback = (startDate: Date, endDate: Date) => {
-    const title = window.prompt(`Provide a name for the event to be scheduled between ${startDate} and ${endDate}`, 'New Event') || 'New Event'
-    return {
-        id: uuidV4(),
-        title: title,
-    }
-};
 
 export default function AppCalendar(props: AppCalendarProps) {
     const onRangeChange = props.onRangeChange
-    const [calendarEvents, setCalendarEvents] = useState<AppCalendarEvent[]>(props.events || []);
+    const onSchedule = props.onSchedule;
+
     const handleOnRangeChange = useCallback((range: Date[] | { start: Date; end: Date }) => {
         if (onRangeChange) {
             if (Array.isArray(range)) {
-                onRangeChange(moment(range[0]).startOf('day').toDate(), moment(range[range.length - 1]).endOf('day').toDate())
+                onRangeChange(moment(range[0]).startOf('day').toDate(), moment(range[range.length - 1]).endOf('day').endOf('hour').endOf('minute').toDate())
             } else {
-                onRangeChange(moment(range.start).startOf('day').toDate(), moment(range.end).endOf('day').toDate());
+                onRangeChange(moment(range.start).startOf('day').toDate(), moment(range.end).endOf('day').endOf('hour').endOf('minute').toDate());
             }
 
         }
@@ -55,40 +51,29 @@ export default function AppCalendar(props: AppCalendarProps) {
     const handleSelectSlot = useCallback(
         ({start, end}: { start: Date; end: Date }) => {
             if (!props.allowOverlap) {
-                const overlapEvents = calendarEvents.filter(event =>
+                const overlapEvents = props.events?.filter(event =>
                     moment(start).isBetween(event.start, event.end) || moment(end).isBetween(event.start, event.end)
                 );
-                if (overlapEvents.length) {
+                if (overlapEvents?.length) {
                     window.alert('Cannot schedule overlap events.');
                     return;
                 }
             }
-            const onScheduleCallback = props.onSchedule || defaultOnSchedule;
-            const callbackResult = onScheduleCallback(start, end);
-            if (callbackResult) {
-                setCalendarEvents((prev: AppCalendarEvent[]) => [...prev, {
-                    id: callbackResult.id,
-                    title: callbackResult.title,
-                    start: start,
-                    end: end
-                }])
+            if (onSchedule) {
+                onSchedule(start, end);
             }
         },
-        [calendarEvents, props.allowOverlap, props.onSchedule]
+        [props.events, props.allowOverlap, onSchedule]
     )
 
-    const handleSelectEvent = useCallback(
-        (event: AppCalendarEvent) => window.alert(event.title),
-        []
-    )
 
-    return <div className={props.className}>
+    return <div className={`${props.className} ${props.isLoading ? 'loading' : ''}`}>
         <Calendar
             localizer={localizer}
             defaultView={Views.WEEK}
             views={[Views.WEEK, Views.DAY]}
-            events={calendarEvents}
-            onSelectEvent={handleSelectEvent}
+            events={props.events}
+            onSelectEvent={props.onEventSelect}
             onSelectSlot={props.allowEventCreation ? handleSelectSlot : undefined}
             selectable={props.allowEventCreation}
             scrollToTime={new Date()}
