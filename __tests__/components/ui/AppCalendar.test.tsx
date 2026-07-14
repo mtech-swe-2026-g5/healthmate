@@ -1,7 +1,7 @@
-import {act, cleanup, render, waitFor} from '@testing-library/react';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import { act, cleanup, render, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type {AppCalendarEvent} from '@/components/ui/AppCalendar';
+import type { AppCalendarEvent } from '@/components/ui/AppCalendar';
 import AppCalendar from '@/components/ui/AppCalendar';
 
 type MockCalendarProps = {
@@ -31,7 +31,7 @@ const getCalendarProps = () => {
 vi.mock('react-big-calendar', () => ({
     Calendar: vi.fn((props: MockCalendarProps) => {
         mockState.calendarProps = props;
-        return <div data-testid="app-calendar"/>;
+        return <div data-testid="app-calendar" />;
     }),
     Views: {
         WEEK: 'WEEK',
@@ -67,8 +67,9 @@ describe('AppCalendar', () => {
             },
         ];
 
-        const {container} = render(
-            <AppCalendar isLoading className="calendar-shell" events={events} allowEventCreation={false}/>,
+
+        const { container } = render(
+            <AppCalendar isLoading className="calendar-shell" events={events} allowEventCreation={false} />,
         );
 
         const calendar = container.querySelector('[data-testid="app-calendar"]');
@@ -85,7 +86,7 @@ describe('AppCalendar', () => {
 
     it('should call back the onSchedule function when an event is scheduled', async () => {
         const onSchedule = vi.fn();
-        render(<AppCalendar isLoading allowEventCreation onSchedule={onSchedule}/>);
+        render(<AppCalendar isLoading allowEventCreation onSchedule={onSchedule} />);
 
         const slot = {
             start: new Date('2026-07-12T11:00:00.000Z'),
@@ -100,14 +101,28 @@ describe('AppCalendar', () => {
             expect(onSchedule).toHaveBeenCalledWith(slot.start, slot.end);
         });
         onSchedule.mockClear();
-        const {container} = render(
-            <AppCalendar isLoading={false} className="calendar-shell" allowEventCreation={false}/>,
+        const { container } = render(
+            <AppCalendar isLoading={false} className="calendar-shell" allowEventCreation={false} />,
         );
         const calendar = container.querySelector('[data-testid="app-calendar"]');
         expect((calendar?.parentElement as HTMLElement | null)?.className).toBe('calendar-shell ');
         expect(onSchedule).not.toHaveBeenCalled();
     });
 
+    it('does not throw when a slot is selected and no onSchedule handler is provided', () => {
+        render(<AppCalendar isLoading allowEventCreation />);
+
+        const slot = {
+            start: new Date('2026-07-12T11:00:00.000Z'),
+            end: new Date('2026-07-12T11:30:00.000Z'),
+        };
+
+        expect(() => {
+            act(() => {
+                getCalendarProps().onSelectSlot?.(slot);
+            });
+        }).not.toThrow();
+    });
 
     it.each([
         {
@@ -117,7 +132,7 @@ describe('AppCalendar', () => {
                 new Date('2026-07-13T10:30:00'),
             ] as Date[],
             expectedStart: new Date('2026-07-12T00:00:00'),
-            expectedEnd: new Date('2026-07-13T23:59:59'),
+            expectedEnd: new Date('2026-07-13T23:59:59.999'),
         },
         {
             name: 'normalizes a start/end range object',
@@ -126,14 +141,14 @@ describe('AppCalendar', () => {
                 end: new Date('2026-07-16T08:20:00'),
             },
             expectedStart: new Date('2026-07-14T00:00:00'),
-            expectedEnd: new Date('2026-07-16T23:59:59'),
+            expectedEnd: new Date('2026-07-16T23:59:59.999'),
         },
     ])(
         'calls onRangeChange when the calendar range changes and %s',
-        ({range, expectedStart, expectedEnd}) => {
+        ({ range, expectedStart, expectedEnd }) => {
             const onRangeChange = vi.fn();
 
-            render(<AppCalendar isLoading onRangeChange={onRangeChange}/>);
+            render(<AppCalendar isLoading onRangeChange={onRangeChange} />);
 
             act(() => {
                 getCalendarProps().onRangeChange?.(range);
@@ -148,7 +163,7 @@ describe('AppCalendar', () => {
     );
 
     it('does nothing when the calendar range changes and no onRangeChange handler is provided', () => {
-        render(<AppCalendar isLoading/>);
+        render(<AppCalendar isLoading />);
 
         expect(() => {
             act(() => {
@@ -172,7 +187,7 @@ describe('AppCalendar', () => {
                 end: new Date('2026-07-12T10:00:00.000Z'),
             },
         ];
-        const onSchedule = vi.fn(() => ({id: 'allowed-overlap', title: 'Allowed overlap'}));
+        const onSchedule = vi.fn(() => ({ id: 'allowed-overlap', title: 'Allowed overlap' }));
 
         render(
             <AppCalendar
@@ -228,7 +243,7 @@ describe('AppCalendar', () => {
         },
     ])(
         '$name',
-        ({slot, shouldAlert, expectedScheduleCalls}) => {
+        ({ slot, shouldAlert, expectedScheduleCalls }) => {
             const events: AppCalendarEvent[] = [
                 {
                     id: 'existing-event',
@@ -237,7 +252,7 @@ describe('AppCalendar', () => {
                     end: new Date('2026-07-12T10:00:00.000Z'),
                 },
             ];
-            const onSchedule = vi.fn(() => ({id: 'new-event', title: 'New appointment'}));
+            const onSchedule = vi.fn(() => ({ id: 'new-event', title: 'New appointment' }));
 
             render(
                 <AppCalendar
