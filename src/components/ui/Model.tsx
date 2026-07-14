@@ -34,7 +34,7 @@ export default function Model({title, content, isOpen, onConfirm, onCancel, onCl
 
 
                 <div className="py-4 text-gray-600">
-                    <p>{content}</p>
+                    {content}
                 </div>
 
                 {(onCancel || onConfirm) &&

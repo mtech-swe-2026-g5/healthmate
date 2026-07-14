@@ -13,17 +13,19 @@ export interface AppointmentsResponse {
     appointments: Appointment[]
 }
 
+export interface Patient {
+    id: string;
+    firstName: string;
+    lastName: string;
+    age: number;
+    gender: typeof GENDER_OPTIONS[number];
+    phoneNumber: string;
+    bloodGroup: typeof BLOOD_GROUP_OPTIONS[number];
+}
+
 export interface Appointment {
     id: string;
-    patient: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        age: number;
-        gender: typeof GENDER_OPTIONS[number];
-        phoneNumber: string ;
-        bloodGroup: typeof BLOOD_GROUP_OPTIONS[number] ;
-    },
+    patient: Patient,
     start: Date;
     end: Date;
 }
