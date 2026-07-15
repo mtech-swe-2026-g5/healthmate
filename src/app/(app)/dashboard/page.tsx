@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { auth, signOut } from '@/lib/auth';
-import { BrandMark } from '@/components/ui/BrandMark';
+import { auth } from '@/lib/auth';
+import { MarketingNav } from '@/features/marketing';
 
 export const metadata: Metadata = {
   title: 'Dashboard — HealthMate',
@@ -20,22 +20,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="auth-body-bg min-h-screen">
-      <header className="flex items-center justify-between border-b border-[var(--color-outline-variant)]/40 bg-[var(--color-surface-container-lowest)] px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
-        <BrandMark variant="badge" href="/dashboard" />
-        <form
-          action={async () => {
-            'use server';
-            await signOut({ redirectTo: '/login' });
-          }}
-        >
-          <button
-            type="submit"
-            className="h-11 rounded-lg border border-[var(--color-outline-variant)] px-[var(--spacing-hm-lg)] font-dm-sans text-label-md font-bold text-[var(--color-on-surface)] transition-all hover:bg-[var(--color-surface-container-low)] active:scale-[0.98]"
-          >
-            Log out
-          </button>
-        </form>
-      </header>
+      {/* Reuse the platform navbar for consistency (Dashboard + Log out). */}
+      <MarketingNav isLoggedIn />
 
       <main className="mx-auto max-w-[800px] px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-xxl)]">
         <div className="rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-xl)] auth-custom-shadow">
@@ -50,7 +36,7 @@ export default async function DashboardPage() {
             <span className="font-bold text-[var(--color-on-surface)]">
               {email}
             </span>
-            . Your dashboard is coming soon.
+            . Your {role} dashboard is coming soon.
           </p>
         </div>
       </main>

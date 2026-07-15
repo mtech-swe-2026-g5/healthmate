@@ -44,6 +44,13 @@ keep them consistent:
   redirect to `/login`; protected API routes (anything under `/api` except
   `/api/auth/*`) return `401 { error: 'Unauthorized' }`. There is no `authorized`
   callback in `auth.config.ts`.
+- **No role selector on login.** One form serves all roles; the role is derived
+  from the account after authentication and carried in the session.
+  `verifyUserCredentials` still accepts an optional role for a future
+  doctor-specific enforcement, but the login UI does not send one.
+- **Session-aware navigation.** `MarketingNav` takes an `isLoggedIn` prop
+  (server pages resolve it via `auth()`): signed-in users get a Dashboard link +
+  logout, and the same nav is reused on `/dashboard` for consistency.
 - **Routes:** sign-in is `/login` (not `/sign-in`); post-login redirect and the
   protected landing is `/dashboard`. Public pages: `/`, `/login`, `/register`.
 

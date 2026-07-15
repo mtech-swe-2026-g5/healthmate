@@ -18,6 +18,10 @@ vi.mock('next/link', () => ({
   }) => <a href={href}>{children}</a>,
 }));
 
+vi.mock('next-auth/react', () => ({
+  signOut: vi.fn(),
+}));
+
 import { LandingPage } from '@/features/marketing';
 
 afterEach(() => {
@@ -74,5 +78,30 @@ describe('LandingPage', () => {
       screen.getByRole('button', { name: /dismiss navigation menu/i }),
     );
     expect(document.getElementById('mobile-nav-menu')).toBeNull();
+  });
+
+  it('shows sign-in actions when logged out', () => {
+    render(<LandingPage />);
+
+    expect(screen.getByRole('link', { name: /log in/i })).toBeDefined();
+    expect(screen.getByRole('link', { name: /get started/i })).toBeDefined();
+    expect(screen.queryByRole('button', { name: /log out/i })).toBeNull();
+  });
+
+  it('shows dashboard + logout actions when logged in', () => {
+    render(<LandingPage isLoggedIn />);
+
+    // Nav dashboard link + hero "Go to Dashboard" both point at /dashboard.
+    const dashboardLinks = screen
+      .getAllByRole('link')
+      .filter((el) => el.getAttribute('href') === '/dashboard');
+    expect(dashboardLinks.length).toBeGreaterThan(0);
+
+    expect(screen.getByRole('button', { name: /log out/i })).toBeDefined();
+    expect(screen.getByRole('link', { name: /go to dashboard/i })).toBeDefined();
+
+    // Signed-in visitors should not see the sign-in / sign-up actions.
+    expect(screen.queryByRole('link', { name: /^log in$/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /get started/i })).toBeNull();
   });
 });

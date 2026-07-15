@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { MdClose, MdMenu } from 'react-icons/md';
 
 import { BrandMark } from '@/components/ui/BrandMark';
+import { LogoutButton } from '@/features/auth/components/LogoutButton';
 import { authRoutes, marketingNavLinks } from '@/config/site';
 import {
   marketingBrandLink,
@@ -15,7 +16,11 @@ import {
 } from '@/features/marketing/constants/interaction-styles';
 import { marketingContainerClass } from '@/features/marketing/constants/layout';
 
-export function MarketingNav() {
+type MarketingNavProps = {
+  isLoggedIn?: boolean;
+};
+
+export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -33,44 +38,59 @@ export function MarketingNav() {
         <BrandMark className={`${marketingBrandLink} shrink-0`} />
 
         {/* Desktop nav links */}
-        <div className="hidden items-center gap-hm-xl lg:flex">
-          {marketingNavLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={
-                link.href === '#features' ? marketingNavLinkActive : marketingNavLink
-              }
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        {/* Marketing section links are only relevant to signed-out visitors. */}
+        {!isLoggedIn && (
+          <div className="hidden items-center gap-hm-xl lg:flex">
+            {marketingNavLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={
+                  link.href === '#features'
+                    ? marketingNavLinkActive
+                    : marketingNavLink
+                }
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
 
-        {/* Desktop + tablet actions */}
-        <div className="hidden items-center gap-hm-md sm:flex">
-          <Link href={authRoutes.login} className={marketingButtonLogin}>
-            <span className="relative z-10 transition-all duration-200 ease-in-out group-hover:tracking-wide">
-              Log in
-            </span>
-          </Link>
-          <Link href={authRoutes.register} className={marketingButtonContainer}>
-            Get Started
-          </Link>
-        </div>
+        <div className="flex items-center gap-hm-md">
+          {isLoggedIn ? (
+            <>
+              <Link href="/dashboard" className={marketingButtonContainer}>
+                Dashboard
+              </Link>
+              <LogoutButton
+                className={`${marketingButtonLogin} hidden sm:inline-flex`}
+              />
+            </>
+          ) : (
+            <>
+              <Link
+                href={authRoutes.login}
+                className={`${marketingButtonLogin} hidden sm:inline-flex`}
+              >
+                <span className="relative z-10 transition-all duration-200 ease-in-out group-hover:tracking-wide">
+                  Log in
+                </span>
+              </Link>
+              <Link
+                href={authRoutes.register}
+                className={marketingButtonContainer}
+              >
+                Get Started
+              </Link>
+            </>
+          )}
 
-        {/* Mobile actions */}
-        <div className="flex items-center gap-2 sm:hidden">
-          <Link
-            href={authRoutes.register}
-            className={`${marketingButtonContainer} !px-3 !py-1.5 text-label-sm`}
-          >
-            Start
-          </Link>
+          {/* Mobile menu toggle */}
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant/50 text-on-surface transition-colors hover:bg-surface-container"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-outline-variant/50 text-on-surface transition-colors hover:bg-surface-container lg:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-nav-menu"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}

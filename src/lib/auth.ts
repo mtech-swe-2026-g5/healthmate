@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { encode } from 'next-auth/jwt';
 
-import { authConfig, SESSION_MAX_AGE_SHORT } from './auth.config';
+import { authConfig, resolveSessionMaxAge } from './auth.config';
 // Import directly (not via the feature barrel) so client-only modules
 // (LoginForm, useLogin → next-auth/react) stay out of this server/edge graph.
 import { verifyUserCredentials } from '@/features/auth/services/login';
@@ -20,9 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   jwt: {
     async encode(params) {
-      if (params.token?.rememberMe === false) {
-        params.maxAge = SESSION_MAX_AGE_SHORT;
-      }
+      params.maxAge = resolveSessionMaxAge(params.token?.rememberMe);
       return encode(params);
     },
   },
@@ -31,15 +29,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
-        role: { label: 'Role', type: 'text' },
         rememberMe: { label: 'Remember me', type: 'text' },
       },
       async authorize(credentials) {
         const parsed = credentialsAuthorizeSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const { email, password, role, rememberMe } = parsed.data;
-        const user = await verifyUserCredentials(email, password, role);
+        const { email, password, rememberMe } = parsed.data;
+        const user = await verifyUserCredentials(email, password);
         if (!user) return null;
 
         return { ...user, rememberMe };

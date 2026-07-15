@@ -8,12 +8,16 @@ import { MarketingFooter } from './MarketingFooter';
 import { MarketingNav } from './MarketingNav';
 import { SocialProofSection } from './SocialProofSection';
 
-export function LandingPage() {
+type LandingPageProps = {
+  isLoggedIn?: boolean;
+};
+
+export function LandingPage({ isLoggedIn = false }: LandingPageProps) {
   return (
     <div className="marketing-landing min-h-screen selection:bg-primary-container selection:text-on-primary-container">
-      <MarketingNav />
+      <MarketingNav isLoggedIn={isLoggedIn} />
       <main>
-        <HeroSection />
+        <HeroSection isLoggedIn={isLoggedIn} />
         <SocialProofSection />
         <PlatformFeaturesSection />
         <FeatureGridSection />
