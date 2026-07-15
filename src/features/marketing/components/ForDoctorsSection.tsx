@@ -1,20 +1,23 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { MdCheckCircle } from 'react-icons/md';
+import Image from "next/image";
+import Link from "next/link";
+import { MdCheckCircle } from "react-icons/md";
 
-import { authRoutes } from '@/config/site';
-import { AppIcon } from '@/components/ui/AppIcon';
-import { marketingButtonContainerLg } from '@/features/marketing/constants/interaction-styles';
+import { authRoutes } from "@/config/site";
+import { AppIcon } from "@/components/ui/AppIcon";
+import { marketingButtonContainerLg } from "@/features/marketing/constants/interaction-styles";
 import {
   DOCTOR_DASHBOARD_IMAGE,
   doctorBenefits,
-} from '@/features/marketing/constants/landing-content';
+} from "@/features/marketing/constants/landing-content";
 
-import { MarketingContainer } from './MarketingContainer';
+import { MarketingContainer } from "./MarketingContainer";
 
 export function ForDoctorsSection() {
   return (
-    <section id="for-doctors" className="overflow-hidden py-hm-xxl scroll-mt-20">
+    <section
+      id="for-doctors"
+      className="overflow-hidden py-hm-xxl scroll-mt-20"
+    >
       <MarketingContainer>
         <div className="flex flex-col items-center gap-hm-xxl rounded-xl border border-outline-variant/30 bg-surface-container-low p-hm-lg md:p-hm-xxl lg:flex-row">
           <div className="w-full space-y-hm-xl gap-12 lg:w-1/2">
@@ -27,12 +30,20 @@ export function ForDoctorsSection() {
             <ul className="space-y-hm-md">
               {doctorBenefits.map((benefit) => (
                 <li key={benefit} className="flex items-start gap-hm-md">
-                  <AppIcon icon={MdCheckCircle} className="mt-1 shrink-0 text-primary" />
-                  <p className="font-literata text-body-md text-on-surface-variant">{benefit}</p>
+                  <AppIcon
+                    icon={MdCheckCircle}
+                    className="mt-1 shrink-0 text-primary"
+                  />
+                  <p className="font-literata text-body-md text-on-surface-variant">
+                    {benefit}
+                  </p>
                 </li>
               ))}
             </ul>
-            <Link href={authRoutes.login} className={marketingButtonContainerLg}>
+            <Link
+              href={authRoutes.login}
+              className={marketingButtonContainerLg}
+            >
               View Doctor Features
             </Link>
           </div>

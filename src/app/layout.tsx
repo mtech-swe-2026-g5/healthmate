@@ -1,27 +1,27 @@
-import type { Metadata } from 'next';
-import { DM_Sans, Literata } from 'next/font/google';
-import { Geist_Mono } from 'next/font/google';
+import type { Metadata } from "next";
+import { DM_Sans, Literata } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 
-import { siteConfig } from '@/config/site';
+import { siteConfig } from "@/config/site";
 
-import './globals.css';
+import "./globals.css";
 
 const dmSans = DM_Sans({
-  variable: '--font-dm-sans',
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 const literata = Literata({
-  variable: '--font-literata',
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
+  variable: "--font-literata",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {

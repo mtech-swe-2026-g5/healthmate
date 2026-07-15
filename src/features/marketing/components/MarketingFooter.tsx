@@ -1,23 +1,23 @@
-import Link from 'next/link';
-import { MdLanguage, MdVerifiedUser } from 'react-icons/md';
+import Link from "next/link";
+import { MdLanguage, MdVerifiedUser } from "react-icons/md";
 
-import { AppIcon } from '@/components/ui/AppIcon';
-import { BrandMark } from '@/components/ui/BrandMark';
+import { AppIcon } from "@/components/ui/AppIcon";
+import { BrandMark } from "@/components/ui/BrandMark";
 import {
   footerDoctorLinks,
   footerLegalLinks,
   footerProductLinks,
   siteConfig,
-} from '@/config/site';
+} from "@/config/site";
 
 import {
   marketingBrandLink,
   marketingFooterLink,
   marketingIconButton,
-} from '@/features/marketing/constants/interaction-styles';
+} from "@/features/marketing/constants/interaction-styles";
 
-import { MarketingContainer } from './MarketingContainer';
-import { ShareSiteButton } from './ShareSiteButton';
+import { MarketingContainer } from "./MarketingContainer";
+import { ShareSiteButton } from "./ShareSiteButton";
 
 export function MarketingFooter() {
   return (
@@ -30,11 +30,14 @@ export function MarketingFooter() {
           <div className="space-y-hm-md sm:col-span-2 lg:col-span-2">
             <BrandMark className={marketingBrandLink} />
             <p className="max-w-md font-literata text-body-md text-on-surface-variant">
-              Leading the transition to intelligent, patient-first healthcare scheduling
-              since {siteConfig.copyrightYear}.
+              Leading the transition to intelligent, patient-first healthcare
+              scheduling since {siteConfig.copyrightYear}.
             </p>
             <div className="flex w-fit items-center gap-hm-sm rounded-full border border-outline-variant bg-surface-container-low px-hm-md py-hm-xs">
-              <AppIcon icon={MdVerifiedUser} className="text-[18px] text-green-600" />
+              <AppIcon
+                icon={MdVerifiedUser}
+                className="text-[18px] text-green-600"
+              />
               <span className="font-dm-sans text-label-sm font-bold tracking-wide text-on-surface-variant">
                 HIPAA COMPLIANT
               </span>
@@ -51,9 +54,13 @@ export function MarketingFooter() {
             © {siteConfig.copyrightYear} {siteConfig.name}. All rights reserved.
           </p>
           <div className="flex gap-hm-lg">
-          <Link href="#" className={marketingIconButton} aria-label="Language">
-            <AppIcon icon={MdLanguage} className="text-xl" />
-          </Link>
+            <Link
+              href="#"
+              className={marketingIconButton}
+              aria-label="Language"
+            >
+              <AppIcon icon={MdLanguage} className="text-xl" />
+            </Link>
             <ShareSiteButton />
           </div>
         </div>
@@ -70,14 +77,13 @@ type FooterLinkColumnProps = {
 function FooterLinkColumn({ title, links }: FooterLinkColumnProps) {
   return (
     <div>
-      <h4 className="mb-hm-md font-dm-sans text-label-md font-bold text-on-surface">{title}</h4>
+      <h4 className="mb-hm-md font-dm-sans text-label-md font-bold text-on-surface">
+        {title}
+      </h4>
       <ul className="space-y-hm-md">
         {links.map((link) => (
           <li key={link.label}>
-            <Link
-              href={link.href}
-              className={marketingFooterLink}
-            >
+            <Link href={link.href} className={marketingFooterLink}>
               {link.label}
             </Link>
           </li>

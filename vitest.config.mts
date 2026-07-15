@@ -1,26 +1,26 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     watch: false,
     coverage: {
-      provider: 'v8',
+      provider: "v8",
       enabled: true,
       thresholds: {
         branches: 90,
-        lines: 90
+        lines: 90,
       },
       reportOnFailure: true,
     },
-    reporters: ['junit'],
+    reporters: ["junit"],
     outputFile: {
-      junit: './build/junit-report.xml'
-    }
+      junit: "./build/junit-report.xml",
+    },
   },
   resolve: {
     tsconfigPaths: true,
-  }
-})
+  },
+});

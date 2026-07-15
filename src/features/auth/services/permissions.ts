@@ -7,6 +7,6 @@
  */
 export function requireRole(userRole: string, allowedRoles: string[]): void {
   if (!allowedRoles.includes(userRole)) {
-    throw new Error('Forbidden');
+    throw new Error("Forbidden");
   }
 }

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-import type { RegistrationInput } from '../types';
+import type { RegistrationInput } from "../types";
 
 type ToastState = {
   message: string;
-  variant: 'success' | 'error';
+  variant: "success" | "error";
 } | null;
 
 type FieldError = {
@@ -26,32 +26,34 @@ export function useRegistration() {
 
   const submitRegistration = async (
     data: RegistrationInput,
-    setFieldError: (field: keyof RegistrationInput, error: { message: string }) => void,
+    setFieldError: (
+      field: keyof RegistrationInput,
+      error: { message: string },
+    ) => void,
   ): Promise<SubmitResult> => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...payload } = data;
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (response.status === 201) {
         setToast({
-          message: 'Account created successfully!',
-          variant: 'success',
+          message: "Account created successfully!",
+          variant: "success",
         });
-        setTimeout(() => router.push('/login'), 1500);
+        setTimeout(() => router.push("/login"), 1500);
         return { success: true };
       }
 
       const body = await response.json();
 
       if (response.status === 409) {
-        setFieldError('email', {
-          message:
-            body.error ?? 'An account with this email already exists',
+        setFieldError("email", {
+          message: body.error ?? "An account with this email already exists",
         });
         return { success: false };
       }
@@ -70,14 +72,14 @@ export function useRegistration() {
       }
 
       setToast({
-        message: body.error ?? 'Something went wrong. Please try again.',
-        variant: 'error',
+        message: body.error ?? "Something went wrong. Please try again.",
+        variant: "error",
       });
       return { success: false };
     } catch {
       setToast({
-        message: 'Network error. Please check your connection and try again.',
-        variant: 'error',
+        message: "Network error. Please check your connection and try again.",
+        variant: "error",
       });
       return { success: false };
     }

@@ -1,12 +1,12 @@
-import type { IconType } from 'react-icons';
+import type { IconType } from "react-icons";
 
-import { AppIcon } from '@/components/ui/AppIcon';
-import { bentoFeatures } from '@/features/marketing/constants/landing-content';
+import { AppIcon } from "@/components/ui/AppIcon";
+import { bentoFeatures } from "@/features/marketing/constants/landing-content";
 
-import { MarketingContainer } from './MarketingContainer';
+import { MarketingContainer } from "./MarketingContainer";
 
 const bentoCardBase =
-  'bento-card flex h-full flex-col items-center justify-center text-center rounded-xl border border-outline-variant p-hm-lg';
+  "bento-card flex h-full flex-col items-center justify-center text-center rounded-xl border border-outline-variant p-hm-lg";
 
 type BentoCardContentProps = {
   icon: IconType;
@@ -14,7 +14,7 @@ type BentoCardContentProps = {
   title: string;
   description: string;
   accent?: boolean;
-  titleTag?: 'h3' | 'h4';
+  titleTag?: "h3" | "h4";
 };
 
 function BentoCardContent({
@@ -23,21 +23,21 @@ function BentoCardContent({
   title,
   description,
   accent = false,
-  titleTag: TitleTag = 'h3',
+  titleTag: TitleTag = "h3",
 }: BentoCardContentProps) {
   return (
     <>
       <AppIcon icon={icon} className={`mb-hm-md shrink-0 ${iconClassName}`} />
       <TitleTag
-        className={`mb-hm-sm font-dm-sans text-title-lg ${accent ? 'text-inherit' : 'text-on-surface'}`}
+        className={`mb-hm-sm font-dm-sans text-title-lg ${accent ? "text-inherit" : "text-on-surface"}`}
       >
         {title}
       </TitleTag>
       <p
         className={
           accent
-            ? 'font-literata text-body-md leading-relaxed text-on-primary-container/80'
-            : 'font-literata text-body-md leading-relaxed text-on-surface-variant'
+            ? "font-literata text-body-md leading-relaxed text-on-primary-container/80"
+            : "font-literata text-body-md leading-relaxed text-on-surface-variant"
         }
       >
         {description}
@@ -57,8 +57,8 @@ export function FeatureGridSection() {
             Engineered for Medical Excellence
           </h2>
           <p className="mx-auto max-w-3xl font-literata text-body-md text-on-surface-variant">
-            Beyond just a calendar—a comprehensive ecosystem designed to optimize every
-            touchpoint of the patient journey.
+            Beyond just a calendar—a comprehensive ecosystem designed to
+            optimize every touchpoint of the patient journey.
           </p>
         </div>
 

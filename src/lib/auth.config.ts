@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from 'next-auth';
+import type { NextAuthConfig } from "next-auth";
 
 const SEVEN_DAYS = 7 * 24 * 60 * 60;
 const THIRTY_MINUTES = 30 * 60;
@@ -36,10 +36,10 @@ export function resolveSessionMaxAge(rememberMe: boolean | undefined): number {
  * `authorized` callback here.
  */
 export const authConfig = {
-  session: { strategy: 'jwt', maxAge: SESSION_MAX_AGE },
+  session: { strategy: "jwt", maxAge: SESSION_MAX_AGE },
   pages: {
-    signIn: '/login',
-    error: '/login',
+    signIn: "/login",
+    error: "/login",
   },
   providers: [],
   callbacks: {
