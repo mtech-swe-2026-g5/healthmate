@@ -16,7 +16,8 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "prepare": "husky"
   },
   "engines": {
     "node": "22.x"
@@ -51,9 +52,13 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.7",
-    "eslint": "^9",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.2.6",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+    "lint-staged": "^17.0.8",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "tsx": "^4.22.3",
