@@ -1,12 +1,16 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { encode } from 'next-auth/jwt';
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { encode } from "next-auth/jwt";
+import { type AdapterUser } from "@auth/core/adapters";
 
-import { authConfig, resolveSessionMaxAge } from './auth.config';
+import { authConfig, resolveSessionMaxAge } from "./auth.config";
 // Import directly (not via the feature barrel) so client-only modules
 // (LoginForm, useLogin → next-auth/react) stay out of this server/edge graph.
-import { verifyUserCredentials } from '@/features/auth/services/login';
-import { credentialsAuthorizeSchema } from '@/features/auth/types/schemas';
+import {
+  AuthenticatedUser,
+  verifyUserCredentials,
+} from "@/features/auth/services/login";
+import { credentialsAuthorizeSchema } from "@/features/auth/types/schemas";
 
 /**
  * Full Auth.js instance for the Node runtime. Adds the Credentials provider
@@ -27,11 +31,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-        rememberMe: { label: 'Remember me', type: 'text' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+        rememberMe: { label: "Remember me", type: "text" },
       },
-      async authorize(credentials) {
+      async authorize(
+        credentials,
+      ): Promise<(AuthenticatedUser & { rememberMe: boolean }) | null> {
         const parsed = credentialsAuthorizeSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
@@ -43,4 +49,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token = { ...token, ...user };
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (token) {
+        const { sub, iat, exp, jti, ...user } = token;
+        session.user = {
+          ...session.user,
+          ...user,
+        } as AuthenticatedUser & AdapterUser;
+      }
+      return session;
+    },
+  },
 });
