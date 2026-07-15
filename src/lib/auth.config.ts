@@ -1,4 +1,6 @@
+import { AuthenticatedUser } from "@/features/auth/services/login";
 import type { NextAuthConfig } from "next-auth";
+import { type AdapterUser } from "@auth/core/adapters";
 
 const SEVEN_DAYS = 7 * 24 * 60 * 60;
 const THIRTY_MINUTES = 30 * 60;
@@ -47,18 +49,17 @@ export const authConfig = {
       if (user) {
         // JWT payload carries the patient's identity + role (id, role name, and
         // role_id) so route handlers can authorize without a DB round-trip.
-        token.id = user.id ?? token.id;
-        token.role = user.role;
-        token.roleId = user.roleId;
-        token.rememberMe = user.rememberMe ?? false;
+        token = { ...token, ...user };
       }
       return token;
     },
     session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.roleId = token.roleId;
+      if (token) {
+        const { sub, iat, exp, jti, ...user } = token;
+        session.user = {
+          ...session.user,
+          ...user,
+        } as AuthenticatedUser & AdapterUser;
       }
       return session;
     },

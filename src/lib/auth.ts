@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { encode } from "next-auth/jwt";
-import { type AdapterUser } from "@auth/core/adapters";
 
 import { authConfig, resolveSessionMaxAge } from "./auth.config";
 // Import directly (not via the feature barrel) so client-only modules
@@ -49,22 +48,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user) {
-        token = { ...token, ...user };
-      }
-      return token;
-    },
-    session: async ({ session, token }) => {
-      if (token) {
-        const { sub, iat, exp, jti, ...user } = token;
-        session.user = {
-          ...session.user,
-          ...user,
-        } as AuthenticatedUser & AdapterUser;
-      }
-      return session;
-    },
-  },
 });
