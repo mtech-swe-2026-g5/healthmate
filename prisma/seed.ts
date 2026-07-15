@@ -26,6 +26,22 @@ const ROLES = [
   },
 ] as const;
 
+const today = moment().add(1, "hour").startOf("hour");
+const doctor = {
+  id: "23b391b6-eb6e-4f54-bf1a-aa0549f6fbc8",
+  userId: "847ce578-d21b-4b4a-80e9-d58893a47c3a",
+};
+const patient = {
+  id: "7c7bf910-2fd8-44af-965b-e5e6a6a6b040",
+  userId: "e50f9967-9762-4deb-8cea-96fdf1591b36",
+};
+const appointment = {
+  id: "e014086e-47b3-4c1f-8658-2aede4df8240",
+  startDate: today.toDate(),
+  endDate: today.clone().add(1, "hour").toDate(),
+  doctorId: doctor.id,
+  patientId: patient.id,
+};
 async function createDefaultDoctor() {
   return prisma.$transaction(async (tx) => {
     // Get the doctor role ID
@@ -40,13 +56,16 @@ async function createDefaultDoctor() {
 
     // Create or update user with doctor role
     const user = await tx.user.upsert({
-      where: { email: "johndoe-doctor@healthmate.com" },
+      where: { id: doctor.userId },
       update: {
+        email: "johndoe-doctor@healthmate.com",
+        passwordHash: await hash("johndoe@123", BCRYPT_SALT_ROUNDS),
         emailVerified: true,
         isActive: true,
         roleId: doctorRole.id,
       },
       create: {
+        id: doctor.userId,
         email: "johndoe-doctor@healthmate.com",
         passwordHash: await hash("johndoe@123", BCRYPT_SALT_ROUNDS),
         emailVerified: true,
@@ -56,8 +75,8 @@ async function createDefaultDoctor() {
     });
 
     // Create doctor profile
-    return tx.doctor.upsert({
-      where: { userId: user.id },
+    await tx.doctor.upsert({
+      where: { id: doctor.id, userId: user.id },
       update: {
         firstName: "John",
         lastName: "Doe",
@@ -65,6 +84,7 @@ async function createDefaultDoctor() {
         phoneNumber: "+1-555-0123",
       },
       create: {
+        id: doctor.id,
         userId: user.id,
         firstName: "John",
         lastName: "Doe",
@@ -89,13 +109,16 @@ async function createDefaultPatient() {
 
     // Create or update user with patient role
     const user = await tx.user.upsert({
-      where: { email: "johndoe-patient@healthmate.com" },
+      where: { id: patient.userId },
       update: {
+        email: "johndoe-patient@healthmate.com",
+        passwordHash: await hash("johndoe@123", BCRYPT_SALT_ROUNDS),
         emailVerified: true,
         isActive: true,
         roleId: patientRole.id,
       },
       create: {
+        id: patient.userId,
         email: "johndoe-patient@healthmate.com",
         passwordHash: await hash("johndoe@123", BCRYPT_SALT_ROUNDS),
         emailVerified: true,
@@ -105,8 +128,8 @@ async function createDefaultPatient() {
     });
 
     // Create patient profile
-    return tx.patient.upsert({
-      where: { userId: user.id },
+    await tx.patient.upsert({
+      where: { id: patient.id, userId: user.id },
       update: {
         firstName: "John",
         lastName: "Doe",
@@ -116,6 +139,7 @@ async function createDefaultPatient() {
         dateOfBirth: new Date("2000-01-01"),
       },
       create: {
+        id: patient.id,
         userId: user.id,
         firstName: "John",
         lastName: "Doe",
@@ -128,20 +152,23 @@ async function createDefaultPatient() {
   });
 }
 
-async function seedTestAppointments(patientId: string, doctorId: string) {
+async function seedTestAppointments() {
   await prisma.$transaction(async (tx) => {
     await tx.appointment.deleteMany({
-      where: { patientId: patientId, doctorId: doctorId },
+      where: {
+        patientId: appointment.patientId,
+        doctorId: appointment.doctorId,
+      },
     });
 
-    const today = moment().add(1, "hour").startOf("hour");
     await tx.appointment.createMany({
       data: [
         {
-          doctorId: doctorId,
-          patientId: patientId,
-          startTime: today.toDate(),
-          endTime: today.add(1, "hour").toDate(),
+          id: appointment.id,
+          doctorId: appointment.doctorId,
+          patientId: appointment.patientId,
+          startTime: appointment.startDate,
+          endTime: appointment.endDate,
         },
       ],
     });
@@ -158,11 +185,11 @@ async function main() {
   }
 
   console.log(`Seeded ${ROLES.length} roles.`);
-  const doctor = await createDefaultDoctor();
+  await createDefaultDoctor();
   console.log(`Seeded sample doctor.`);
-  const patient = await createDefaultPatient();
+  await createDefaultPatient();
   console.log(`Seeded sample patient.`);
-  await seedTestAppointments(patient?.id as string, doctor?.id as string);
+  await seedTestAppointments();
   console.log(`Seeded sample appointments.`);
 }
 
