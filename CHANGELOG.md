@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.1.0...v1.1.1) (2026-07-15)
+
+
+### Bug Fixes
+
+* responding to some suggestions on login flow (after some more fixes) ([#32](https://github.com/mtech-swe-2026-g5/healthmate/issues/32)) ([62a4c3a](https://github.com/mtech-swe-2026-g5/healthmate/commit/62a4c3abe2d3ceb08445d48d113ede05c6d97c9b))
+
 # [1.1.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.0.1...v1.1.0) (2026-06-17)
 
 
