@@ -87,8 +87,9 @@ model Doctor {
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments Appointment[]
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments       Appointment[]
+  slotConfigurations SlotConfiguration[]
 
   @@index([userId])
   @@map("doctors")

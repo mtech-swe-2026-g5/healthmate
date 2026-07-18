@@ -6,6 +6,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 export type DoctorModel = Prisma.DoctorGetPayload<true>;
 export type PatientModel = Prisma.PatientGetPayload<true>;
+export type SlotConfigurationModel = Prisma.SlotConfigurationGetPayload<true>;
 
 function createPrismaClient() {
   const connectionString =

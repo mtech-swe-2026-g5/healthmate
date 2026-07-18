@@ -12,3 +12,24 @@ model Appointment {
 
   @@map("appointments")
 }
+
+model SlotConfiguration {
+  id         String    @id @default(uuid()) @db.Uuid
+  doctorId   String?   @map("doctor_id") @db.Uuid
+  // Captures the recurring day structure (e.g., 1 = Monday, 6 = Saturday)
+  dayOfWeek  Int       @map("day_of_week")
+  startTime  DateTime  @map("start_time") @db.Time(0)
+  endTime    DateTime  @map("end_time") @db.Time(0)
+  // IANA timezone identifier (e.g. "Asia/Kolkata") that startTime/endTime are
+  // wall-clock times in. Required for accurate timezone conversion.
+  timezone   String    @default("Asia/Kolkata") @map("timezone")
+  validFrom  DateTime  @map("valid_from") @db.Timestamptz()
+  validUntil DateTime? @map("valid_until") @db.Timestamptz()
+  active     Boolean   @default(true) @map("active")
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  doctor     Doctor?   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId, validFrom, validUntil, active], name: "idx_slot_config_lookup")
+  @@map("slot_configurations")
+}

@@ -10,7 +10,7 @@ describe("handleApiError", () => {
       {
         code: "too_small",
         minimum: 1,
-        type: "string",
+        origin: "string",
         inclusive: true,
         exact: false,
         message: "Required",

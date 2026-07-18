@@ -15,3 +15,13 @@
 .loading .rbc-month-view {
     animation: flash-opacity 1s infinite;
 }
+
+.app-calendar-slot-inactive {
+    background-color: var(--color-surface-variant);
+    border-color: var(--color-outline-variant);
+}
+
+.app-calendar-event-inactive {
+    background-color: var(--color-on-surface-variant);
+    opacity: 0.85;
+}

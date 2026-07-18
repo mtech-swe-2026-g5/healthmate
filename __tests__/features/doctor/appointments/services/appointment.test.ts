@@ -13,7 +13,7 @@ import { Prisma } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/client";
 import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker/locale/en";
-import moment from "moment";
+import { DateTime } from "luxon";
 
 const errorDoctor = faker.string.uuid();
 
@@ -75,8 +75,12 @@ describe("getAppointmentsByDoctor", () => {
         where: {
           doctorId: validRequest.doctorId,
           startTime: {
-            gte: validRequest.startDate,
-            lt: validRequest.endDate,
+            gte: DateTime.fromJSDate(validRequest.startDate)
+              .startOf("day")
+              .toJSDate(),
+            lt: DateTime.fromJSDate(validRequest.endDate)
+              .endOf("day")
+              .toJSDate(),
           },
         },
         include: {
@@ -109,9 +113,11 @@ describe("getAppointmentsByDoctor", () => {
     it("should calculate patient age correctly from date of birth", async () => {
       const result = await getAppointmentsByDoctor(validRequest);
       const appointment = result?.appointments[0];
-      const expectedAge = moment("2026-06-08").diff(
-        moment(mockPatient1.dateOfBirth),
-        "years",
+      const expectedAge = Math.trunc(
+        DateTime.fromISO("2026-06-08").diff(
+          DateTime.fromJSDate(mockPatient1.dateOfBirth),
+          "years",
+        ).years,
       );
       expect(appointment?.patient.age).toBe(expectedAge);
     });
@@ -132,10 +138,10 @@ describe("getAppointmentsByDoctor", () => {
         "/api/doctor/appointments",
       );
       expect(result?._metadata.links.self).toContain(
-        `startDate=${validRequest.startDate.toISOString()}`,
+        `startDate=${DateTime.fromJSDate(validRequest.startDate).startOf("day").toJSDate().toISOString()}`,
       );
       expect(result?._metadata.links.self).toContain(
-        `endDate=${validRequest.endDate.toISOString()}`,
+        `endDate=${DateTime.fromJSDate(validRequest.endDate).endOf("day").toJSDate().toISOString()}`,
       );
     });
 

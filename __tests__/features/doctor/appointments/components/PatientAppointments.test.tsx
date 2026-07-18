@@ -4,7 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PatientAppointments from "@/features/doctor/appointments/components/PatientAppointments";
 import { Appointment } from "@/features/doctor/appointments/types/response";
 import * as AppointmentsHookModule from "@/features/doctor/appointments/hooks/use-appointments";
+import * as SlotConfigurationsHookModule from "@/features/doctor/appointments/hooks/use-slot-configurations";
 import { AppCalendarEvent } from "@/components/ui/AppCalendar";
+import { SlotConfigurationModel } from "@/lib/prisma";
 import { UseQueryResult } from "@tanstack/react-query";
 
 const mockAppointments: Appointment[] = [
@@ -45,14 +47,56 @@ vi.mock("@/features/doctor/appointments/hooks/use-appointments", () => ({
   })),
 }));
 
+const mockSlotConfigurations: SlotConfigurationModel[] = [
+  {
+    id: "slot-1",
+    doctorId: "doc123",
+    dayOfWeek: 1,
+    startTime: new Date("1970-01-01T09:00:00.000Z"),
+    endTime: new Date("1970-01-01T17:00:00.000Z"),
+    timezone: "Asia/Kolkata",
+    validFrom: new Date("2026-01-01T00:00:00.000Z"),
+    validUntil: null,
+    active: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
+
+vi.mock("@/features/doctor/appointments/hooks/use-slot-configurations", () => ({
+  default: vi.fn(() => ({
+    data: mockSlotConfigurations,
+    isFetched: true,
+  })),
+}));
+
 vi.mock("@/components/ui/AppCalendar", () => ({
   default: vi.fn(
-    ({ events, onRangeChange, onEventSelect, isLoading, className }) => (
+    ({
+      events,
+      onRangeChange,
+      onEventSelect,
+      isLoading,
+      className,
+      slotConfigurations,
+    }) => (
       <div data-testid="app-calendar-mock" className={className}>
         <div data-testid="calendar-loading">
           {isLoading ? "Loading" : "Loaded"}
         </div>
         <div data-testid="calendar-events-count">{events?.length || 0}</div>
+        <div data-testid="calendar-slot-configurations-count">
+          {slotConfigurations?.length || 0}
+        </div>
+        <div data-testid="calendar-slot-configuration-day">
+          {slotConfigurations?.[0]?.dayOfWeek}
+        </div>
+        <div data-testid="calendar-slot-configuration-valid-from">
+          {slotConfigurations?.[0]?.validFrom ? "set" : "unset"}
+        </div>
+        <div data-testid="calendar-slot-configuration-valid-until">
+          {slotConfigurations?.[0]?.validUntil ? "set" : "unset"}
+        </div>
         {events?.map((event: AppCalendarEvent) => (
           <div
             key={event.id}
@@ -138,10 +182,95 @@ describe("PatientAppointments", () => {
     );
   });
 
+  it("should call useSlotConfigurations hook with correct parameters", () => {
+    render(<PatientAppointments doctorId="doc123" />);
+
+    const useSlotConfigurationsMock = vi.mocked(
+      SlotConfigurationsHookModule.default,
+    );
+    expect(useSlotConfigurationsMock).toHaveBeenCalledWith(
+      "doc123",
+      expect.any(Date),
+      expect.any(Date),
+    );
+  });
+
   it("should transform appointments to calendar events", () => {
     render(<PatientAppointments doctorId="doc123" />);
 
     expect(screen.getByTestId("calendar-events-count").textContent).toBe("2");
+  });
+
+  it("should transform slot configurations for the calendar", () => {
+    render(<PatientAppointments doctorId="doc123" />);
+
+    expect(
+      screen.getByTestId("calendar-slot-configurations-count").textContent,
+    ).toBe("1");
+    expect(
+      screen.getByTestId("calendar-slot-configuration-day").textContent,
+    ).toBe("1");
+    expect(
+      screen.getByTestId("calendar-slot-configuration-valid-from").textContent,
+    ).toBe("set");
+    expect(
+      screen.getByTestId("calendar-slot-configuration-valid-until").textContent,
+    ).toBe("unset");
+  });
+
+  it("should transform a slot configuration without validFrom and with validUntil", () => {
+    const useSlotConfigurationsMock = vi.mocked(
+      SlotConfigurationsHookModule.default,
+    );
+    useSlotConfigurationsMock.mockReturnValueOnce({
+      data: [
+        {
+          ...mockSlotConfigurations[0],
+          validFrom: null as unknown as Date,
+          validUntil: new Date("2026-12-31T23:59:59.999Z"),
+        },
+      ],
+      isFetched: true,
+    } as UseQueryResult<NoInfer<SlotConfigurationModel[]>, Error>);
+
+    render(<PatientAppointments doctorId="doc123" />);
+
+    expect(
+      screen.getByTestId("calendar-slot-configuration-valid-from").textContent,
+    ).toBe("unset");
+    expect(
+      screen.getByTestId("calendar-slot-configuration-valid-until").textContent,
+    ).toBe("set");
+  });
+
+  it("should handle undefined slot configuration data gracefully", () => {
+    const useSlotConfigurationsMock = vi.mocked(
+      SlotConfigurationsHookModule.default,
+    );
+    useSlotConfigurationsMock.mockReturnValueOnce({
+      data: undefined as unknown as SlotConfigurationModel[],
+      isFetched: true,
+    } as UseQueryResult<NoInfer<SlotConfigurationModel[]>, Error>);
+
+    render(<PatientAppointments doctorId="doc123" />);
+
+    expect(
+      screen.getByTestId("calendar-slot-configurations-count").textContent,
+    ).toBe("0");
+  });
+
+  it("should show loading state when slot configurations have not been fetched yet", () => {
+    const useSlotConfigurationsMock = vi.mocked(
+      SlotConfigurationsHookModule.default,
+    );
+    useSlotConfigurationsMock.mockReturnValueOnce({
+      data: [] as SlotConfigurationModel[],
+      isFetched: false,
+    } as UseQueryResult<NoInfer<SlotConfigurationModel[]>, Error>);
+
+    render(<PatientAppointments doctorId="doc123" />);
+
+    expect(screen.getByTestId("calendar-loading").textContent).toBe("Loading");
   });
 
   it("should display appointment titles with patient names", () => {

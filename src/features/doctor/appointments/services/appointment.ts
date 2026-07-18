@@ -8,7 +8,7 @@ import {
 } from "@/features/doctor/appointments/types/request";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
-import moment from "moment";
+import { DateTime } from "luxon";
 
 type AppointmentEntity = Prisma.AppointmentGetPayload<{
   include: {
@@ -47,9 +47,9 @@ async function getAppointmentsFor(
 
 function mapToResponse(appointments: AppointmentEntity[]) {
   return appointments.map((appointment: AppointmentEntity): Appointment => {
-    const patientDob = moment(appointment.patient.dateOfBirth);
-    const appointmentStart = moment(appointment.startTime);
-    const age = appointmentStart.diff(patientDob, "years");
+    const patientDob = DateTime.fromJSDate(appointment.patient.dateOfBirth);
+    const appointmentStart = DateTime.fromJSDate(appointment.startTime);
+    const age = Math.trunc(appointmentStart.diff(patientDob, "years").years);
 
     return {
       id: appointment.id,
@@ -72,9 +72,9 @@ function toHateosResponse(
   validatedRequest: GetWeeklyAppointmentsRequest,
   mappedAppointments: Appointment[],
 ): AppointmentsResponse {
-  const currentWeek = moment(validatedRequest.startDate);
-  const prevWeek = currentWeek.clone().subtract(1, "week");
-  const nextWeek = currentWeek.clone().add(1, "week");
+  const currentWeek = DateTime.fromJSDate(validatedRequest.startDate);
+  const prevWeek = currentWeek.minus({ week: 1 });
+  const nextWeek = currentWeek.plus({ week: 1 });
 
   const baseUrl = `/api/doctor/appointments`;
 
@@ -82,8 +82,8 @@ function toHateosResponse(
     _metadata: {
       links: {
         self: `${baseUrl}?startDate=${validatedRequest.startDate.toISOString()}&endDate=${validatedRequest.endDate.toISOString()}`,
-        prevWeek: `${baseUrl}?startDate=${prevWeek.startOf("week").toISOString()}&endDate=${prevWeek.endOf("week").toISOString()}`,
-        nextWeek: `${baseUrl}?startDate=${nextWeek.startOf("week").toISOString()}&endDate=${nextWeek.endOf("week").toISOString()}`,
+        prevWeek: `${baseUrl}?startDate=${prevWeek.startOf("week").toJSDate().toISOString()}&endDate=${prevWeek.endOf("week").toJSDate().toISOString()}`,
+        nextWeek: `${baseUrl}?startDate=${nextWeek.startOf("week").toJSDate().toISOString()}&endDate=${nextWeek.endOf("week").toJSDate().toISOString()}`,
       },
     },
     appointments: mappedAppointments,

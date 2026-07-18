@@ -1,4 +1,5 @@
 import { BLOOD_GROUP_OPTIONS, GENDER_OPTIONS } from "@/features/auth";
+import { SlotConfigurationModel } from "@/lib/prisma";
 
 export interface Metadata {
   links: {
@@ -28,4 +29,9 @@ export interface Appointment {
   patient: Patient;
   start: Date;
   end: Date;
+}
+
+export interface AppointmentSlotsResponse {
+  _metadata: Metadata;
+  slots: Partial<SlotConfigurationModel>[];
 }

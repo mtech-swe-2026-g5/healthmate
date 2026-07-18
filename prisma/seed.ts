@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "bcryptjs";
 import { BCRYPT_SALT_ROUNDS } from "@/features/auth/services/registration";
-import moment from "moment";
+import { DateTime } from "luxon";
 
 const connectionString =
   process.env.DATABASE_URL ??
@@ -26,7 +26,16 @@ const ROLES = [
   },
 ] as const;
 
-const today = moment().add(1, "hour").startOf("hour");
+const today = DateTime.now().plus({ hours: 1 }).startOf("hour");
+const defaultSlotConfiguration = {
+  id: "f944755b-5443-4157-81c1-0e3bf62e0d78",
+  validFrom: new Date("2026-01-01T00:00:00.000Z"),
+  dayOfWeeks: [1, 2, 3, 4, 5], // Monday to Friday
+  startTime: new Date("2026-01-01T11:00:00.000Z"),
+  endTime: new Date("2026-01-01T19:00:00.000Z"),
+  // Wall-clock startTime/endTime above are interpreted in this timezone.
+  timezone: "Asia/Kolkata",
+};
 const doctor = {
   id: "23b391b6-eb6e-4f54-bf1a-aa0549f6fbc8",
   userId: "847ce578-d21b-4b4a-80e9-d58893a47c3a",
@@ -37,11 +46,12 @@ const patient = {
 };
 const appointment = {
   id: "e014086e-47b3-4c1f-8658-2aede4df8240",
-  startDate: today.toDate(),
-  endDate: today.clone().add(1, "hour").toDate(),
+  startDate: today.toJSDate(),
+  endDate: today.plus({ hours: 1 }).toJSDate(),
   doctorId: doctor.id,
   patientId: patient.id,
 };
+
 async function createDefaultDoctor() {
   return prisma.$transaction(async (tx) => {
     // Get the doctor role ID
@@ -92,6 +102,37 @@ async function createDefaultDoctor() {
         phoneNumber: "+1-555-0123",
       },
     });
+  });
+}
+
+async function createDefaultSlotConfiguration() {
+  return prisma.$transaction(async (tx) => {
+    await Promise.all(
+      defaultSlotConfiguration.dayOfWeeks.map(async (dayOfWeek) => {
+        return tx.slotConfiguration.upsert({
+          where: {
+            id: `${defaultSlotConfiguration.id.slice(0, -1)}${dayOfWeek}`,
+          },
+          update: {
+            validFrom: defaultSlotConfiguration.validFrom,
+            dayOfWeek: dayOfWeek,
+            startTime: defaultSlotConfiguration.startTime,
+            endTime: defaultSlotConfiguration.endTime,
+            timezone: defaultSlotConfiguration.timezone,
+            active: true,
+          },
+          create: {
+            id: `${defaultSlotConfiguration.id.slice(0, -1)}${dayOfWeek}`,
+            validFrom: defaultSlotConfiguration.validFrom,
+            dayOfWeek: dayOfWeek,
+            startTime: defaultSlotConfiguration.startTime,
+            endTime: defaultSlotConfiguration.endTime,
+            timezone: defaultSlotConfiguration.timezone,
+            active: true,
+          },
+        });
+      }),
+    );
   });
 }
 
@@ -185,6 +226,11 @@ async function main() {
   }
 
   console.log(`Seeded ${ROLES.length} roles.`);
+
+  await createDefaultSlotConfiguration();
+  console.log(`Created default slot configuration.`);
+
+  // TEST DATA
   await createDefaultDoctor();
   console.log(`Seeded sample doctor.`);
   await createDefaultPatient();
