@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MdVisibility, MdVisibilityOff, MdWarning } from 'react-icons/md';
+import { MdLogin, MdVisibility, MdVisibilityOff, MdWarning } from 'react-icons/md';
 
 import { BrandMark } from '@/components/ui/BrandMark';
 import { Toast } from '@/components/ui/Toast';
@@ -28,6 +29,8 @@ function inputClass(hasError: boolean) {
 
 export function LoginForm() {
   const { toast, setToast, submitLogin } = useLogin();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -40,7 +43,7 @@ export function LoginForm() {
   });
 
   const onSubmit = async (data: LoginInput) => {
-    await submitLogin(data);
+    await submitLogin(data, callbackUrl);
   };
 
   return (
@@ -133,8 +136,9 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-14 bg-[var(--color-primary)] text-white rounded-lg font-dm-sans text-label-md font-bold hover:bg-[var(--color-primary-container)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] font-dm-sans text-label-md font-bold text-white transition-all hover:bg-[var(--color-primary-container)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
+          <MdLogin size={20} aria-hidden />
           {isSubmitting ? 'Logging in...' : 'Log In'}
         </button>
       </form>

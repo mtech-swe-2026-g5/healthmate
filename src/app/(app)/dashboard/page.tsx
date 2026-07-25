@@ -2,44 +2,37 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
-import { MarketingNav } from '@/features/marketing';
+import { listPatientAppointments } from '@/features/appointments/services/appointments';
+import { PatientDashboardView } from '@/features/dashboard';
+import { prisma } from '@/lib/prisma';
 
 export const metadata: Metadata = {
   title: 'Dashboard — HealthMate',
-  description: 'Your HealthMate dashboard.',
+  description: 'Your HealthMate patient dashboard.',
 };
 
 export default async function DashboardPage() {
   const session = await auth();
+  if (!session?.user?.id) redirect('/login');
 
-  // Defence in depth: middleware already guards this route, but server
-  // components must re-check the session before rendering protected UI.
-  if (!session?.user) redirect('/login');
+  const [patient, appointments] = await Promise.all([
+    prisma.patient.findUnique({
+      where: { userId: session.user.id },
+      select: { firstName: true },
+    }),
+    listPatientAppointments(session.user.id, session.user.role),
+  ]);
 
-  const { email, role } = session.user;
+  const firstName =
+    patient?.firstName ||
+    session.user.email?.split('@')[0] ||
+    'there';
 
   return (
-    <div className="auth-body-bg min-h-screen">
-      {/* Reuse the platform navbar for consistency (Dashboard + Log out). */}
-      <MarketingNav isLoggedIn />
-
-      <main className="mx-auto max-w-[800px] px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-xxl)]">
-        <div className="rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-xl)] auth-custom-shadow">
-          <span className="inline-block rounded-full bg-[var(--color-primary)]/10 px-3 py-1 font-dm-sans text-label-sm uppercase tracking-wide text-[var(--color-primary)]">
-            {role}
-          </span>
-          <h1 className="mt-[var(--spacing-hm-md)] font-dm-sans text-headline-lg text-[var(--color-on-surface)]">
-            Welcome back
-          </h1>
-          <p className="mt-[var(--spacing-hm-xs)] font-literata text-body-md text-[var(--color-on-surface-variant)]">
-            You are signed in as{' '}
-            <span className="font-bold text-[var(--color-on-surface)]">
-              {email}
-            </span>
-            . Your {role} dashboard is coming soon.
-          </p>
-        </div>
-      </main>
-    </div>
+    <PatientDashboardView
+      firstName={firstName}
+      upcoming={appointments.upcoming}
+      pastCount={appointments.past.length}
+    />
   );
 }

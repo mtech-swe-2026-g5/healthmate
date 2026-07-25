@@ -1,6 +1,7 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
+import { MdLogout } from 'react-icons/md';
 
 type LogoutButtonProps = {
   className?: string;
@@ -17,8 +18,9 @@ export function LogoutButton({ className, label = 'Log out' }: LogoutButtonProps
     <button
       type="button"
       onClick={() => signOut({ callbackUrl: '/login' })}
-      className={className}
+      className={`inline-flex items-center justify-center gap-2 transition-colors hover:bg-[var(--color-surface-container-highest)] ${className ?? ''}`}
     >
+      <MdLogout size={18} aria-hidden />
       {label}
     </button>
   );

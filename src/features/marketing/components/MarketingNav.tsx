@@ -6,6 +6,7 @@ import { MdClose, MdMenu } from 'react-icons/md';
 
 import { BrandMark } from '@/components/ui/BrandMark';
 import { LogoutButton } from '@/features/auth/components/LogoutButton';
+import { roleHomes } from '@/config/routes';
 import { authRoutes, marketingNavLinks } from '@/config/site';
 import {
   marketingBrandLink,
@@ -18,9 +19,14 @@ import { marketingContainerClass } from '@/features/marketing/constants/layout';
 
 type MarketingNavProps = {
   isLoggedIn?: boolean;
+  /** Role home for signed-in users (patient dashboard or doctor portal). */
+  portalHref?: string;
 };
 
-export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
+export function MarketingNav({
+  isLoggedIn = false,
+  portalHref = roleHomes.patient,
+}: MarketingNavProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -37,8 +43,6 @@ export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
       >
         <BrandMark className={`${marketingBrandLink} shrink-0`} />
 
-        {/* Desktop nav links */}
-        {/* Marketing section links are only relevant to signed-out visitors. */}
         {!isLoggedIn && (
           <div className="hidden items-center gap-hm-xl lg:flex">
             {marketingNavLinks.map((link) => (
@@ -60,8 +64,8 @@ export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
         <div className="flex items-center gap-hm-md">
           {isLoggedIn ? (
             <>
-              <Link href="/dashboard" className={marketingButtonContainer}>
-                Dashboard
+              <Link href={portalHref} className={marketingButtonContainer}>
+                Open portal
               </Link>
               <LogoutButton
                 className={`${marketingButtonLogin} hidden sm:inline-flex`}
@@ -86,7 +90,6 @@ export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
             </>
           )}
 
-          {/* Mobile menu toggle */}
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
@@ -100,7 +103,6 @@ export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
         </div>
       </div>
 
-      {/* Mobile menu panel */}
       {menuOpen && (
         <>
           <button
@@ -114,27 +116,44 @@ export function MarketingNav({ isLoggedIn = false }: MarketingNavProps) {
             className="fixed inset-x-0 top-14 z-50 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-outline-variant/30 bg-surface/95 backdrop-blur-md lg:hidden"
           >
             <div className={`${marketingContainerClass} flex flex-col gap-1 py-4`}>
-              {marketingNavLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`rounded-lg px-3 py-3 font-dm-sans text-label-md ${
-                    link.href === '#features'
-                      ? 'font-bold text-primary bg-secondary-container/50'
-                      : 'font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link
-                href={authRoutes.login}
-                onClick={() => setMenuOpen(false)}
-                className={`${marketingButtonLogin} mt-2 w-full justify-center`}
-              >
-                Log in
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    href={portalHref}
+                    onClick={() => setMenuOpen(false)}
+                    className={`${marketingButtonContainer} w-full justify-center`}
+                  >
+                    Open portal
+                  </Link>
+                  <div className="mt-2 px-3">
+                    <LogoutButton className={`${marketingButtonLogin} w-full justify-center`} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {marketingNavLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className={`rounded-lg px-3 py-3 font-dm-sans text-label-md ${
+                        link.href === '#features'
+                          ? 'font-bold text-primary bg-secondary-container/50'
+                          : 'font-medium text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  <Link
+                    href={authRoutes.login}
+                    onClick={() => setMenuOpen(false)}
+                    className={`${marketingButtonLogin} mt-2 w-full justify-center`}
+                  >
+                    Log in
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </>

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MdArrowForward, MdCheckCircle } from 'react-icons/md';
 
+import { roleHomes } from '@/config/routes';
 import { authRoutes } from '@/config/site';
 import { AppIcon } from '@/components/ui/AppIcon';
 import {
@@ -15,9 +16,13 @@ import { MarketingContainer } from './MarketingContainer';
 
 type HeroSectionProps = {
   isLoggedIn?: boolean;
+  portalHref?: string;
 };
 
-export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
+export function HeroSection({
+  isLoggedIn = false,
+  portalHref = roleHomes.patient,
+}: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden pb-hm-xxl pt-hm-xxl md:pb-32 md:pt-32">
       <MarketingContainer>
@@ -37,10 +42,10 @@ export function HeroSection({ isLoggedIn = false }: HeroSectionProps) {
             </p>
             <div className="flex flex-col items-center justify-center gap-hm-md sm:flex-row lg:justify-start">
               <Link
-                href={isLoggedIn ? '/dashboard' : authRoutes.register}
+                href={isLoggedIn ? portalHref : authRoutes.register}
                 className={`${marketingButtonPrimary} w-full sm:w-auto`}
               >
-                {isLoggedIn ? 'Go to Dashboard' : 'Book an Appointment'}
+                {isLoggedIn ? 'Open portal' : 'Book an Appointment'}
               </Link>
               <Link href="#for-doctors" className={marketingTextLink}>
                 For Doctors

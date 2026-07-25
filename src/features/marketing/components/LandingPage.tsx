@@ -10,14 +10,18 @@ import { SocialProofSection } from './SocialProofSection';
 
 type LandingPageProps = {
   isLoggedIn?: boolean;
+  portalHref?: string;
 };
 
-export function LandingPage({ isLoggedIn = false }: LandingPageProps) {
+export function LandingPage({
+  isLoggedIn = false,
+  portalHref,
+}: LandingPageProps) {
   return (
     <div className="marketing-landing min-h-screen selection:bg-primary-container selection:text-on-primary-container">
-      <MarketingNav isLoggedIn={isLoggedIn} />
+      <MarketingNav isLoggedIn={isLoggedIn} portalHref={portalHref} />
       <main>
-        <HeroSection isLoggedIn={isLoggedIn} />
+        <HeroSection isLoggedIn={isLoggedIn} portalHref={portalHref} />
         <SocialProofSection />
         <PlatformFeaturesSection />
         <FeatureGridSection />

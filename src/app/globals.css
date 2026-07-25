@@ -195,6 +195,21 @@ body {
   font-family: var(--font-family-dm-sans);
 }
 
+/* Interactive cursor defaults (Tailwind preflight does not set these) */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+[role='switch']:not(:disabled),
+[role='tab']:not([aria-disabled='true']),
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled='true'],
+[role='switch']:disabled {
+  cursor: not-allowed;
+}
+
 .marketing-landing button:not(:disabled),
 .marketing-landing button:not(:disabled):hover {
   cursor: pointer;
@@ -394,5 +409,16 @@ body {
 
   .marketing-landing .bento-card:hover {
     box-shadow: none;
+  }
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
