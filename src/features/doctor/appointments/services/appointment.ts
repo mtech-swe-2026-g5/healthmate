@@ -31,7 +31,7 @@ async function getAppointmentsFor(
   return prisma.appointment.findMany({
     where: {
       doctorId: validatedRequest.doctorId,
-      startTime: {
+      startsAt: {
         gte: validatedRequest.startDate,
         lt: validatedRequest.endDate,
       },
@@ -40,7 +40,7 @@ async function getAppointmentsFor(
       patient: true,
     },
     orderBy: {
-      startTime: "asc",
+      startsAt: "asc",
     },
   });
 }
@@ -48,7 +48,7 @@ async function getAppointmentsFor(
 function mapToResponse(appointments: AppointmentEntity[]) {
   return appointments.map((appointment: AppointmentEntity): Appointment => {
     const patientDob = DateTime.fromJSDate(appointment.patient.dateOfBirth);
-    const appointmentStart = DateTime.fromJSDate(appointment.startTime);
+    const appointmentStart = DateTime.fromJSDate(appointment.startsAt);
     const age = Math.trunc(appointmentStart.diff(patientDob, "years").years);
 
     return {
@@ -62,8 +62,8 @@ function mapToResponse(appointments: AppointmentEntity[]) {
         phoneNumber: appointment.patient.phoneNumber as string,
         bloodGroup: appointment.patient.bloodGroup as never,
       },
-      start: appointment.startTime,
-      end: appointment.endTime,
+      start: appointment.startsAt,
+      end: appointment.endsAt,
     };
   });
 }

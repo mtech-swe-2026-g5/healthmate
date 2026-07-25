@@ -7,6 +7,10 @@ import { LoginForm } from "@/features/auth/components/LoginForm";
 const mockSubmitLogin = vi.fn();
 let mockToast: { message: string; variant: "success" | "error" } | null = null;
 
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 vi.mock("@/features/auth/hooks", () => ({
   useLogin: () => ({
     toast: mockToast,
@@ -99,6 +103,7 @@ describe("LoginForm", () => {
         password: "Secret1!",
         rememberMe: true,
       }),
+      null,
     );
   });
 

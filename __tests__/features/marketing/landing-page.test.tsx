@@ -100,19 +100,15 @@ describe("LandingPage", () => {
     expect(screen.queryByRole("button", { name: /log out/i })).toBeNull();
   });
 
-  it("shows dashboard + logout actions when logged in", () => {
-    render(<LandingPage isLoggedIn />);
+  it("shows open portal + logout actions when logged in", () => {
+    render(<LandingPage isLoggedIn portalHref="/doctor" />);
 
-    // Nav dashboard link + hero "Go to Dashboard" both point at /dashboard.
-    const dashboardLinks = screen
-      .getAllByRole("link")
-      .filter((el) => el.getAttribute("href") === "/dashboard");
-    expect(dashboardLinks.length).toBeGreaterThan(0);
+    const portalLinks = screen
+      .getAllByRole("link", { name: /open portal/i })
+      .filter((el) => el.getAttribute("href") === "/doctor");
+    expect(portalLinks.length).toBeGreaterThan(0);
 
     expect(screen.getByRole("button", { name: /log out/i })).toBeDefined();
-    expect(
-      screen.getByRole("link", { name: /go to dashboard/i }),
-    ).toBeDefined();
 
     // Signed-in visitors should not see the sign-in / sign-up actions.
     expect(screen.queryByRole("link", { name: /^log in$/i })).toBeNull();

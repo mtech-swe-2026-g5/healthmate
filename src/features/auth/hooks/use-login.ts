@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 
+import { resolvePostLoginRedirect } from "@/config/routes";
 import type { LoginInput } from "../types";
 
 type ToastState = {
@@ -16,13 +17,15 @@ type SubmitResult = {
 };
 
 const GENERIC_ERROR = "Invalid email or password.";
-const DEFAULT_REDIRECT = "/dashboard";
 
 export function useLogin() {
   const router = useRouter();
   const [toast, setToast] = useState<ToastState>(null);
 
-  const submitLogin = async (data: LoginInput): Promise<SubmitResult> => {
+  const submitLogin = async (
+    data: LoginInput,
+    callbackUrl?: string | null,
+  ): Promise<SubmitResult> => {
     try {
       const result = await signIn("credentials", {
         email: data.email,
@@ -36,7 +39,13 @@ export function useLogin() {
         return { success: false };
       }
 
-      router.push(DEFAULT_REDIRECT);
+      const session = await getSession();
+      const destination = resolvePostLoginRedirect(
+        session?.user?.role,
+        callbackUrl,
+      );
+
+      router.push(destination);
       router.refresh();
       return { success: true };
     } catch {

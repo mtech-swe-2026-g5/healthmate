@@ -6,6 +6,7 @@ import { useLogin } from "@/features/auth/hooks/use-login";
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
 const mockSignIn = vi.fn();
+const mockGetSession = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush, refresh: mockRefresh }),
@@ -13,6 +14,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next-auth/react", () => ({
   signIn: (...args: unknown[]) => mockSignIn(...args),
+  getSession: (...args: unknown[]) => mockGetSession(...args),
 }));
 
 const VALID_DATA = {
@@ -24,6 +26,9 @@ const VALID_DATA = {
 describe("useLogin", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetSession.mockResolvedValue({
+      user: { role: "patient", email: "jane@example.com" },
+    });
   });
 
   it("calls signIn with credentials and redirect disabled", async () => {
@@ -43,7 +48,7 @@ describe("useLogin", () => {
     });
   });
 
-  it("redirects to /dashboard on success", async () => {
+  it("redirects patients to /dashboard on success", async () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
 
     const { result } = renderHook(() => useLogin());
@@ -52,8 +57,51 @@ describe("useLogin", () => {
       await result.current.submitLogin(VALID_DATA);
     });
 
+    expect(mockGetSession).toHaveBeenCalled();
     expect(mockPush).toHaveBeenCalledWith("/dashboard");
     expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it("redirects doctors to /doctor on success", async () => {
+    mockSignIn.mockResolvedValue({ ok: true, error: null });
+    mockGetSession.mockResolvedValue({
+      user: { role: "doctor", email: "doc@example.com" },
+    });
+
+    const { result } = renderHook(() => useLogin());
+
+    await act(async () => {
+      await result.current.submitLogin(VALID_DATA);
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/doctor");
+  });
+
+  it("honours a role-allowed callbackUrl", async () => {
+    mockSignIn.mockResolvedValue({ ok: true, error: null });
+
+    const { result } = renderHook(() => useLogin());
+
+    await act(async () => {
+      await result.current.submitLogin(VALID_DATA, "/appointments/book");
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/appointments/book");
+  });
+
+  it("ignores a callbackUrl the role cannot access", async () => {
+    mockSignIn.mockResolvedValue({ ok: true, error: null });
+    mockGetSession.mockResolvedValue({
+      user: { role: "doctor", email: "doc@example.com" },
+    });
+
+    const { result } = renderHook(() => useLogin());
+
+    await act(async () => {
+      await result.current.submitLogin(VALID_DATA, "/appointments");
+    });
+
+    expect(mockPush).toHaveBeenCalledWith("/doctor");
   });
 
   it("shows a generic error toast on invalid credentials", async () => {

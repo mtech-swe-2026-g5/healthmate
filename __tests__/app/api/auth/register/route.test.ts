@@ -52,7 +52,6 @@ describe("POST /api/auth/register", () => {
           minimum: 8,
           origin: "string",
           inclusive: true,
-          exact: false,
           message: "Password must be at least 8 characters",
           path: ["password"],
         },

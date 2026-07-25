@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 
-import { handleApiError } from "@/lib/errors";
+import { AppError, handleApiError } from "@/lib/errors";
 
 describe("handleApiError", () => {
   it("should return 400 for ZodError", async () => {
@@ -12,7 +12,6 @@ describe("handleApiError", () => {
         minimum: 1,
         origin: "string",
         inclusive: true,
-        exact: false,
         message: "Required",
         path: ["email"],
       },
@@ -25,6 +24,43 @@ describe("handleApiError", () => {
     expect(json.error).toBe("Validation failed");
     expect(json.issues).toHaveLength(1);
     expect(json.issues[0].path).toBe("email");
+  });
+
+  it("should return AppError status and message", async () => {
+    const response = handleApiError(new AppError("Slot already booked", 409));
+    const json = await response.json();
+    expect(response.status).toBe(409);
+    expect(json.error).toBe("Slot already booked");
+  });
+
+  it("should return 403 for Forbidden errors", async () => {
+    const response = handleApiError(new Error("Forbidden"));
+    const json = await response.json();
+    expect(response.status).toBe(403);
+    expect(json.error).toBe("Forbidden");
+  });
+
+  it("should return 409 for slot unique constraint targets", async () => {
+    const error = new Prisma.PrismaClientKnownRequestError(
+      "Unique constraint failed",
+      {
+        code: "P2002",
+        clientVersion: "7.0.0",
+        meta: { target: ["doctor_id", "starts_at"] },
+      },
+    );
+
+    const response = handleApiError(error);
+    const json = await response.json();
+    expect(response.status).toBe(409);
+    expect(json.error).toBe("Slot already booked");
+  });
+
+  it("should return 401 for Unauthorized errors", async () => {
+    const response = handleApiError(new Error("Unauthorized"));
+    const json = await response.json();
+    expect(response.status).toBe(401);
+    expect(json.error).toBe("Unauthorized");
   });
 
   it("should return 409 for Prisma P2002 unique constraint", async () => {

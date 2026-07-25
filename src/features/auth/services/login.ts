@@ -44,7 +44,7 @@ export async function verifyUserCredentials(
   if (!isValid) return null;
 
   if (role && user.role.name !== role) return null;
-  console.log("user", user);
+
   return {
     id: user.id,
     email: user.email,

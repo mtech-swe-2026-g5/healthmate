@@ -74,7 +74,7 @@ describe("getAppointmentsByDoctor", () => {
       expect(prisma.appointment.findMany).toHaveBeenCalledWith({
         where: {
           doctorId: validRequest.doctorId,
-          startTime: {
+          startsAt: {
             gte: DateTime.fromJSDate(validRequest.startDate)
               .startOf("day")
               .toJSDate(),
@@ -87,7 +87,7 @@ describe("getAppointmentsByDoctor", () => {
           patient: true,
         },
         orderBy: {
-          startTime: "asc",
+          startsAt: "asc",
         },
       });
     });
@@ -125,8 +125,8 @@ describe("getAppointmentsByDoctor", () => {
     it("should map start and end times to appointment response", async () => {
       const result = await getAppointmentsByDoctor(validRequest);
       const appointment = result?.appointments[0];
-      expect(appointment?.start).toStrictEqual(mockAppointment1.startTime);
-      expect(appointment?.end).toStrictEqual(mockAppointment1.endTime);
+      expect(appointment?.start).toStrictEqual(mockAppointment1.startsAt);
+      expect(appointment?.end).toStrictEqual(mockAppointment1.endsAt);
     });
   });
 

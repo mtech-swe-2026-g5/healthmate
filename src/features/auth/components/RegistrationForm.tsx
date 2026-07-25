@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { MdHowToReg, MdVisibility, MdVisibilityOff } from "react-icons/md";
 
 import { BrandMark } from "@/components/ui/BrandMark";
 import { Toast } from "@/components/ui/Toast";
@@ -305,8 +305,9 @@ export function RegistrationForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-14 bg-[var(--color-primary)] text-white rounded-lg font-dm-sans text-label-md font-bold hover:bg-[var(--color-primary-container)] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] font-dm-sans text-label-md font-bold text-white transition-all hover:bg-[var(--color-primary-container)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
+          <MdHowToReg size={20} aria-hidden />
           {isSubmitting ? "Creating account..." : "Create Account"}
         </button>
       </form>

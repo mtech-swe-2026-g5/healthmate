@@ -1,33 +1,42 @@
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 
+import {
+  getRoleHome,
+  isAuthOnlyRoute,
+  isPublicRoute,
+  matchRouteAccess,
+} from "@/config/routes";
 import { authConfig } from "@/lib/auth.config";
 
 /**
- * Centralised route protection (the story's recommended approach). Runs on the
- * edge using the edge-safe config only — the Credentials provider (bcrypt /
- * Prisma) stays out so this is edge-compatible.
+ * Centralised route protection. Runs on the edge using the edge-safe config
+ * only — Credentials (bcrypt / Prisma) stay out so this is edge-compatible.
  *
- * - Public pages and Auth.js / registration endpoints are always allowed.
- * - Unauthenticated requests to a protected API route get a 401 JSON response.
- * - Unauthenticated requests to a protected page are redirected to /login.
- * - Authenticated users are kept out of /login and /register.
+ * Access matrix (see `src/config/routes.ts`):
+ * - Public pages are always allowed.
+ * - Auth-only pages redirect signed-in users to their role home.
+ * - Patient / doctor portals enforce role; wrong role → role home.
+ * - Unauthenticated protected pages → /login?callbackUrl=…
+ * - Protected APIs → 401 JSON when unauthenticated.
  */
 const { auth } = NextAuth(authConfig);
-
-const PUBLIC_PAGES = ["/", "/login", "/register"];
 
 export default auth((req) => {
   const { nextUrl } = req;
   const { pathname } = nextUrl;
   const isLoggedIn = !!req.auth?.user;
+  const role = req.auth?.user?.role;
 
-  // Auth.js endpoints + registration must stay open.
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  // Protected API routes answer with 401 rather than redirecting.
+  // Razorpay webhooks are authenticated via signature, not session cookies.
+  if (pathname === "/api/payments/webhook") {
+    return NextResponse.next();
+  }
+
   if (pathname.startsWith("/api")) {
     if (!isLoggedIn) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -35,20 +44,32 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  // Signed-in users should not see the auth pages.
-  if (isLoggedIn && (pathname === "/login" || pathname === "/register")) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl));
+  if (isLoggedIn && isAuthOnlyRoute(pathname)) {
+    return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
   }
 
-  // Unauthenticated users hitting a protected page go to login.
-  if (!isLoggedIn && !PUBLIC_PAGES.includes(pathname)) {
-    return NextResponse.redirect(new URL("/login", nextUrl));
+  if (!isLoggedIn) {
+    if (isPublicRoute(pathname) || isAuthOnlyRoute(pathname)) {
+      return NextResponse.next();
+    }
+    const loginUrl = new URL("/login", nextUrl);
+    loginUrl.searchParams.set("callbackUrl", `${pathname}${nextUrl.search}`);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  const access = matchRouteAccess(pathname);
+
+  if (access === "patient" && role !== "patient") {
+    return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
+  }
+
+  if (access === "doctor" && role !== "doctor" && role !== "admin") {
+    return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  // Run on everything except Next internals and static assets.
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

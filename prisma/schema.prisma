@@ -1,5 +1,6 @@
 // Database schema is added incrementally via migrations as features are implemented.
 // Run: pnpm db:migrate -- --name <descriptive_name>
+// Multi-file schema: prisma/schema.prisma + prisma/models/*.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -67,6 +68,7 @@ model Patient {
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+  payments     Payment[]
 
   @@index([userId])
   @@map("patients")
@@ -81,6 +83,8 @@ model Doctor {
   userId            String   @unique @map("user_id") @db.Uuid
   firstName         String   @map("first_name") @db.VarChar(100)
   lastName          String   @map("last_name") @db.VarChar(100)
+  specialization    String   @default("General Physician") @db.VarChar(120)
+  isActive          Boolean  @default(true) @map("is_active")
   gender            String?  @db.VarChar(20)
   phoneNumber       String?  @map("phone_number") @db.VarChar(20)
   profilePictureUrl String?  @map("profile_picture_url")
@@ -92,6 +96,8 @@ model Doctor {
   slotConfigurations SlotConfiguration[]
 
   @@index([userId])
+  @@index([specialization])
+  @@index([isActive])
   @@map("doctors")
 }
 

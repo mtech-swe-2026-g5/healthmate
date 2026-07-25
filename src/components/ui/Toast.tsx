@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MdCheckCircle, MdClose, MdError } from "react-icons/md";
 
 type ToastVariant = "success" | "error";
 
@@ -43,6 +44,19 @@ export function Toast({
         visible ? "opacity-100" : "opacity-0"
       } ${VARIANT_STYLES[variant]}`}
     >
+      {variant === "success" ? (
+        <MdCheckCircle
+          size={20}
+          className="shrink-0 text-[var(--color-primary)]"
+          aria-hidden
+        />
+      ) : (
+        <MdError
+          size={20}
+          className="shrink-0 text-[var(--color-error)]"
+          aria-hidden
+        />
+      )}
       <span className="text-body-md">{message}</span>
       <button
         type="button"
@@ -50,10 +64,10 @@ export function Toast({
           setVisible(false);
           setTimeout(onClose, 300);
         }}
-        className="ml-2 text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors duration-200"
+        className="ml-1 rounded-md p-1 text-[var(--color-on-surface-variant)] transition-colors duration-200 hover:bg-[var(--color-surface-container-high)] hover:text-[var(--color-on-surface)]"
         aria-label="Dismiss notification"
       >
-        &times;
+        <MdClose size={18} aria-hidden />
       </button>
     </div>
   );

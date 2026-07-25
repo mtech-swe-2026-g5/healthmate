@@ -212,7 +212,7 @@ src/
 - **GitHub Actions**: Prisma schema check → lint → test → build on every PR
 - **Dependabot** for dependency updates
 - **Environment templates**: `.env.sample` (and local `.env`, gitignored) with `DATABASE_URL` and auth placeholders
-- **Prisma 7 scaffolding**: empty schema, `prisma.config.ts`, `src/lib/prisma.ts`, `prisma/migrations/`, and `db:*` scripts
+- **Prisma 7 scaffolding**: schema + migrations, `prisma.config.ts`, `src/lib/prisma.ts`, and `db:*` scripts
 - **AI agent rules** in `.ai-agent-rules/` (architecture, database, auth, testing, DevOps)
 - **Authentication** — Auth.js (NextAuth v5) credentials login/logout with role-based session:
   - **JWT session strategy** (no Prisma adapter): the current schema uses a custom
@@ -234,16 +234,21 @@ src/
     dashboards come later.
   - Navbar and landing CTAs are session-aware: signed-in users see a **Dashboard**
     link + **Log out** (the same `MarketingNav` is reused on the dashboard).
+- **Patient appointment booking (HAS7)** — doctors list, slot picker (Mon–Sat,
+  11AM–7PM, 1-hour slots), visit details, confirmation, and appointments list:
+  - Schema: `doctors`, `working_hours`, `appointments` (+ docs in `docs/has7/`)
+  - APIs: `GET /api/doctors`, `GET /api/doctors/[id]/slots`, `GET|POST /api/appointments`,
+    `GET /api/appointments/[id]`
+  - UI: `/appointments/book`, `/appointments`, `/appointments/[id]`
+  - Seed doctors with password `Doctor@123` via `pnpm db:seed`
 
 ### In progress / next up
 
-- Add remaining domain models to `prisma/schema.prisma`
 - Doctor dashboard and role-specific landing pages
-- Feature modules: appointments, doctors, patients, reminders, analytics
+- Cancellations, reminders, analytics
 
 ### Not yet implemented
 
-- Appointment booking, dashboards, and REST/API routes
 - SMS/email reminders and analytics
 - Forgot-password and OAuth (deferred per auth rules)
 

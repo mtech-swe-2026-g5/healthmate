@@ -2,36 +2,35 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
-import { MarketingNav } from "@/features/marketing";
-import ComingSoon from "@/features/auth/components/ComingSoon";
-import DoctorDashboard from "@/features/doctor/appointments/components/DoctorDashboard";
+import { listPatientAppointments } from "@/features/appointments/services/appointments";
+import { PatientDashboardView } from "@/features/dashboard";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Dashboard — HealthMate",
-  description: "Your HealthMate dashboard.",
+  description: "Your HealthMate patient dashboard.",
 };
 
 export default async function DashboardPage() {
   const session = await auth();
+  if (!session?.user?.id) redirect("/login");
 
-  // Defence in depth: middleware already guards this route, but server
-  // components must re-check the session before rendering protected UI.
-  if (!session?.user) redirect("/login");
+  const [patient, appointments] = await Promise.all([
+    prisma.patient.findUnique({
+      where: { userId: session.user.id },
+      select: { firstName: true },
+    }),
+    listPatientAppointments(session.user.id, session.user.role),
+  ]);
 
-  const { email, role } = session.user;
+  const firstName =
+    patient?.firstName || session.user.email?.split("@")[0] || "there";
 
   return (
-    <div className="auth-body-bg min-h-screen">
-      {/* Reuse the platform navbar for consistency (Dashboard + Log out). */}
-      <MarketingNav isLoggedIn />
-
-      <main className="mx-auto max-w-[800px] px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-xxl)]">
-        {role === "doctor" ? (
-          <DoctorDashboard doctorId={session.user.doctor!.id as string} />
-        ) : (
-          <ComingSoon role={role} email={email} />
-        )}
-      </main>
-    </div>
+    <PatientDashboardView
+      firstName={firstName}
+      upcoming={appointments.upcoming}
+      pastCount={appointments.past.length}
+    />
   );
 }

@@ -1,17 +1,95 @@
+// Appointments, payments, and scheduling models (patient HAS7 + doctor dashboard)
+
+enum AppointmentStatus {
+  CONFIRMED
+
+  @@map("appointment_status")
+}
+
+enum PaymentStatus {
+  CREATED
+  CAPTURED
+  FAILED
+
+  @@map("payment_status")
+}
+
+// ============================================
+// Clinic working hours (global defaults for patient booking MVP)
+// dayOfWeek: 0 = Sunday … 6 = Saturday
+// ============================================
+
+model WorkingHours {
+  id                  Int     @id @default(autoincrement()) @db.SmallInt
+  dayOfWeek           Int     @unique @map("day_of_week") @db.SmallInt
+  startTime           String  @map("start_time") @db.VarChar(5)
+  endTime             String  @map("end_time") @db.VarChar(5)
+  slotDurationMinutes Int     @default(60) @map("slot_duration_minutes") @db.SmallInt
+  isActive            Boolean @default(true) @map("is_active")
+
+  @@map("working_hours")
+}
+
+// ============================================
+// Appointments (HAS7 patient booking + doctor dashboard)
+// ============================================
+
 model Appointment {
-  id        String   @id @default(uuid()) @db.Uuid
-  patientId String   @map("patient_id") @db.Uuid
-  doctorId  String   @map("doctor_id") @db.Uuid
-  startTime DateTime @map("start_time") @db.Timestamptz()
-  endTime   DateTime @map("end_time") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  id               String            @id @default(uuid()) @db.Uuid
+  bookingReference String            @unique @map("booking_reference") @db.VarChar(20)
+  patientId        String            @map("patient_id") @db.Uuid
+  doctorId         String            @map("doctor_id") @db.Uuid
+  startsAt         DateTime          @map("starts_at") @db.Timestamptz()
+  endsAt           DateTime          @map("ends_at") @db.Timestamptz()
+  status           AppointmentStatus @default(CONFIRMED)
+  reasonForVisit   String            @default("General consultation") @map("reason_for_visit") @db.VarChar(200)
+  additionalNotes  String?           @map("additional_notes") @db.VarChar(500)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz()
 
-  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor  Doctor  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  payment Payment?
 
+  @@unique([doctorId, startsAt])
+  @@index([patientId, startsAt])
+  @@index([doctorId, startsAt])
+  @@index([status])
   @@map("appointments")
 }
+
+// ============================================
+// Payments (Razorpay) — booking draft until CAPTURED
+// ============================================
+
+model Payment {
+  id                String        @id @default(uuid()) @db.Uuid
+  patientId         String        @map("patient_id") @db.Uuid
+  razorpayOrderId   String        @unique @map("razorpay_order_id") @db.VarChar(64)
+  razorpayPaymentId String?       @unique @map("razorpay_payment_id") @db.VarChar(64)
+  amountInPaise     Int           @map("amount_in_paise")
+  currency          String        @default("INR") @db.VarChar(3)
+  status            PaymentStatus @default(CREATED)
+  doctorId          String        @map("doctor_id") @db.Uuid
+  appointmentDate   String        @map("appointment_date") @db.VarChar(10)
+  startTime         String        @map("start_time") @db.VarChar(5)
+  reasonForVisit    String        @map("reason_for_visit") @db.VarChar(200)
+  additionalNotes   String?       @map("additional_notes") @db.VarChar(500)
+  appointmentId     String?       @unique @map("appointment_id") @db.Uuid
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz()
+
+  patient     Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([patientId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ============================================
+// Per-doctor slot configurations (doctor dashboard)
+// ============================================
 
 model SlotConfiguration {
   id         String    @id @default(uuid()) @db.Uuid
