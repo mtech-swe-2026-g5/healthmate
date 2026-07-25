@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.2.0...v1.3.0) (2026-07-25)
+
+
+### Features
+
+* **appointments:** add patient booking, payments, portals, and profile ([#39](https://github.com/mtech-swe-2026-g5/healthmate/issues/39)) ([5a19bae](https://github.com/mtech-swe-2026-g5/healthmate/commit/5a19bae154df816593d0a808c5b3bceaf2cc0af7))
+
 # [1.2.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.1.1...v1.2.0) (2026-07-25)
 
 
