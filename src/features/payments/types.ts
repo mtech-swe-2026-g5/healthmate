@@ -1,18 +1,18 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { DATE_REGEX, TIME_REGEX } from '@/features/appointments/types';
+import { DATE_REGEX, TIME_REGEX } from "@/features/appointments/types";
 
 export const createPaymentOrderSchema = z.object({
   doctorId: z.string().uuid(),
-  date: z.string().regex(DATE_REGEX, 'date must be YYYY-MM-DD'),
-  startTime: z.string().regex(TIME_REGEX, 'startTime must be HH:mm'),
+  date: z.string().regex(DATE_REGEX, "date must be YYYY-MM-DD"),
+  startTime: z.string().regex(TIME_REGEX, "startTime must be HH:mm"),
   reasonForVisit: z
     .string()
-    .min(1, 'Reason for visit is required')
-    .max(200, 'Reason for visit must be 200 characters or fewer'),
+    .min(1, "Reason for visit is required")
+    .max(200, "Reason for visit must be 200 characters or fewer"),
   additionalNotes: z
     .string()
-    .max(500, 'Additional notes must be 500 characters or fewer')
+    .max(500, "Additional notes must be 500 characters or fewer")
     .optional(),
 });
 

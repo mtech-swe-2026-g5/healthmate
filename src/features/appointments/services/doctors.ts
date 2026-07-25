@@ -1,13 +1,13 @@
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
-import type { DoctorListItem } from '../types/doctor';
+import type { DoctorListItem } from "../types/doctor";
 
-export type { DoctorListItem } from '../types/doctor';
+export type { DoctorListItem } from "../types/doctor";
 
 export async function listActiveDoctors(): Promise<DoctorListItem[]> {
   const doctors = await prisma.doctor.findMany({
     where: { isActive: true },
-    orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
+    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     select: {
       id: true,
       firstName: true,

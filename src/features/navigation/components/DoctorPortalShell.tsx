@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   MdCalendarMonth,
   MdDashboard,
   MdGroups,
   MdHealthAndSafety,
   MdPerson,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import { LogoutButton } from '@/features/auth/components/LogoutButton';
+import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
 type DoctorPortalShellProps = {
   children: React.ReactNode;
@@ -20,14 +20,14 @@ type DoctorPortalShellProps = {
 };
 
 const NAV = [
-  { href: '/doctor', label: 'Dashboard', icon: MdDashboard },
-  { href: '/doctor/schedule', label: 'Schedule', icon: MdCalendarMonth },
-  { href: '/doctor/patients', label: 'Patients', icon: MdGroups },
+  { href: "/doctor", label: "Dashboard", icon: MdDashboard },
+  { href: "/doctor/schedule", label: "Schedule", icon: MdCalendarMonth },
+  { href: "/doctor/patients", label: "Patients", icon: MdGroups },
 ] as const;
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === '/doctor') {
-    return pathname === '/doctor';
+  if (href === "/doctor") {
+    return pathname === "/doctor";
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -36,16 +36,16 @@ export function DoctorPortalShell({
   children,
   userEmail,
   userName,
-  roleLabel = 'Doctor',
+  roleLabel = "Doctor",
 }: DoctorPortalShellProps) {
   const pathname = usePathname();
-  const displayName = userName || userEmail || 'Doctor';
+  const displayName = userName || userEmail || "Doctor";
   const initials = displayName
     .split(/[\s@]/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('');
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
 
   return (
     <div className="flex min-h-screen bg-[var(--color-background)] text-[var(--color-on-surface)]">
@@ -67,7 +67,10 @@ export function DoctorPortalShell({
           </div>
         </Link>
 
-        <nav className="flex flex-1 flex-col gap-1" aria-label="Doctor navigation">
+        <nav
+          className="flex flex-1 flex-col gap-1"
+          aria-label="Doctor navigation"
+        >
           {NAV.map((item) => {
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
@@ -77,8 +80,8 @@ export function DoctorPortalShell({
                 href={item.href}
                 className={`flex items-center gap-[var(--spacing-hm-md)] rounded-lg px-[var(--spacing-hm-md)] py-2 transition-all duration-200 ${
                   active
-                    ? 'bg-[var(--color-secondary-container)] font-bold text-[var(--color-on-secondary-container)]'
-                    : 'font-medium text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)]'
+                    ? "bg-[var(--color-secondary-container)] font-bold text-[var(--color-on-secondary-container)]"
+                    : "font-medium text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)]"
                 }`}
               >
                 <Icon size={22} aria-hidden />
@@ -115,13 +118,16 @@ export function DoctorPortalShell({
             >
               HealthMate
             </Link>
-            <nav className="hidden items-center gap-8 md:flex" aria-label="Section">
+            <nav
+              className="hidden items-center gap-8 md:flex"
+              aria-label="Section"
+            >
               <Link
                 href="/doctor"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname === '/doctor'
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                  pathname === "/doctor"
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdDashboard size={18} aria-hidden />
@@ -130,9 +136,9 @@ export function DoctorPortalShell({
               <Link
                 href="/doctor/schedule"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname.startsWith('/doctor/schedule')
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                  pathname.startsWith("/doctor/schedule")
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdCalendarMonth size={18} aria-hidden />
@@ -141,9 +147,9 @@ export function DoctorPortalShell({
               <Link
                 href="/doctor/patients"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname.startsWith('/doctor/patients')
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                  pathname.startsWith("/doctor/patients")
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdGroups size={18} aria-hidden />
@@ -177,8 +183,8 @@ export function DoctorPortalShell({
                 href={item.href}
                 className={`flex flex-col items-center gap-1 transition-colors ${
                   active
-                    ? 'font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                    ? "font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <Icon size={22} aria-hidden />

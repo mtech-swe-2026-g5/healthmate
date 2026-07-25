@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Patients — HealthMate',
-  description: 'Doctor patient list.',
+  title: "Patients — HealthMate",
+  description: "Doctor patient list.",
 };
 
 export default function DoctorPatientsPage() {

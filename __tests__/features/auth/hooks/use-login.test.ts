@@ -1,37 +1,37 @@
-import { renderHook, act } from '@testing-library/react';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { renderHook, act } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { useLogin } from '@/features/auth/hooks/use-login';
+import { useLogin } from "@/features/auth/hooks/use-login";
 
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
 const mockSignIn = vi.fn();
 const mockGetSession = vi.fn();
 
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush, refresh: mockRefresh }),
 }));
 
-vi.mock('next-auth/react', () => ({
+vi.mock("next-auth/react", () => ({
   signIn: (...args: unknown[]) => mockSignIn(...args),
   getSession: (...args: unknown[]) => mockGetSession(...args),
 }));
 
 const VALID_DATA = {
-  email: 'jane@example.com',
-  password: 'Secure1!pass',
+  email: "jane@example.com",
+  password: "Secure1!pass",
   rememberMe: true,
 };
 
-describe('useLogin', () => {
+describe("useLogin", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetSession.mockResolvedValue({
-      user: { role: 'patient', email: 'jane@example.com' },
+      user: { role: "patient", email: "jane@example.com" },
     });
   });
 
-  it('calls signIn with credentials and redirect disabled', async () => {
+  it("calls signIn with credentials and redirect disabled", async () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
 
     const { result } = renderHook(() => useLogin());
@@ -40,15 +40,15 @@ describe('useLogin', () => {
       await result.current.submitLogin(VALID_DATA);
     });
 
-    expect(mockSignIn).toHaveBeenCalledWith('credentials', {
-      email: 'jane@example.com',
-      password: 'Secure1!pass',
-      rememberMe: 'true',
+    expect(mockSignIn).toHaveBeenCalledWith("credentials", {
+      email: "jane@example.com",
+      password: "Secure1!pass",
+      rememberMe: "true",
       redirect: false,
     });
   });
 
-  it('redirects patients to /dashboard on success', async () => {
+  it("redirects patients to /dashboard on success", async () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
 
     const { result } = renderHook(() => useLogin());
@@ -58,14 +58,14 @@ describe('useLogin', () => {
     });
 
     expect(mockGetSession).toHaveBeenCalled();
-    expect(mockPush).toHaveBeenCalledWith('/dashboard');
+    expect(mockPush).toHaveBeenCalledWith("/dashboard");
     expect(mockRefresh).toHaveBeenCalled();
   });
 
-  it('redirects doctors to /doctor on success', async () => {
+  it("redirects doctors to /doctor on success", async () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
     mockGetSession.mockResolvedValue({
-      user: { role: 'doctor', email: 'doc@example.com' },
+      user: { role: "doctor", email: "doc@example.com" },
     });
 
     const { result } = renderHook(() => useLogin());
@@ -74,38 +74,38 @@ describe('useLogin', () => {
       await result.current.submitLogin(VALID_DATA);
     });
 
-    expect(mockPush).toHaveBeenCalledWith('/doctor');
+    expect(mockPush).toHaveBeenCalledWith("/doctor");
   });
 
-  it('honours a role-allowed callbackUrl', async () => {
+  it("honours a role-allowed callbackUrl", async () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
 
     const { result } = renderHook(() => useLogin());
 
     await act(async () => {
-      await result.current.submitLogin(VALID_DATA, '/appointments/book');
+      await result.current.submitLogin(VALID_DATA, "/appointments/book");
     });
 
-    expect(mockPush).toHaveBeenCalledWith('/appointments/book');
+    expect(mockPush).toHaveBeenCalledWith("/appointments/book");
   });
 
-  it('ignores a callbackUrl the role cannot access', async () => {
+  it("ignores a callbackUrl the role cannot access", async () => {
     mockSignIn.mockResolvedValue({ ok: true, error: null });
     mockGetSession.mockResolvedValue({
-      user: { role: 'doctor', email: 'doc@example.com' },
+      user: { role: "doctor", email: "doc@example.com" },
     });
 
     const { result } = renderHook(() => useLogin());
 
     await act(async () => {
-      await result.current.submitLogin(VALID_DATA, '/appointments');
+      await result.current.submitLogin(VALID_DATA, "/appointments");
     });
 
-    expect(mockPush).toHaveBeenCalledWith('/doctor');
+    expect(mockPush).toHaveBeenCalledWith("/doctor");
   });
 
-  it('shows a generic error toast on invalid credentials', async () => {
-    mockSignIn.mockResolvedValue({ ok: false, error: 'CredentialsSignin' });
+  it("shows a generic error toast on invalid credentials", async () => {
+    mockSignIn.mockResolvedValue({ ok: false, error: "CredentialsSignin" });
 
     const { result } = renderHook(() => useLogin());
 
@@ -114,14 +114,14 @@ describe('useLogin', () => {
     });
 
     expect(result.current.toast).toEqual({
-      message: 'Invalid email or password.',
-      variant: 'error',
+      message: "Invalid email or password.",
+      variant: "error",
     });
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('shows a network error toast when signIn throws', async () => {
-    mockSignIn.mockRejectedValue(new Error('network down'));
+  it("shows a network error toast when signIn throws", async () => {
+    mockSignIn.mockRejectedValue(new Error("network down"));
 
     const { result } = renderHook(() => useLogin());
 
@@ -130,13 +130,13 @@ describe('useLogin', () => {
     });
 
     expect(result.current.toast).toEqual({
-      message: 'Network error. Please check your connection and try again.',
-      variant: 'error',
+      message: "Network error. Please check your connection and try again.",
+      variant: "error",
     });
   });
 
-  it('allows dismissing the toast', async () => {
-    mockSignIn.mockResolvedValue({ ok: false, error: 'CredentialsSignin' });
+  it("allows dismissing the toast", async () => {
+    mockSignIn.mockResolvedValue({ ok: false, error: "CredentialsSignin" });
 
     const { result } = renderHook(() => useLogin());
 

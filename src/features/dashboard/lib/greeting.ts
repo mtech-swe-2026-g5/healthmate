@@ -2,9 +2,9 @@
  * Time-of-day greeting for the patient dashboard header.
  */
 export function greetingForHour(hour: number): string {
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 /**
@@ -21,7 +21,7 @@ export function daysUntil(target: Date, from: Date = new Date()): number {
 }
 
 export function formatCountdownLabel(days: number): string {
-  if (days <= 0) return 'Today';
-  if (days === 1) return '1 Day';
+  if (days <= 0) return "Today";
+  if (days === 1) return "1 Day";
   return `${days} Days`;
 }

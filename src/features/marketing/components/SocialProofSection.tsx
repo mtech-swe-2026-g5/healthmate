@@ -1,7 +1,7 @@
-import { AppIcon } from '@/components/ui/AppIcon';
-import { socialProofClinics } from '@/features/marketing/constants/landing-content';
+import { AppIcon } from "@/components/ui/AppIcon";
+import { socialProofClinics } from "@/features/marketing/constants/landing-content";
 
-import { MarketingContainer } from './MarketingContainer';
+import { MarketingContainer } from "./MarketingContainer";
 
 export function SocialProofSection() {
   return (

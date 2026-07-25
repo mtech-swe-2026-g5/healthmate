@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   MdCalendarMonth,
   MdDashboard,
@@ -9,9 +9,9 @@ import {
   MdHealthAndSafety,
   MdPerson,
   MdSettings,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import { LogoutButton } from '@/features/auth/components/LogoutButton';
+import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
 type PatientPortalShellProps = {
   children: React.ReactNode;
@@ -20,25 +20,30 @@ type PatientPortalShellProps = {
 };
 
 const NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: MdDashboard },
-  { href: '/appointments', label: 'Appointments', icon: MdEvent, match: '/appointments' },
-  { href: '/appointments/book', label: 'Schedule', icon: MdCalendarMonth },
-  { href: '/profile', label: 'Settings', icon: MdSettings },
+  { href: "/dashboard", label: "Dashboard", icon: MdDashboard },
+  {
+    href: "/appointments",
+    label: "Appointments",
+    icon: MdEvent,
+    match: "/appointments",
+  },
+  { href: "/appointments/book", label: "Schedule", icon: MdCalendarMonth },
+  { href: "/profile", label: "Settings", icon: MdSettings },
 ] as const;
 
 function isActive(pathname: string, href: string, match?: string): boolean {
-  if (href === '/appointments/book') {
-    return pathname.startsWith('/appointments/book');
+  if (href === "/appointments/book") {
+    return pathname.startsWith("/appointments/book");
   }
-  if (match === '/appointments') {
+  if (match === "/appointments") {
     return (
-      pathname === '/appointments' ||
+      pathname === "/appointments" ||
       (/^\/appointments\/[^/]+$/.test(pathname) &&
-        !pathname.startsWith('/appointments/book'))
+        !pathname.startsWith("/appointments/book"))
     );
   }
-  if (href === '/profile') {
-    return pathname === '/profile' || pathname.startsWith('/profile/');
+  if (href === "/profile") {
+    return pathname === "/profile" || pathname.startsWith("/profile/");
   }
   return pathname === href;
 }
@@ -49,13 +54,13 @@ export function PatientPortalShell({
   userName,
 }: PatientPortalShellProps) {
   const pathname = usePathname();
-  const displayName = userName || userEmail || 'Patient';
+  const displayName = userName || userEmail || "Patient";
   const initials = displayName
     .split(/[\s@]/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('');
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
 
   return (
     <div className="flex min-h-screen bg-[var(--color-background)] text-[var(--color-on-surface)]">
@@ -77,9 +82,16 @@ export function PatientPortalShell({
           </div>
         </Link>
 
-        <nav className="flex flex-1 flex-col gap-1" aria-label="Patient navigation">
+        <nav
+          className="flex flex-1 flex-col gap-1"
+          aria-label="Patient navigation"
+        >
           {NAV.map((item) => {
-            const active = isActive(pathname, item.href, 'match' in item ? item.match : undefined);
+            const active = isActive(
+              pathname,
+              item.href,
+              "match" in item ? item.match : undefined,
+            );
             const Icon = item.icon;
             return (
               <Link
@@ -87,8 +99,8 @@ export function PatientPortalShell({
                 href={item.href}
                 className={`flex items-center gap-[var(--spacing-hm-md)] rounded-lg px-[var(--spacing-hm-md)] py-2 transition-all duration-200 ${
                   active
-                    ? 'bg-[var(--color-secondary-container)] font-bold text-[var(--color-on-secondary-container)]'
-                    : 'font-medium text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)]'
+                    ? "bg-[var(--color-secondary-container)] font-bold text-[var(--color-on-secondary-container)]"
+                    : "font-medium text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-highest)]"
                 }`}
               >
                 <Icon size={22} aria-hidden />
@@ -135,13 +147,16 @@ export function PatientPortalShell({
             >
               HealthMate
             </Link>
-            <nav className="hidden items-center gap-8 md:flex" aria-label="Section">
+            <nav
+              className="hidden items-center gap-8 md:flex"
+              aria-label="Section"
+            >
               <Link
                 href="/dashboard"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname === '/dashboard'
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                  pathname === "/dashboard"
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdDashboard size={18} aria-hidden />
@@ -150,11 +165,11 @@ export function PatientPortalShell({
               <Link
                 href="/appointments"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname === '/appointments' ||
+                  pathname === "/appointments" ||
                   (/^\/appointments\/[^/]+$/.test(pathname) &&
-                    !pathname.startsWith('/appointments/book'))
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                    !pathname.startsWith("/appointments/book"))
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdEvent size={18} aria-hidden />
@@ -163,9 +178,9 @@ export function PatientPortalShell({
               <Link
                 href="/appointments/book"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname.startsWith('/appointments/book')
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                  pathname.startsWith("/appointments/book")
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdCalendarMonth size={18} aria-hidden />
@@ -174,9 +189,9 @@ export function PatientPortalShell({
               <Link
                 href="/profile"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
-                  pathname.startsWith('/profile')
-                    ? 'border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                  pathname.startsWith("/profile")
+                    ? "border-b-2 border-[var(--color-primary)] pb-1 font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <MdSettings size={18} aria-hidden />
@@ -202,7 +217,11 @@ export function PatientPortalShell({
           aria-label="Mobile navigation"
         >
           {NAV.map((item) => {
-            const active = isActive(pathname, item.href, 'match' in item ? item.match : undefined);
+            const active = isActive(
+              pathname,
+              item.href,
+              "match" in item ? item.match : undefined,
+            );
             const Icon = item.icon;
             return (
               <Link
@@ -210,8 +229,8 @@ export function PatientPortalShell({
                 href={item.href}
                 className={`flex flex-col items-center gap-1 transition-colors ${
                   active
-                    ? 'font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]'
+                    ? "font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-primary)]"
                 }`}
               >
                 <Icon size={22} aria-hidden />

@@ -1,12 +1,12 @@
-import { CtaSection } from './CtaSection';
-import { FeatureGridSection } from './FeatureGridSection';
-import { PlatformFeaturesSection } from './PlatformFeaturesSection';
-import { ForDoctorsSection } from './ForDoctorsSection';
-import { HeroSection } from './HeroSection';
-import { HowItWorksSection } from './HowItWorksSection';
-import { MarketingFooter } from './MarketingFooter';
-import { MarketingNav } from './MarketingNav';
-import { SocialProofSection } from './SocialProofSection';
+import { CtaSection } from "./CtaSection";
+import { FeatureGridSection } from "./FeatureGridSection";
+import { PlatformFeaturesSection } from "./PlatformFeaturesSection";
+import { ForDoctorsSection } from "./ForDoctorsSection";
+import { HeroSection } from "./HeroSection";
+import { HowItWorksSection } from "./HowItWorksSection";
+import { MarketingFooter } from "./MarketingFooter";
+import { MarketingNav } from "./MarketingNav";
+import { SocialProofSection } from "./SocialProofSection";
 
 type LandingPageProps = {
   isLoggedIn?: boolean;

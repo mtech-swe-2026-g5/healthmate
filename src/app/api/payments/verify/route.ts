@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-import { auth } from '@/lib/auth';
-import { handleApiError } from '@/lib/errors';
-import { verifyAndCompletePayment } from '@/features/payments/services';
+import { auth } from "@/lib/auth";
+import { handleApiError } from "@/lib/errors";
+import { verifyAndCompletePayment } from "@/features/payments/services";
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();

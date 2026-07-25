@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   MdArrowBack,
@@ -9,9 +9,9 @@ import {
   MdPayment,
   MdPerson,
   MdSchedule,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import type { DoctorListItem } from '@/features/appointments/types/doctor';
+import type { DoctorListItem } from "@/features/appointments/types/doctor";
 
 type PaymentStepProps = {
   doctor: DoctorListItem;
@@ -27,29 +27,29 @@ type PaymentStepProps = {
 
 const TEST_CARDS = [
   {
-    network: 'Visa',
-    number: '4100 2800 0000 1007',
-    type: 'Debit',
-    subType: 'Consumer',
+    network: "Visa",
+    number: "4100 2800 0000 1007",
+    type: "Debit",
+    subType: "Consumer",
   },
   {
-    network: 'Mastercard',
-    number: '5555 5100 0008 1006',
-    type: 'Credit',
-    subType: 'Business',
+    network: "Mastercard",
+    number: "5555 5100 0008 1006",
+    type: "Credit",
+    subType: "Business",
   },
 ] as const;
 
 function formatDisplayTime(hm: string): string {
-  const [h, m] = hm.split(':').map(Number);
-  const period = (h ?? 0) >= 12 ? 'PM' : 'AM';
+  const [h, m] = hm.split(":").map(Number);
+  const period = (h ?? 0) >= 12 ? "PM" : "AM";
   const hour12 = (h ?? 0) % 12 || 12;
-  return `${hour12}:${String(m ?? 0).padStart(2, '0')} ${period}`;
+  return `${hour12}:${String(m ?? 0).padStart(2, "0")} ${period}`;
 }
 
 function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
   const initials =
-    `${doctor.firstName[0] ?? ''}${doctor.lastName[0] ?? ''}`.toUpperCase();
+    `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
   return (
     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-primary-fixed)] bg-[var(--color-primary-container)]/15 font-dm-sans text-title-lg font-bold text-[var(--color-primary)]">
       {initials || <MdPerson size={24} />}
@@ -59,7 +59,7 @@ function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
 
 async function copyCardNumber(number: string) {
   try {
-    await navigator.clipboard.writeText(number.replace(/\s/g, ''));
+    await navigator.clipboard.writeText(number.replace(/\s/g, ""));
   } catch {
     // Clipboard may be unavailable; ignore — number remains visible.
   }
@@ -77,10 +77,10 @@ export function PaymentStep({
   onPay,
 }: PaymentStepProps) {
   const dateLabel = new Date(`${date}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    weekday: "long",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 
   return (
@@ -94,7 +94,7 @@ export function PaymentStep({
             Payment
           </h2>
           <p className="mt-2 font-literata text-body-md text-[var(--color-on-surface-variant)]">
-            Pay the consultation fee to confirm your appointment with Dr.{' '}
+            Pay the consultation fee to confirm your appointment with Dr.{" "}
             {doctor.lastName}.
           </p>
         </div>
@@ -110,7 +110,11 @@ export function PaymentStep({
               </p>
             </div>
             <p className="flex items-center gap-2 font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-              <MdLock size={16} className="text-[var(--color-primary)]" aria-hidden />
+              <MdLock
+                size={16}
+                className="text-[var(--color-primary)]"
+                aria-hidden
+              />
               Secured by Razorpay
             </p>
           </div>
@@ -186,7 +190,7 @@ export function PaymentStep({
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-[var(--spacing-hm-lg)] font-dm-sans text-label-md text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
           >
             <MdPayment size={20} aria-hidden />
-            {paying ? 'Opening checkout…' : `Pay ₹${feeInr}`}
+            {paying ? "Opening checkout…" : `Pay ₹${feeInr}`}
           </button>
           <button
             type="button"

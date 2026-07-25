@@ -1,21 +1,21 @@
-import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { MdEvent } from 'react-icons/md';
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { MdEvent } from "react-icons/md";
 
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { BookingWizard } from '@/features/appointments/components/BookingWizard';
-import { getConsultationFeeInr } from '@/features/payments';
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { BookingWizard } from "@/features/appointments/components/BookingWizard";
+import { getConsultationFeeInr } from "@/features/payments";
 
 export const metadata: Metadata = {
-  title: 'Book appointment — HealthMate',
-  description: 'Select a doctor, choose a slot, and confirm your visit.',
+  title: "Book appointment — HealthMate",
+  description: "Select a doctor, choose a slot, and confirm your visit.",
 };
 
 export default async function BookAppointmentPage() {
   const session = await auth();
-  if (!session?.user) redirect('/login');
+  if (!session?.user) redirect("/login");
 
   const patient = session.user.id
     ? await prisma.patient.findUnique({

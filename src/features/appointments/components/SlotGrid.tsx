@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { MdWbSunny, MdWbTwilight } from 'react-icons/md';
+import { MdWbSunny, MdWbTwilight } from "react-icons/md";
 
-import type { TimeSlot } from '../lib/date-utils';
+import type { TimeSlot } from "../lib/date-utils";
 
 type SlotGridProps = {
   slots: TimeSlot[];
@@ -14,14 +14,14 @@ type SlotGridProps = {
 };
 
 function formatDisplayTime(hm: string): string {
-  const [h, m] = hm.split(':').map(Number);
-  const period = h >= 12 ? 'PM' : 'AM';
+  const [h, m] = hm.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
   const hour12 = h % 12 || 12;
-  return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function isMorning(hm: string): boolean {
-  const hour = Number(hm.split(':')[0]);
+  const hour = Number(hm.split(":")[0]);
   return hour < 12;
 }
 
@@ -43,7 +43,10 @@ export function SlotGrid({
 
   if (error) {
     return (
-      <p role="alert" className="font-literata text-body-md text-[var(--color-error)]">
+      <p
+        role="alert"
+        className="font-literata text-body-md text-[var(--color-error)]"
+      >
         {error}
       </p>
     );
@@ -74,8 +77,8 @@ export function SlotGrid({
         </p>
         <ul className="grid grid-cols-2 gap-[var(--spacing-hm-md)] sm:grid-cols-4">
           {group.map((slot) => {
-            const isBooked = slot.status === 'booked';
-            const isUnavailable = slot.status === 'unavailable';
+            const isBooked = slot.status === "booked";
+            const isUnavailable = slot.status === "unavailable";
             const disabled = isBooked || isUnavailable;
             const selected = selectedStartTime === slot.startTime;
 
@@ -88,16 +91,16 @@ export function SlotGrid({
                   onClick={() => onSelect(slot.startTime, slot.endTime)}
                   className={`w-full rounded-full px-4 py-3 text-center font-dm-sans text-label-md transition-all duration-200 ${
                     isBooked
-                      ? 'cursor-not-allowed border border-[var(--color-outline-variant)]/30 text-[var(--color-on-surface-variant)] line-through opacity-40'
+                      ? "cursor-not-allowed border border-[var(--color-outline-variant)]/30 text-[var(--color-on-surface-variant)] line-through opacity-40"
                       : isUnavailable
-                        ? 'cursor-not-allowed border border-[var(--color-outline-variant)]/30 text-[var(--color-on-surface-variant)] opacity-40'
+                        ? "cursor-not-allowed border border-[var(--color-outline-variant)]/30 text-[var(--color-on-surface-variant)] opacity-40"
                         : selected
-                          ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                          : 'border border-[var(--color-outline-variant)] text-[var(--color-on-surface)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]'
+                          ? "bg-[var(--color-primary)] text-white shadow-sm"
+                          : "border border-[var(--color-outline-variant)] text-[var(--color-on-surface)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
                   }`}
                 >
                   {formatDisplayTime(slot.startTime)}
-                  {isBooked ? ' · Booked' : ''}
+                  {isBooked ? " · Booked" : ""}
                 </button>
               </li>
             );
@@ -119,8 +122,8 @@ export function SlotGrid({
           </span>
         )}
       </div>
-      {renderGroup('Morning', morning, MdWbSunny)}
-      {renderGroup('Afternoon', afternoon, MdWbTwilight)}
+      {renderGroup("Morning", morning, MdWbSunny)}
+      {renderGroup("Afternoon", afternoon, MdWbTwilight)}
     </div>
   );
 }

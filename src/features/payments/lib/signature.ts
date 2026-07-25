@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'crypto';
+import { createHmac, timingSafeEqual } from "crypto";
 
 /**
  * Verify Razorpay Checkout payment signature:
@@ -10,13 +10,13 @@ export function verifyPaymentSignature(
   signature: string,
   secret: string,
 ): boolean {
-  const expected = createHmac('sha256', secret)
+  const expected = createHmac("sha256", secret)
     .update(`${orderId}|${paymentId}`)
-    .digest('hex');
+    .digest("hex");
 
   try {
-    const a = Buffer.from(expected, 'hex');
-    const b = Buffer.from(signature, 'hex');
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(signature, "hex");
     if (a.length !== b.length) return false;
     return timingSafeEqual(a, b);
   } catch {
@@ -33,11 +33,11 @@ export function verifyWebhookSignature(
   signature: string,
   secret: string,
 ): boolean {
-  const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
+  const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
 
   try {
-    const a = Buffer.from(expected, 'utf8');
-    const b = Buffer.from(signature, 'utf8');
+    const a = Buffer.from(expected, "utf8");
+    const b = Buffer.from(signature, "utf8");
     if (a.length !== b.length) return false;
     return timingSafeEqual(a, b);
   } catch {

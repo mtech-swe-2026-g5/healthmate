@@ -1,5 +1,5 @@
-export { listActiveDoctors, getActiveDoctor } from './doctors';
-export type { DoctorListItem } from './doctors';
+export { listActiveDoctors, getActiveDoctor } from "./doctors";
+export type { DoctorListItem } from "./doctors";
 export {
   generateSlots,
   buildSlotStarts,
@@ -9,12 +9,12 @@ export {
   formatHm,
   dayOfWeekFromYmd,
   dateFromYmd,
-} from './slots';
-export type { TimeSlot } from './slots';
+} from "./slots";
+export type { TimeSlot } from "./slots";
 export {
   createAppointment,
   getAppointmentForPatient,
   listPatientAppointments,
   generateBookingReference,
   serializeAppointment,
-} from './appointments';
+} from "./appointments";

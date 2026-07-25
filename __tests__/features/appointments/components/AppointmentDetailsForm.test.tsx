@@ -1,22 +1,22 @@
-import { render, screen, cleanup } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi, afterEach } from 'vitest';
+import { render, screen, cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi, afterEach } from "vitest";
 
-import { AppointmentDetailsForm } from '@/features/appointments/components/AppointmentDetailsForm';
+import { AppointmentDetailsForm } from "@/features/appointments/components/AppointmentDetailsForm";
 
 const doctor = {
-  id: 'd1',
-  firstName: 'Ananya',
-  lastName: 'Patel',
-  specialization: 'General Physician',
+  id: "d1",
+  firstName: "Ananya",
+  lastName: "Patel",
+  specialization: "General Physician",
 };
 
-describe('AppointmentDetailsForm', () => {
+describe("AppointmentDetailsForm", () => {
   afterEach(() => {
     cleanup();
   });
 
-  it('shows inline reason error when provided on proceed', () => {
+  it("shows inline reason error when provided on proceed", () => {
     render(
       <AppointmentDetailsForm
         doctor={doctor}
@@ -35,12 +35,12 @@ describe('AppointmentDetailsForm', () => {
       />,
     );
 
-    expect(screen.getByRole('alert').textContent).toContain(
-      'Reason for visit is required',
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Reason for visit is required",
     );
   });
 
-  it('calls onBack without clearing parent slot state responsibility', async () => {
+  it("calls onBack without clearing parent slot state responsibility", async () => {
     const user = userEvent.setup();
     const onBack = vi.fn();
 
@@ -62,11 +62,11 @@ describe('AppointmentDetailsForm', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Back' }));
+    await user.click(screen.getByRole("button", { name: "Back" }));
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  it('shows booking summary with doctor, date, and slot', () => {
+  it("shows booking summary with doctor, date, and slot", () => {
     render(
       <AppointmentDetailsForm
         doctor={doctor}
@@ -90,7 +90,7 @@ describe('AppointmentDetailsForm', () => {
     expect(screen.getByText(/2:00 PM/i)).toBeDefined();
   });
 
-  it('invokes change handlers for reason and notes', async () => {
+  it("invokes change handlers for reason and notes", async () => {
     const user = userEvent.setup();
     const onReasonChange = vi.fn();
     const onNotesChange = vi.fn();
@@ -114,13 +114,15 @@ describe('AppointmentDetailsForm', () => {
       />,
     );
 
-    await user.type(screen.getByLabelText(/reason for visit/i), 'Pain');
-    await user.type(screen.getByLabelText(/notes for doctor/i), 'Note');
-    await user.click(screen.getByRole('button', { name: 'Confirm Booking' }));
+    await user.type(screen.getByLabelText(/reason for visit/i), "Pain");
+    await user.type(screen.getByLabelText(/notes for doctor/i), "Note");
+    await user.click(screen.getByRole("button", { name: "Confirm Booking" }));
 
     expect(onReasonChange).toHaveBeenCalled();
     expect(onNotesChange).toHaveBeenCalled();
     expect(onSubmit).toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toContain('Slot already booked');
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Slot already booked",
+    );
   });
 });

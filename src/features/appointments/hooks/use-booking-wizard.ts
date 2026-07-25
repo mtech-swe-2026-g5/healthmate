@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from "react";
 
-import type { BookingStepId } from '../constants';
-import type { DoctorListItem } from '../types/doctor';
-import type { AppointmentConfirmation } from '../services/client';
-import { appointmentDetailsSchema } from '../types';
+import type { BookingStepId } from "../constants";
+import type { DoctorListItem } from "../types/doctor";
+import type { AppointmentConfirmation } from "../services/client";
+import { appointmentDetailsSchema } from "../types";
 import {
   createPaymentOrderRequest,
   verifyPaymentRequest,
-} from '@/features/payments/services/client';
-import { openRazorpayCheckout } from '@/features/payments/lib/checkout';
+} from "@/features/payments/services/client";
+import { openRazorpayCheckout } from "@/features/payments/lib/checkout";
 
 export type BookingWizardState = {
   step: BookingStepId;
@@ -24,13 +24,13 @@ export type BookingWizardState = {
 };
 
 const INITIAL: BookingWizardState = {
-  step: 'doctor',
+  step: "doctor",
   doctor: null,
   date: null,
   startTime: null,
   endTime: null,
-  reasonForVisit: '',
-  additionalNotes: '',
+  reasonForVisit: "",
+  additionalNotes: "",
   confirmation: null,
 };
 
@@ -50,7 +50,7 @@ export function useBookingWizard(options?: {
       date: null,
       startTime: null,
       endTime: null,
-      step: 'slot',
+      step: "slot",
     }));
   }, []);
 
@@ -74,14 +74,14 @@ export function useBookingWizard(options?: {
   const goToDetails = useCallback(() => {
     setState((prev) => {
       if (!prev.doctor || !prev.date || !prev.startTime) return prev;
-      return { ...prev, step: 'details' };
+      return { ...prev, step: "details" };
     });
     setDetailsError(null);
     setSubmitError(null);
   }, []);
 
   const goBackToSlot = useCallback(() => {
-    setState((prev) => ({ ...prev, step: 'slot' }));
+    setState((prev) => ({ ...prev, step: "slot" }));
     setDetailsError(null);
     setSubmitError(null);
   }, []);
@@ -89,12 +89,12 @@ export function useBookingWizard(options?: {
   const goBackToDoctor = useCallback(() => {
     setState((prev) => ({
       ...prev,
-      step: 'doctor',
+      step: "doctor",
     }));
   }, []);
 
   const goBackToDetails = useCallback(() => {
-    setState((prev) => ({ ...prev, step: 'details' }));
+    setState((prev) => ({ ...prev, step: "details" }));
     setSubmitError(null);
   }, []);
 
@@ -121,18 +121,18 @@ export function useBookingWizard(options?: {
 
       if (!parsed.success) {
         const reasonIssue = parsed.error.issues.find(
-          (i) => i.path[0] === 'reasonForVisit',
+          (i) => i.path[0] === "reasonForVisit",
         );
         setDetailsError(
           reasonIssue?.message ??
             parsed.error.issues[0]?.message ??
-            'Invalid details',
+            "Invalid details",
         );
         return prev;
       }
 
       if (!prev.doctor || !prev.date || !prev.startTime) {
-        setSubmitError('Missing booking selection');
+        setSubmitError("Missing booking selection");
         return prev;
       }
 
@@ -140,8 +140,8 @@ export function useBookingWizard(options?: {
       return {
         ...prev,
         reasonForVisit: parsed.data.reasonForVisit,
-        additionalNotes: parsed.data.additionalNotes ?? '',
-        step: 'payment',
+        additionalNotes: parsed.data.additionalNotes ?? "",
+        step: "payment",
       };
     });
 
@@ -153,7 +153,7 @@ export function useBookingWizard(options?: {
     setSubmitError(null);
 
     if (!state.doctor || !state.date || !state.startTime) {
-      setSubmitError('Missing booking selection');
+      setSubmitError("Missing booking selection");
       return null;
     }
 
@@ -172,14 +172,14 @@ export function useBookingWizard(options?: {
           key: order.keyId,
           amount: order.amount,
           currency: order.currency,
-          name: 'HealthMate',
-          description: 'Consultation fee',
+          name: "HealthMate",
+          description: "Consultation fee",
           order_id: order.orderId,
           prefill: {
             email: options?.patientEmail ?? undefined,
             name: options?.patientName ?? undefined,
           },
-          theme: { color: '#005258' },
+          theme: { color: "#005258" },
           handler: (response) => {
             void (async () => {
               try {
@@ -191,17 +191,21 @@ export function useBookingWizard(options?: {
                 setState((prev) => ({
                   ...prev,
                   confirmation: result.appointment,
-                  step: 'confirmed',
+                  step: "confirmed",
                 }));
                 resolve();
               } catch (err) {
-                reject(err instanceof Error ? err : new Error('Payment verification failed'));
+                reject(
+                  err instanceof Error
+                    ? err
+                    : new Error("Payment verification failed"),
+                );
               }
             })();
           },
           modal: {
             ondismiss: () => {
-              reject(new Error('Payment cancelled'));
+              reject(new Error("Payment cancelled"));
             },
           },
         }).catch(reject);
@@ -209,11 +213,11 @@ export function useBookingWizard(options?: {
 
       return true;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Payment failed';
-      if (message !== 'Payment cancelled') {
+      const message = err instanceof Error ? err.message : "Payment failed";
+      if (message !== "Payment cancelled") {
         setSubmitError(message);
       } else {
-        setSubmitError('Payment was cancelled. You can try again when ready.');
+        setSubmitError("Payment was cancelled. You can try again when ready.");
       }
       return null;
     } finally {

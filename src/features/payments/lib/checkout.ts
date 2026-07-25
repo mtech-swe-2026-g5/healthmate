@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 type RazorpaySuccessResponse = {
   razorpay_order_id: string;
@@ -33,20 +33,20 @@ declare global {
 let scriptPromise: Promise<void> | null = null;
 
 export function loadRazorpayScript(): Promise<void> {
-  if (typeof window === 'undefined') {
-    return Promise.reject(new Error('Razorpay requires a browser'));
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("Razorpay requires a browser"));
   }
   if (window.Razorpay) return Promise.resolve();
   if (scriptPromise) return scriptPromise;
 
   scriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => {
       scriptPromise = null;
-      reject(new Error('Failed to load Razorpay Checkout'));
+      reject(new Error("Failed to load Razorpay Checkout"));
     };
     document.body.appendChild(script);
   });
@@ -54,10 +54,12 @@ export function loadRazorpayScript(): Promise<void> {
   return scriptPromise;
 }
 
-export async function openRazorpayCheckout(options: RazorpayOptions): Promise<void> {
+export async function openRazorpayCheckout(
+  options: RazorpayOptions,
+): Promise<void> {
   await loadRazorpayScript();
   if (!window.Razorpay) {
-    throw new Error('Razorpay Checkout is unavailable');
+    throw new Error("Razorpay Checkout is unavailable");
   }
   const rzp = new window.Razorpay(options);
   rzp.open();

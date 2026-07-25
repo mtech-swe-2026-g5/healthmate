@@ -1,1 +1,5 @@
-export { getPatientProfile, updatePatientProfile, assertPatientRole } from './profile';
+export {
+  getPatientProfile,
+  updatePatientProfile,
+  assertPatientRole,
+} from "./profile";

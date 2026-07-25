@@ -1,9 +1,14 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { MdArrowForward, MdCheck, MdDescription, MdPerson } from 'react-icons/md';
+import Link from "next/link";
+import {
+  MdArrowForward,
+  MdCheck,
+  MdDescription,
+  MdPerson,
+} from "react-icons/md";
 
-import type { AppointmentConfirmation } from '../services/client';
+import type { AppointmentConfirmation } from "../services/client";
 
 type ConfirmationViewProps = {
   appointment: AppointmentConfirmation;
@@ -16,15 +21,15 @@ export function ConfirmationView({
 }: ConfirmationViewProps) {
   const starts = new Date(appointment.startsAt);
   const dateTimeLabel = starts.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 
   const initials =
-    `${appointment.doctor.firstName[0] ?? ''}${appointment.doctor.lastName[0] ?? ''}`.toUpperCase();
+    `${appointment.doctor.firstName[0] ?? ""}${appointment.doctor.lastName[0] ?? ""}`.toUpperCase();
 
   return (
     <div className="mx-auto flex w-full max-w-[640px] flex-col items-center">
@@ -44,13 +49,13 @@ export function ConfirmationView({
           Your appointment has been successfully scheduled
           {patientEmail ? (
             <>
-              . We&apos;ve sent a confirmation to{' '}
+              . We&apos;ve sent a confirmation to{" "}
               <span className="font-bold text-[var(--color-on-surface)]">
                 {patientEmail}
               </span>
             </>
           ) : (
-            '.'
+            "."
           )}
         </p>
 
@@ -65,7 +70,7 @@ export function ConfirmationView({
               </p>
             </div>
             <span className="rounded bg-[var(--color-primary)]/10 px-2 py-1 font-dm-sans text-label-sm font-bold text-[var(--color-primary)]">
-              {appointment.timing === 'upcoming' ? 'UPCOMING' : 'PAST'}
+              {appointment.timing === "upcoming" ? "UPCOMING" : "PAST"}
             </span>
           </div>
 
@@ -79,8 +84,9 @@ export function ConfirmationView({
                   Provider
                 </p>
                 <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                  Dr. {appointment.doctor.firstName} {appointment.doctor.lastName}
-                  , {appointment.doctor.specialization}
+                  Dr. {appointment.doctor.firstName}{" "}
+                  {appointment.doctor.lastName},{" "}
+                  {appointment.doctor.specialization}
                 </p>
               </div>
             </div>

@@ -1,9 +1,14 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { MdEventAvailable, MdPerson, MdPersonSearch, MdSearch } from 'react-icons/md';
+import { useMemo, useState } from "react";
+import {
+  MdEventAvailable,
+  MdPerson,
+  MdPersonSearch,
+  MdSearch,
+} from "react-icons/md";
 
-import type { DoctorListItem } from '../types/doctor';
+import type { DoctorListItem } from "../types/doctor";
 
 type DoctorCardGridProps = {
   doctors: DoctorListItem[];
@@ -14,7 +19,8 @@ type DoctorCardGridProps = {
 };
 
 function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
-  const initials = `${doctor.firstName[0] ?? ''}${doctor.lastName[0] ?? ''}`.toUpperCase();
+  const initials =
+    `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
 
   return (
     <div
@@ -33,8 +39,8 @@ export function DoctorCardGrid({
   loading,
   error,
 }: DoctorCardGridProps) {
-  const [query, setQuery] = useState('');
-  const [specialty, setSpecialty] = useState('all');
+  const [query, setQuery] = useState("");
+  const [specialty, setSpecialty] = useState("all");
 
   const specialties = useMemo(() => {
     const set = new Set(doctors.map((d) => d.specialization));
@@ -45,7 +51,7 @@ export function DoctorCardGrid({
     const q = query.trim().toLowerCase();
     return doctors.filter((doctor) => {
       const matchesSpecialty =
-        specialty === 'all' || doctor.specialization === specialty;
+        specialty === "all" || doctor.specialization === specialty;
       if (!matchesSpecialty) return false;
       if (!q) return true;
       const haystack =
@@ -64,7 +70,10 @@ export function DoctorCardGrid({
 
   if (error) {
     return (
-      <p role="alert" className="font-literata text-body-md text-[var(--color-error)]">
+      <p
+        role="alert"
+        className="font-literata text-body-md text-[var(--color-error)]"
+      >
         {error}
       </p>
     );
@@ -128,7 +137,7 @@ export function DoctorCardGrid({
             Recommended Doctors
           </h2>
           <span className="font-dm-sans text-label-md text-[var(--color-on-surface-variant)]">
-            {filtered.length} result{filtered.length === 1 ? '' : 's'} found
+            {filtered.length} result{filtered.length === 1 ? "" : "s"} found
           </span>
         </div>
 
@@ -152,8 +161,8 @@ export function DoctorCardGrid({
                   <article
                     className={`rounded-xl border bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-lg)] transition-all duration-300 ${
                       selected
-                        ? 'border-[var(--color-primary)] shadow-xl ring-2 ring-[var(--color-primary)]/20'
-                        : 'border-[var(--color-outline-variant)]/30 hover:shadow-xl'
+                        ? "border-[var(--color-primary)] shadow-xl ring-2 ring-[var(--color-primary)]/20"
+                        : "border-[var(--color-outline-variant)]/30 hover:shadow-xl"
                     }`}
                   >
                     <div className="mb-[var(--spacing-hm-md)] flex items-start gap-[var(--spacing-hm-md)]">

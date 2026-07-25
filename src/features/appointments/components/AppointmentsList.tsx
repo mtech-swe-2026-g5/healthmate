@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   MdAdd,
   MdCheckCircle,
@@ -10,41 +10,41 @@ import {
   MdHistory,
   MdPerson,
   MdUpcoming,
-} from 'react-icons/md';
+} from "react-icons/md";
 
 import {
   fetchAppointments,
   type AppointmentConfirmation,
   type AppointmentsListResponse,
-} from '../services/client';
+} from "../services/client";
 
-type Tab = 'upcoming' | 'past';
+type Tab = "upcoming" | "past";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
 
 function doctorInitials(appointment: AppointmentConfirmation): string {
-  return `${appointment.doctor.firstName[0] ?? ''}${appointment.doctor.lastName[0] ?? ''}`.toUpperCase();
+  return `${appointment.doctor.firstName[0] ?? ""}${appointment.doctor.lastName[0] ?? ""}`.toUpperCase();
 }
 
 export function AppointmentsList() {
   const [data, setData] = useState<AppointmentsListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>('upcoming');
-  const [query, setQuery] = useState('');
+  const [tab, setTab] = useState<Tab>("upcoming");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +54,9 @@ export function AppointmentsList() {
         if (!cancelled) setData(result);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load appointments');
+          setError(
+            err instanceof Error ? err.message : "Failed to load appointments",
+          );
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -66,7 +68,8 @@ export function AppointmentsList() {
   }, []);
 
   const rows = useMemo(() => {
-    const list = tab === 'upcoming' ? (data?.upcoming ?? []) : (data?.past ?? []);
+    const list =
+      tab === "upcoming" ? (data?.upcoming ?? []) : (data?.past ?? []);
     const q = query.trim().toLowerCase();
     if (!q) return list;
     return list.filter((a) => {
@@ -86,7 +89,10 @@ export function AppointmentsList() {
 
   if (error) {
     return (
-      <p role="alert" className="font-literata text-body-md text-[var(--color-error)]">
+      <p
+        role="alert"
+        className="font-literata text-body-md text-[var(--color-error)]"
+      >
         {error}
       </p>
     );
@@ -103,7 +109,8 @@ export function AppointmentsList() {
             Appointment History
           </h1>
           <p className="mt-1 font-literata text-body-md text-[var(--color-on-surface-variant)]">
-            Review your visits, track upcoming bookings, and manage your schedule.
+            Review your visits, track upcoming bookings, and manage your
+            schedule.
           </p>
         </div>
         <div className="flex items-center gap-[var(--spacing-hm-md)] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface)] p-[var(--spacing-hm-md)] shadow-[0px_4px_20px_rgba(26,107,114,0.08)]">
@@ -138,11 +145,11 @@ export function AppointmentsList() {
         <div className="flex flex-col border-b border-[var(--color-outline-variant)] md:flex-row">
           <button
             type="button"
-            onClick={() => setTab('upcoming')}
+            onClick={() => setTab("upcoming")}
             className={`flex-1 px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)] font-dm-sans text-label-md transition-colors ${
-              tab === 'upcoming'
-                ? 'border-b-2 border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]'
-                : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]'
+              tab === "upcoming"
+                ? "border-b-2 border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]"
+                : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]"
             }`}
           >
             <span className="inline-flex items-center justify-center gap-2">
@@ -151,11 +158,11 @@ export function AppointmentsList() {
           </button>
           <button
             type="button"
-            onClick={() => setTab('past')}
+            onClick={() => setTab("past")}
             className={`flex-1 px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)] font-dm-sans text-label-md transition-colors ${
-              tab === 'past'
-                ? 'border-b-2 border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]'
-                : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]'
+              tab === "past"
+                ? "border-b-2 border-[var(--color-primary)] bg-[var(--color-primary)]/5 text-[var(--color-primary)]"
+                : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container-low)]"
             }`}
           >
             <span className="inline-flex items-center justify-center gap-2">
@@ -220,8 +227,8 @@ export function AppointmentsList() {
                     colSpan={5}
                     className="px-[var(--spacing-hm-lg)] py-10 text-center font-literata text-body-md text-[var(--color-on-surface-variant)]"
                   >
-                    No {tab} appointments found.{' '}
-                    {tab === 'upcoming' && (
+                    No {tab} appointments found.{" "}
+                    {tab === "upcoming" && (
                       <Link
                         href="/appointments/book"
                         className="text-[var(--color-primary)] underline"
@@ -248,11 +255,13 @@ export function AppointmentsList() {
                     <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
                       <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary-fixed)] font-dm-sans text-xs font-bold text-[var(--color-primary)]">
-                          {doctorInitials(appointment) || <MdPerson size={14} />}
+                          {doctorInitials(appointment) || (
+                            <MdPerson size={14} />
+                          )}
                         </div>
                         <div>
                           <p className="font-dm-sans text-label-md text-[var(--color-on-surface)]">
-                            Dr. {appointment.doctor.firstName}{' '}
+                            Dr. {appointment.doctor.firstName}{" "}
                             {appointment.doctor.lastName}
                           </p>
                           <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
@@ -269,13 +278,15 @@ export function AppointmentsList() {
                     <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-dm-sans text-label-sm font-semibold ${
-                          appointment.timing === 'upcoming'
-                            ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
-                            : 'bg-[var(--color-success-container)] text-[var(--color-success)]'
+                          appointment.timing === "upcoming"
+                            ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                            : "bg-[var(--color-success-container)] text-[var(--color-success)]"
                         }`}
                       >
                         <MdCheckCircle size={14} aria-hidden />
-                        {appointment.timing === 'upcoming' ? 'Upcoming' : 'Completed'}
+                        {appointment.timing === "upcoming"
+                          ? "Upcoming"
+                          : "Completed"}
                       </span>
                     </td>
                     <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)] text-right">
@@ -296,8 +307,8 @@ export function AppointmentsList() {
 
         <div className="flex items-center justify-between gap-3 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-lg)]">
           <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-            Showing {rows.length} of{' '}
-            {tab === 'upcoming' ? upcomingCount : pastCount} results
+            Showing {rows.length} of{" "}
+            {tab === "upcoming" ? upcomingCount : pastCount} results
           </p>
         </div>
       </div>

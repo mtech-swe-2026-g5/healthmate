@@ -1,4 +1,4 @@
-import { PatientAppLayout } from '@/features/navigation';
+import { PatientAppLayout } from "@/features/navigation";
 
 export default function AppointmentsLayout({
   children,

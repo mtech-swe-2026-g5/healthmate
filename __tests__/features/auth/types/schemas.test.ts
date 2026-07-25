@@ -1,122 +1,122 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
 import {
   registrationSchema,
   registrationApiSchema,
-} from '@/features/auth/types/schemas';
+} from "@/features/auth/types/schemas";
 
 const VALID_INPUT = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@example.com',
-  password: 'Secure1!pass',
-  confirmPassword: 'Secure1!pass',
-  dateOfBirth: '2000-01-15',
-  gender: 'male' as const,
-  phoneNumber: '+919876543210',
+  firstName: "John",
+  lastName: "Doe",
+  email: "john@example.com",
+  password: "Secure1!pass",
+  confirmPassword: "Secure1!pass",
+  dateOfBirth: "2000-01-15",
+  gender: "male" as const,
+  phoneNumber: "+919876543210",
 };
 
 const VALID_API_INPUT = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@example.com',
-  password: 'Secure1!pass',
-  dateOfBirth: '2000-01-15',
-  gender: 'male' as const,
-  phoneNumber: '+919876543210',
+  firstName: "John",
+  lastName: "Doe",
+  email: "john@example.com",
+  password: "Secure1!pass",
+  dateOfBirth: "2000-01-15",
+  gender: "male" as const,
+  phoneNumber: "+919876543210",
 };
 
-describe('registrationSchema', () => {
-  it('should accept valid input', () => {
+describe("registrationSchema", () => {
+  it("should accept valid input", () => {
     const result = registrationSchema.safeParse(VALID_INPUT);
     expect(result.success).toBe(true);
   });
 
-  it('should accept valid input with optional blood group', () => {
+  it("should accept valid input with optional blood group", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      bloodGroup: 'O+',
+      bloodGroup: "O+",
     });
     expect(result.success).toBe(true);
   });
 
-  it('should reject missing first name', () => {
+  it("should reject missing first name", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      firstName: '',
+      firstName: "",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject missing last name', () => {
+  it("should reject missing last name", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      lastName: '',
+      lastName: "",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject first name exceeding 100 characters', () => {
+  it("should reject first name exceeding 100 characters", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      firstName: 'a'.repeat(101),
+      firstName: "a".repeat(101),
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject invalid email', () => {
+  it("should reject invalid email", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      email: 'not-an-email',
+      email: "not-an-email",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject password shorter than 8 characters', () => {
+  it("should reject password shorter than 8 characters", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      password: 'Ab1!',
-      confirmPassword: 'Ab1!',
+      password: "Ab1!",
+      confirmPassword: "Ab1!",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject password without uppercase letter', () => {
+  it("should reject password without uppercase letter", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      password: 'secure1!pass',
-      confirmPassword: 'secure1!pass',
+      password: "secure1!pass",
+      confirmPassword: "secure1!pass",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject password without a number', () => {
+  it("should reject password without a number", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      password: 'Secure!pass',
-      confirmPassword: 'Secure!pass',
+      password: "Secure!pass",
+      confirmPassword: "Secure!pass",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject password without a special character', () => {
+  it("should reject password without a special character", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      password: 'Secure1pass',
-      confirmPassword: 'Secure1pass',
+      password: "Secure1pass",
+      confirmPassword: "Secure1pass",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject mismatched confirm password', () => {
+  it("should reject mismatched confirm password", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      confirmPassword: 'Different1!',
+      confirmPassword: "Different1!",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should reject future date of birth', () => {
+  it("should reject future date of birth", () => {
     const futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 1);
 
@@ -127,16 +127,16 @@ describe('registrationSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('should reject invalid gender value', () => {
+  it("should reject invalid gender value", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      gender: 'invalid',
+      gender: "invalid",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should accept all valid gender values', () => {
-    const genders = ['male', 'female', 'other', 'prefer_not_to_say'] as const;
+  it("should accept all valid gender values", () => {
+    const genders = ["male", "female", "other", "prefer_not_to_say"] as const;
     for (const gender of genders) {
       const result = registrationSchema.safeParse({
         ...VALID_INPUT,
@@ -146,16 +146,16 @@ describe('registrationSchema', () => {
     }
   });
 
-  it('should reject invalid blood group value', () => {
+  it("should reject invalid blood group value", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      bloodGroup: 'X+',
+      bloodGroup: "X+",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should accept all valid blood group values', () => {
-    const groups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as const;
+  it("should accept all valid blood group values", () => {
+    const groups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
     for (const bloodGroup of groups) {
       const result = registrationSchema.safeParse({
         ...VALID_INPUT,
@@ -165,41 +165,41 @@ describe('registrationSchema', () => {
     }
   });
 
-  it('should reject invalid phone number', () => {
+  it("should reject invalid phone number", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      phoneNumber: 'abc',
+      phoneNumber: "abc",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should accept phone number without plus prefix', () => {
+  it("should accept phone number without plus prefix", () => {
     const result = registrationSchema.safeParse({
       ...VALID_INPUT,
-      phoneNumber: '9876543210',
+      phoneNumber: "9876543210",
     });
     expect(result.success).toBe(true);
   });
 });
 
-describe('registrationApiSchema', () => {
-  it('should accept valid API input without confirmPassword', () => {
+describe("registrationApiSchema", () => {
+  it("should accept valid API input without confirmPassword", () => {
     const result = registrationApiSchema.safeParse(VALID_API_INPUT);
     expect(result.success).toBe(true);
   });
 
-  it('should reject invalid API input', () => {
+  it("should reject invalid API input", () => {
     const result = registrationApiSchema.safeParse({
       ...VALID_API_INPUT,
-      email: 'bad',
+      email: "bad",
     });
     expect(result.success).toBe(false);
   });
 
-  it('should accept optional blood group in API schema', () => {
+  it("should accept optional blood group in API schema", () => {
     const result = registrationApiSchema.safeParse({
       ...VALID_API_INPUT,
-      bloodGroup: 'AB-',
+      bloodGroup: "AB-",
     });
     expect(result.success).toBe(true);
   });

@@ -1,7 +1,7 @@
-import { AppIcon } from '@/components/ui/AppIcon';
-import { platformFeatures } from '@/features/marketing/constants/landing-content';
+import { AppIcon } from "@/components/ui/AppIcon";
+import { platformFeatures } from "@/features/marketing/constants/landing-content";
 
-import { MarketingContainer } from './MarketingContainer';
+import { MarketingContainer } from "./MarketingContainer";
 
 export function PlatformFeaturesSection() {
   return (
@@ -12,8 +12,9 @@ export function PlatformFeaturesSection() {
             Built for patients and clinics
           </h2>
           <p className="mx-auto max-w-3xl font-literata text-body-md text-on-surface-variant">
-            HealthMate brings together the core tools your practice needs—from sign-up and
-            booking to reminders and reporting—in one calm, reliable platform.
+            HealthMate brings together the core tools your practice needs—from
+            sign-up and booking to reminders and reporting—in one calm, reliable
+            platform.
           </p>
         </div>
 

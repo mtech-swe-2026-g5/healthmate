@@ -1,14 +1,14 @@
-import { cleanup, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock('next/image', () => ({
+vi.mock("next/image", () => ({
   default: function MockImage(props: { alt: string }) {
     return <span role="img" aria-label={props.alt} />;
   },
 }));
 
-vi.mock('next/link', () => ({
+vi.mock("next/link", () => ({
   default: ({
     children,
     href,
@@ -18,88 +18,100 @@ vi.mock('next/link', () => ({
   }) => <a href={href}>{children}</a>,
 }));
 
-vi.mock('next-auth/react', () => ({
+vi.mock("next-auth/react", () => ({
   signOut: vi.fn(),
 }));
 
-import { LandingPage } from '@/features/marketing';
+import { LandingPage } from "@/features/marketing";
 
 afterEach(() => {
   cleanup();
 });
 
-describe('LandingPage', () => {
-  it('renders hero headline and primary actions', () => {
+describe("LandingPage", () => {
+  it("renders hero headline and primary actions", () => {
     render(<LandingPage />);
 
     expect(
-      screen.getByRole('heading', {
+      screen.getByRole("heading", {
         name: /healthcare scheduling, finally effortless/i,
       }),
     ).toBeDefined();
     expect(
-      screen.getByRole('link', { name: /book an appointment/i }).getAttribute('href'),
-    ).toBe('/register');
+      screen
+        .getByRole("link", { name: /book an appointment/i })
+        .getAttribute("href"),
+    ).toBe("/register");
     expect(
-      screen.getByRole('link', { name: /get started/i }).getAttribute('href'),
-    ).toBe('/register');
+      screen.getByRole("link", { name: /get started/i }).getAttribute("href"),
+    ).toBe("/register");
   });
 
-  it('renders feature and footer sections', () => {
+  it("renders feature and footer sections", () => {
     render(<LandingPage />);
 
     expect(
-      screen.getByRole('heading', { name: /built for patients and clinics/i }),
+      screen.getByRole("heading", { name: /built for patients and clinics/i }),
     ).toBeDefined();
     expect(screen.getByText(/Patient Registration & Login/i)).toBeDefined();
     expect(screen.getByText(/Analytics & Insights/i)).toBeDefined();
     expect(
-      screen.getByRole('heading', { name: /engineered for medical excellence/i }),
+      screen.getByRole("heading", {
+        name: /engineered for medical excellence/i,
+      }),
     ).toBeDefined();
-    expect(screen.getByRole('heading', { name: /smart scheduling/i })).toBeDefined();
-    expect(screen.getByRole('heading', { name: /automated reminders/i })).toBeDefined();
-    expect(screen.getByRole('heading', { name: /conflict detection/i })).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: /smart scheduling/i }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: /automated reminders/i }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: /conflict detection/i }),
+    ).toBeDefined();
     expect(screen.getByText(/HIPAA COMPLIANT/i)).toBeDefined();
     expect(screen.getByText(/© 2026 HealthMate/i)).toBeDefined();
-    expect(screen.getByText(/Trusted by 200\+ clinics nationwide/i)).toBeDefined();
+    expect(
+      screen.getByText(/Trusted by 200\+ clinics nationwide/i),
+    ).toBeDefined();
   });
 
-  it('opens and closes the mobile navigation menu', async () => {
+  it("opens and closes the mobile navigation menu", async () => {
     const user = userEvent.setup();
     render(<LandingPage />);
 
-    await user.click(screen.getByRole('button', { name: /open menu/i }));
+    await user.click(screen.getByRole("button", { name: /open menu/i }));
 
-    const mobileMenu = document.getElementById('mobile-nav-menu');
+    const mobileMenu = document.getElementById("mobile-nav-menu");
     expect(mobileMenu).toBeDefined();
-    expect(screen.getByRole('button', { name: /^close menu$/i })).toBeDefined();
+    expect(screen.getByRole("button", { name: /^close menu$/i })).toBeDefined();
 
     await user.click(
-      screen.getByRole('button', { name: /dismiss navigation menu/i }),
+      screen.getByRole("button", { name: /dismiss navigation menu/i }),
     );
-    expect(document.getElementById('mobile-nav-menu')).toBeNull();
+    expect(document.getElementById("mobile-nav-menu")).toBeNull();
   });
 
-  it('shows sign-in actions when logged out', () => {
+  it("shows sign-in actions when logged out", () => {
     render(<LandingPage />);
 
-    expect(screen.getByRole('link', { name: /log in/i })).toBeDefined();
-    expect(screen.getByRole('link', { name: /get started/i })).toBeDefined();
-    expect(screen.queryByRole('button', { name: /log out/i })).toBeNull();
+    expect(screen.getByRole("link", { name: /log in/i })).toBeDefined();
+    expect(screen.getByRole("link", { name: /get started/i })).toBeDefined();
+    expect(screen.queryByRole("button", { name: /log out/i })).toBeNull();
   });
 
-  it('shows open portal + logout actions when logged in', () => {
+  it("shows open portal + logout actions when logged in", () => {
     render(<LandingPage isLoggedIn portalHref="/doctor" />);
 
     const portalLinks = screen
-      .getAllByRole('link', { name: /open portal/i })
-      .filter((el) => el.getAttribute('href') === '/doctor');
+      .getAllByRole("link", { name: /open portal/i })
+      .filter((el) => el.getAttribute("href") === "/doctor");
     expect(portalLinks.length).toBeGreaterThan(0);
 
-    expect(screen.getByRole('button', { name: /log out/i })).toBeDefined();
+    expect(screen.getByRole("button", { name: /log out/i })).toBeDefined();
 
     // Signed-in visitors should not see the sign-in / sign-up actions.
-    expect(screen.queryByRole('link', { name: /^log in$/i })).toBeNull();
-    expect(screen.queryByRole('link', { name: /get started/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^log in$/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /get started/i })).toBeNull();
   });
 });

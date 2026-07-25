@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   MdArrowBack,
@@ -7,11 +7,11 @@ import {
   MdInfo,
   MdPerson,
   MdSchedule,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import { FieldError } from '@/features/auth/components/FieldError';
+import { FieldError } from "@/features/auth/components/FieldError";
 
-import type { DoctorListItem } from '../types/doctor';
+import type { DoctorListItem } from "../types/doctor";
 
 type AppointmentDetailsFormProps = {
   doctor: DoctorListItem;
@@ -31,14 +31,15 @@ type AppointmentDetailsFormProps = {
 };
 
 function formatDisplayTime(hm: string): string {
-  const [h, m] = hm.split(':').map(Number);
-  const period = h >= 12 ? 'PM' : 'AM';
+  const [h, m] = hm.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
   const hour12 = h % 12 || 12;
-  return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
 function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
-  const initials = `${doctor.firstName[0] ?? ''}${doctor.lastName[0] ?? ''}`.toUpperCase();
+  const initials =
+    `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
   return (
     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-primary-fixed)] bg-[var(--color-primary-container)]/15 font-dm-sans text-title-lg font-bold text-[var(--color-primary)]">
       {initials || <MdPerson size={24} />}
@@ -56,17 +57,17 @@ export function AppointmentDetailsForm({
   reasonError,
   submitError,
   submitting,
-  submitLabel = 'Confirm Booking',
+  submitLabel = "Confirm Booking",
   onReasonChange,
   onNotesChange,
   onBack,
   onSubmit,
 }: AppointmentDetailsFormProps) {
   const dateLabel = new Date(`${date}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    weekday: "long",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 
   return (
@@ -77,7 +78,7 @@ export function AppointmentDetailsForm({
             Appointment Details
           </h2>
           <p className="mt-2 font-literata text-body-md text-[var(--color-on-surface-variant)]">
-            Please provide more information about your visit to help Dr.{' '}
+            Please provide more information about your visit to help Dr.{" "}
             {doctor.lastName} prepare for your consultation.
           </p>
         </div>
@@ -88,7 +89,8 @@ export function AppointmentDetailsForm({
               htmlFor="reasonForVisit"
               className="mb-2 block font-dm-sans text-label-md text-[var(--color-on-surface)]"
             >
-              Reason for visit <span className="text-[var(--color-error)]">*</span>
+              Reason for visit{" "}
+              <span className="text-[var(--color-error)]">*</span>
             </label>
             <textarea
               id="reasonForVisit"
@@ -97,12 +99,14 @@ export function AppointmentDetailsForm({
               maxLength={200}
               rows={4}
               placeholder="Describe the reason for your visit"
-              aria-invalid={reasonError ? 'true' : 'false'}
-              aria-describedby={reasonError ? 'reasonForVisit-error' : undefined}
+              aria-invalid={reasonError ? "true" : "false"}
+              aria-describedby={
+                reasonError ? "reasonForVisit-error" : undefined
+              }
               className={`w-full resize-none rounded-xl border bg-transparent p-[var(--spacing-hm-md)] font-literata text-body-md text-[var(--color-on-surface)] outline-none transition-all focus:ring-1 ${
                 reasonError
-                  ? 'border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]'
-                  : 'border-[var(--color-outline-variant)] focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]'
+                  ? "border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]"
+                  : "border-[var(--color-outline-variant)] focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
               }`}
             />
             <p className="mt-1 font-literata text-label-sm text-[var(--color-on-surface-variant)]">
@@ -118,8 +122,10 @@ export function AppointmentDetailsForm({
               htmlFor="additionalNotes"
               className="mb-2 block font-dm-sans text-label-md text-[var(--color-on-surface)]"
             >
-              Notes for doctor{' '}
-              <span className="text-[var(--color-on-surface-variant)]">(optional)</span>
+              Notes for doctor{" "}
+              <span className="text-[var(--color-on-surface-variant)]">
+                (optional)
+              </span>
             </label>
             <textarea
               id="additionalNotes"
@@ -148,7 +154,10 @@ export function AppointmentDetailsForm({
           </div>
 
           {submitError && (
-            <p role="alert" className="font-literata text-body-md text-[var(--color-error)]">
+            <p
+              role="alert"
+              className="font-literata text-body-md text-[var(--color-error)]"
+            >
               {submitError}
             </p>
           )}
@@ -160,7 +169,7 @@ export function AppointmentDetailsForm({
               disabled={submitting}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-[var(--spacing-hm-lg)] font-dm-sans text-label-md text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
             >
-              {submitting ? 'Confirming…' : submitLabel}
+              {submitting ? "Confirming…" : submitLabel}
               {!submitting && <MdArrowForward size={18} aria-hidden />}
             </button>
             <button

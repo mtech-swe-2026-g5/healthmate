@@ -1,13 +1,16 @@
-import { compare } from 'bcryptjs';
+import { compare } from "bcryptjs";
 
-import { prisma } from '@/lib/prisma';
+import { DoctorModel, PatientModel, prisma } from "@/lib/prisma";
+import { DefaultSession } from "next-auth";
 
 export type AuthenticatedUser = {
   id: string;
   email: string;
   role: string;
   roleId: number;
-};
+  doctor: Partial<DoctorModel>;
+  patient: Partial<PatientModel>;
+} & DefaultSession["user"];
 
 /**
  * Validates email/password against the stored credentials.
@@ -28,7 +31,11 @@ export async function verifyUserCredentials(
 ): Promise<AuthenticatedUser | null> {
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
-    include: { role: true },
+    include: {
+      role: true,
+      doctor: { select: { id: true, firstName: true, lastName: true } },
+      patient: { select: { id: true, firstName: true, lastName: true } },
+    },
   });
 
   if (!user || !user.isActive) return null;
@@ -43,5 +50,15 @@ export async function verifyUserCredentials(
     email: user.email,
     role: user.role.name,
     roleId: user.roleId,
+    doctor: {
+      id: user.doctor?.id,
+      firstName: user.doctor?.firstName,
+      lastName: user.doctor?.lastName,
+    },
+    patient: {
+      id: user.patient?.id,
+      firstName: user.patient?.firstName,
+      lastName: user.patient?.lastName,
+    },
   };
 }

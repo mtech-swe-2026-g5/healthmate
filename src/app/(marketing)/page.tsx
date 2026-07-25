@@ -1,6 +1,6 @@
-import { auth } from '@/lib/auth';
-import { getRoleHome } from '@/config/routes';
-import { LandingPage } from '@/features/marketing';
+import { auth } from "@/lib/auth";
+import { getRoleHome } from "@/config/routes";
+import { LandingPage } from "@/features/marketing";
 
 export default async function HomePage() {
   const session = await auth();

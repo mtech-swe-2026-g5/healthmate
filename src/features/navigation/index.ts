@@ -3,4 +3,4 @@ export {
   DoctorPortalShell,
   PatientAppLayout,
   DoctorAppLayout,
-} from './components';
+} from "./components";

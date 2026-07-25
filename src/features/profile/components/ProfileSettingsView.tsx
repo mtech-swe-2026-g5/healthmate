@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useTransition } from 'react';
-import Link from 'next/link';
+import { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   MdBadge,
   MdCall,
@@ -15,15 +15,15 @@ import {
   MdSave,
   MdShield,
   MdSms,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import { Toast } from '@/components/ui/Toast';
+import { Toast } from "@/components/ui/Toast";
 import {
   BLOOD_GROUP_OPTIONS,
   GENDER_LABELS,
   GENDER_OPTIONS,
-} from '@/features/auth/constants';
-import type { PatientProfile } from '../types';
+} from "@/features/auth/constants";
+import type { PatientProfile } from "../types";
 
 type ProfileSettingsViewProps = {
   initialProfile: PatientProfile;
@@ -32,15 +32,15 @@ type ProfileSettingsViewProps = {
 function formatDisplayDate(ymd: string): string {
   const date = new Date(`${ymd}T12:00:00`);
   if (Number.isNaN(date.getTime())) return ymd;
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function genderLabel(value: string | null): string {
-  if (!value) return '—';
+  if (!value) return "—";
   if (value in GENDER_LABELS) {
     return GENDER_LABELS[value as keyof typeof GENDER_LABELS];
   }
@@ -48,16 +48,16 @@ function genderLabel(value: string | null): string {
 }
 
 const CARD =
-  'rounded-2xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-lg)] md:p-[var(--spacing-hm-xl)] shadow-[0px_4px_20px_rgba(26,107,114,0.08)]';
+  "rounded-2xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-lg)] md:p-[var(--spacing-hm-xl)] shadow-[0px_4px_20px_rgba(26,107,114,0.08)]";
 
 const INPUT =
-  'w-full rounded-xl border border-[var(--color-outline-variant)]/50 bg-[var(--color-surface)] px-[var(--spacing-hm-md)] py-3 font-literata text-body-md text-[var(--color-on-surface)] outline-none transition-colors focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15';
+  "w-full rounded-xl border border-[var(--color-outline-variant)]/50 bg-[var(--color-surface)] px-[var(--spacing-hm-md)] py-3 font-literata text-body-md text-[var(--color-on-surface)] outline-none transition-colors focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15";
 
 const LABEL =
-  'mb-1.5 block font-dm-sans text-label-md text-[var(--color-on-surface-variant)]';
+  "mb-1.5 block font-dm-sans text-label-md text-[var(--color-on-surface-variant)]";
 
 const COMING_SOON =
-  'inline-flex shrink-0 items-center rounded-md bg-[var(--color-secondary-container)] px-2 py-0.5 font-dm-sans text-[10px] font-bold tracking-wide text-[var(--color-primary)] uppercase';
+  "inline-flex shrink-0 items-center rounded-md bg-[var(--color-secondary-container)] px-2 py-0.5 font-dm-sans text-[10px] font-bold tracking-wide text-[var(--color-primary)] uppercase";
 
 function ComingSoonTag() {
   return <span className={COMING_SOON}>Coming soon</span>;
@@ -82,7 +82,13 @@ function Field({
   );
 }
 
-function ReadRow({ label, children }: { label: string; children: React.ReactNode }) {
+function ReadRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-w-0 border-b border-[var(--color-outline-variant)]/20 py-3 last:border-b-0">
       <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
@@ -95,21 +101,23 @@ function ReadRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps) {
+export function ProfileSettingsView({
+  initialProfile,
+}: ProfileSettingsViewProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     firstName: initialProfile.firstName,
     lastName: initialProfile.lastName,
-    phoneNumber: initialProfile.phoneNumber ?? '',
+    phoneNumber: initialProfile.phoneNumber ?? "",
     dateOfBirth: initialProfile.dateOfBirth,
     gender: (initialProfile.gender ??
-      'prefer_not_to_say') as (typeof GENDER_OPTIONS)[number],
-    bloodGroup: initialProfile.bloodGroup ?? '',
+      "prefer_not_to_say") as (typeof GENDER_OPTIONS)[number],
+    bloodGroup: initialProfile.bloodGroup ?? "",
   });
   const [toast, setToast] = useState<{
     message: string;
-    variant: 'success' | 'error';
+    variant: "success" | "error";
   } | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -118,10 +126,13 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('');
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
 
-  const setField = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
+  const setField = <K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -129,11 +140,11 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
     setForm({
       firstName: profile.firstName,
       lastName: profile.lastName,
-      phoneNumber: profile.phoneNumber ?? '',
+      phoneNumber: profile.phoneNumber ?? "",
       dateOfBirth: profile.dateOfBirth,
       gender: (profile.gender ??
-        'prefer_not_to_say') as (typeof GENDER_OPTIONS)[number],
-      bloodGroup: profile.bloodGroup ?? '',
+        "prefer_not_to_say") as (typeof GENDER_OPTIONS)[number],
+      bloodGroup: profile.bloodGroup ?? "",
     });
     setEditing(false);
   };
@@ -141,9 +152,9 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
   const saveChanges = () => {
     startTransition(async () => {
       try {
-        const res = await fetch('/api/profile', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             firstName: form.firstName,
             lastName: form.lastName,
@@ -156,8 +167,8 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
         const data = await res.json();
         if (!res.ok) {
           setToast({
-            message: data.error ?? 'Could not save profile.',
-            variant: 'error',
+            message: data.error ?? "Could not save profile.",
+            variant: "error",
           });
           return;
         }
@@ -165,18 +176,18 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
         setForm({
           firstName: data.profile.firstName,
           lastName: data.profile.lastName,
-          phoneNumber: data.profile.phoneNumber ?? '',
+          phoneNumber: data.profile.phoneNumber ?? "",
           dateOfBirth: data.profile.dateOfBirth,
           gender: (data.profile.gender ??
-            'prefer_not_to_say') as (typeof GENDER_OPTIONS)[number],
-          bloodGroup: data.profile.bloodGroup ?? '',
+            "prefer_not_to_say") as (typeof GENDER_OPTIONS)[number],
+          bloodGroup: data.profile.bloodGroup ?? "",
         });
         setEditing(false);
-        setToast({ message: 'Profile saved.', variant: 'success' });
+        setToast({ message: "Profile saved.", variant: "success" });
       } catch {
         setToast({
-          message: 'Network error. Please try again.',
-          variant: 'error',
+          message: "Network error. Please try again.",
+          variant: "error",
         });
       }
     });
@@ -214,7 +225,8 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
           Profile Settings
         </h1>
         <p className="mt-1 max-w-2xl font-literata text-body-md text-[var(--color-on-surface-variant)]">
-          Update your personal details used for appointments and clinic communication.
+          Update your personal details used for appointments and clinic
+          communication.
         </p>
       </header>
 
@@ -248,7 +260,7 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                       className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-5 py-2 font-dm-sans text-label-md font-bold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
                     >
                       <MdSave size={18} aria-hidden />
-                      {isPending ? 'Saving…' : 'Save changes'}
+                      {isPending ? "Saving…" : "Save changes"}
                     </button>
                   </>
                 ) : (
@@ -284,7 +296,7 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         id="profile-first-name"
                         className={INPUT}
                         value={form.firstName}
-                        onChange={(e) => setField('firstName', e.target.value)}
+                        onChange={(e) => setField("firstName", e.target.value)}
                         autoComplete="given-name"
                       />
                     </Field>
@@ -293,7 +305,7 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         id="profile-last-name"
                         className={INPUT}
                         value={form.lastName}
-                        onChange={(e) => setField('lastName', e.target.value)}
+                        onChange={(e) => setField("lastName", e.target.value)}
                         autoComplete="family-name"
                       />
                     </Field>
@@ -305,11 +317,11 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         <span
                           className={`shrink-0 rounded-md px-2 py-0.5 font-dm-sans text-[10px] font-bold tracking-wide uppercase ${
                             profile.emailVerified
-                              ? 'bg-emerald-50 text-emerald-700'
-                              : 'bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface-variant)]'
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface-variant)]"
                           }`}
                         >
-                          {profile.emailVerified ? 'Verified' : 'Unverified'}
+                          {profile.emailVerified ? "Verified" : "Unverified"}
                         </span>
                       </div>
                       <p className="mt-1 font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
@@ -321,7 +333,9 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         id="profile-phone"
                         className={INPUT}
                         value={form.phoneNumber}
-                        onChange={(e) => setField('phoneNumber', e.target.value)}
+                        onChange={(e) =>
+                          setField("phoneNumber", e.target.value)
+                        }
                         autoComplete="tel"
                         inputMode="tel"
                       />
@@ -332,7 +346,9 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         className={INPUT}
                         type="date"
                         value={form.dateOfBirth}
-                        onChange={(e) => setField('dateOfBirth', e.target.value)}
+                        onChange={(e) =>
+                          setField("dateOfBirth", e.target.value)
+                        }
                       />
                     </Field>
                     <Field label="Gender" htmlFor="profile-gender">
@@ -342,7 +358,7 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         value={form.gender}
                         onChange={(e) =>
                           setField(
-                            'gender',
+                            "gender",
                             e.target.value as (typeof GENDER_OPTIONS)[number],
                           )
                         }
@@ -359,7 +375,7 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         id="profile-blood"
                         className={INPUT}
                         value={form.bloodGroup}
-                        onChange={(e) => setField('bloodGroup', e.target.value)}
+                        onChange={(e) => setField("bloodGroup", e.target.value)}
                       >
                         <option value="">Not specified</option>
                         {BLOOD_GROUP_OPTIONS.map((bg) => (
@@ -378,21 +394,23 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                         <span
                           className={`rounded-md px-2 py-0.5 font-dm-sans text-[10px] font-bold tracking-wide uppercase ${
                             profile.emailVerified
-                              ? 'bg-emerald-50 text-emerald-700'
-                              : 'bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface-variant)]'
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-[var(--color-surface-container-highest)] text-[var(--color-on-surface-variant)]"
                           }`}
                         >
-                          {profile.emailVerified ? 'Verified' : 'Unverified'}
+                          {profile.emailVerified ? "Verified" : "Unverified"}
                         </span>
                       </span>
                     </ReadRow>
                     <ReadRow label="Phone number">
-                      {profile.phoneNumber || '—'}
+                      {profile.phoneNumber || "—"}
                     </ReadRow>
                     <ReadRow label="Date of birth">
                       {formatDisplayDate(profile.dateOfBirth)}
                     </ReadRow>
-                    <ReadRow label="Gender">{genderLabel(profile.gender)}</ReadRow>
+                    <ReadRow label="Gender">
+                      {genderLabel(profile.gender)}
+                    </ReadRow>
                   </div>
                 )}
               </div>
@@ -477,18 +495,18 @@ export function ProfileSettingsView({ initialProfile }: ProfileSettingsViewProps
                 [
                   {
                     icon: MdMail,
-                    title: 'Email reminders',
-                    description: 'Reminder 24h before your appointment.',
+                    title: "Email reminders",
+                    description: "Reminder 24h before your appointment.",
                   },
                   {
                     icon: MdSms,
-                    title: 'SMS reminders',
-                    description: 'Texts for booking changes.',
+                    title: "SMS reminders",
+                    description: "Texts for booking changes.",
                   },
                   {
                     icon: MdCampaign,
-                    title: 'Promotional updates',
-                    description: 'Clinic news and health tips.',
+                    title: "Promotional updates",
+                    description: "Clinic news and health tips.",
                   },
                 ] as const
               ).map((item) => (

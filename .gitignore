@@ -72,3 +72,4 @@ next-env.d.ts
 
 .idea/vcs.xml
 .idea/inspectionProfiles/Project_Default.xml
+/.idea/jsLinters/eslint.xml

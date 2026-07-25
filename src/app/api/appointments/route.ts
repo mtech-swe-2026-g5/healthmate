@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-import { auth } from '@/lib/auth';
-import { handleApiError } from '@/lib/errors';
+import { auth } from "@/lib/auth";
+import { handleApiError } from "@/lib/errors";
 import {
   createAppointment,
   listPatientAppointments,
-} from '@/features/appointments/services/appointments';
+} from "@/features/appointments/services/appointments";
 
 export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const result = await listPatientAppointments(
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();

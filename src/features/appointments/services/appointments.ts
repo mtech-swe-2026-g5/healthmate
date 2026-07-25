@@ -1,17 +1,17 @@
-import { randomBytes } from 'crypto';
-import { Prisma } from '@prisma/client';
+import { randomBytes } from "crypto";
+import { Prisma } from "@prisma/client";
 
-import { prisma } from '@/lib/prisma';
-import { AppError } from '@/lib/errors';
-import { requireRole } from '@/features/auth/services/permissions';
+import { prisma } from "@/lib/prisma";
+import { AppError } from "@/lib/errors";
+import { requireRole } from "@/features/auth/services/permissions";
 
-import { createAppointmentSchema } from '../types';
-import type { CreateAppointmentInput } from '../types';
-import { generateSlots, combineDateAndTime, addMinutes } from './slots';
-import { getActiveDoctor } from './doctors';
+import { createAppointmentSchema } from "../types";
+import type { CreateAppointmentInput } from "../types";
+import { generateSlots, combineDateAndTime, addMinutes } from "./slots";
+import { getActiveDoctor } from "./doctors";
 
 export function generateBookingReference(): string {
-  return `HM-${randomBytes(3).toString('hex').toUpperCase()}`;
+  return `HM-${randomBytes(3).toString("hex").toUpperCase()}`;
 }
 
 export async function getPatientIdForUser(userId: string): Promise<string> {
@@ -21,7 +21,7 @@ export async function getPatientIdForUser(userId: string): Promise<string> {
   });
 
   if (!patient) {
-    throw new AppError('Patient profile not found', 404);
+    throw new AppError("Patient profile not found", 404);
   }
 
   return patient.id;
@@ -29,9 +29,9 @@ export async function getPatientIdForUser(userId: string): Promise<string> {
 
 export function assertPatientRole(role: string | undefined): void {
   if (!role) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
-  requireRole(role, ['patient']);
+  requireRole(role, ["patient"]);
 }
 
 const appointmentDetailSelect = {
@@ -83,7 +83,7 @@ export function serializeAppointment(
     lastName: string;
     specialization: string;
   };
-  timing: 'upcoming' | 'past';
+  timing: "upcoming" | "past";
 } {
   return {
     id: appointment.id,
@@ -94,7 +94,8 @@ export function serializeAppointment(
     reasonForVisit: appointment.reasonForVisit,
     additionalNotes: appointment.additionalNotes,
     doctor: appointment.doctor,
-    timing: appointment.startsAt.getTime() >= now.getTime() ? 'upcoming' : 'past',
+    timing:
+      appointment.startsAt.getTime() >= now.getTime() ? "upcoming" : "past",
   };
 }
 
@@ -109,20 +110,20 @@ export async function createAppointment(
 
   const doctor = await getActiveDoctor(input.doctorId);
   if (!doctor) {
-    throw new AppError('Doctor not found', 404);
+    throw new AppError("Doctor not found", 404);
   }
 
   const slots = await generateSlots(input.doctorId, input.date);
   const slot = slots.find((s) => s.startTime === input.startTime);
 
   if (!slot) {
-    throw new AppError('Invalid time slot for selected date', 400);
+    throw new AppError("Invalid time slot for selected date", 400);
   }
-  if (slot.status === 'booked') {
-    throw new AppError('Slot already booked', 409);
+  if (slot.status === "booked") {
+    throw new AppError("Slot already booked", 409);
   }
-  if (slot.status !== 'available') {
-    throw new AppError('Slot is not available', 400);
+  if (slot.status !== "available") {
+    throw new AppError("Slot is not available", 400);
   }
 
   const startsAt = combineDateAndTime(input.date, input.startTime);
@@ -140,7 +141,7 @@ export async function createAppointment(
         doctorId: input.doctorId,
         startsAt,
         endsAt,
-        status: 'CONFIRMED',
+        status: "CONFIRMED",
         reasonForVisit: input.reasonForVisit.trim(),
         additionalNotes: notes,
       },
@@ -151,9 +152,9 @@ export async function createAppointment(
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
+      error.code === "P2002"
     ) {
-      throw new AppError('Slot already booked', 409);
+      throw new AppError("Slot already booked", 409);
     }
     throw error;
   }
@@ -173,7 +174,7 @@ export async function getAppointmentForPatient(
   });
 
   if (!appointment) {
-    throw new AppError('Appointment not found', 404);
+    throw new AppError("Appointment not found", 404);
   }
 
   return serializeAppointment(appointment);
@@ -189,7 +190,7 @@ export async function listPatientAppointments(
 
   const appointments = await prisma.appointment.findMany({
     where: { patientId },
-    orderBy: { startsAt: 'desc' },
+    orderBy: { startsAt: "desc" },
     select: appointmentDetailSelect,
   });
 
@@ -197,10 +198,11 @@ export async function listPatientAppointments(
 
   return {
     upcoming: serialized
-      .filter((a) => a.timing === 'upcoming')
+      .filter((a) => a.timing === "upcoming")
       .sort(
-        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+        (a, b) =>
+          new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
       ),
-    past: serialized.filter((a) => a.timing === 'past'),
+    past: serialized.filter((a) => a.timing === "past"),
   };
 }

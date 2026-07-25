@@ -1,4 +1,4 @@
-import { FieldError } from './FieldError';
+import { FieldError } from "./FieldError";
 
 type FloatingFieldProps = {
   id: string;
@@ -17,13 +17,13 @@ export function FloatingField({
 }: FloatingFieldProps) {
   return (
     <div>
-      <div className={`floating-label-group ${error ? 'has-error' : ''}`}>
+      <div className={`floating-label-group ${error ? "has-error" : ""}`}>
         {children}
         <label htmlFor={id} className="font-dm-sans text-label-md">
           {label}
           {required && (
             <span className="text-[var(--color-error)]" aria-hidden="true">
-              {' '}
+              {" "}
               *
             </span>
           )}

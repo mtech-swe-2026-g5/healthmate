@@ -1,4 +1,4 @@
-import { DoctorAppLayout } from '@/features/navigation';
+import { DoctorAppLayout } from "@/features/navigation";
 
 export default function DoctorLayout({
   children,

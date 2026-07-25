@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
-import type { DoctorListItem } from '../types/doctor';
-import { fetchDoctors } from '../services/client';
+import type { DoctorListItem } from "../types/doctor";
+import { fetchDoctors } from "../services/client";
 
 export function useDoctors() {
   const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
@@ -28,7 +28,7 @@ export function useDoctors() {
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Failed to load doctors');
+        setError(err instanceof Error ? err.message : "Failed to load doctors");
       } finally {
         if (!cancelled) setLoading(false);
       }

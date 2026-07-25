@@ -9,10 +9,10 @@ export {
   SlotGrid,
   AppointmentDetailsForm,
   StepIndicator,
-} from './components';
+} from "./components";
 
-export { useDoctors, useSlots, useBookingWizard } from './hooks';
-export type { BookingWizardState } from './hooks';
+export { useDoctors, useSlots, useBookingWizard } from "./hooks";
+export type { BookingWizardState } from "./hooks";
 
 export {
   listActiveDoctors,
@@ -23,7 +23,7 @@ export {
   listPatientAppointments,
   generateBookingReference,
   serializeAppointment,
-} from './services';
+} from "./services";
 
 export {
   buildSlotStarts,
@@ -33,9 +33,9 @@ export {
   formatHm,
   dayOfWeekFromYmd,
   dateFromYmd,
-} from './lib/date-utils';
-export type { TimeSlot } from './lib/date-utils';
-export type { DoctorListItem } from './types/doctor';
+} from "./lib/date-utils";
+export type { TimeSlot } from "./lib/date-utils";
+export type { DoctorListItem } from "./types/doctor";
 
 export {
   appointmentDetailsSchema,
@@ -43,11 +43,8 @@ export {
   slotsQuerySchema,
   DATE_REGEX,
   TIME_REGEX,
-} from './types';
-export type {
-  AppointmentDetailsInput,
-  CreateAppointmentInput,
-} from './types';
+} from "./types";
+export type { AppointmentDetailsInput, CreateAppointmentInput } from "./types";
 
-export { BOOKING_STEPS, SLOT_STATUSES } from './constants';
-export type { BookingStepId, SlotStatus } from './constants';
+export { BOOKING_STEPS, SLOT_STATUSES } from "./constants";
+export type { BookingStepId, SlotStatus } from "./constants";

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState } from "react";
+import Link from "next/link";
 import {
   MdArrowForward,
   MdEventAvailable,
@@ -14,16 +14,16 @@ import {
   MdSchedule,
   MdSms,
   MdWavingHand,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import { Toast } from '@/components/ui/Toast';
-import type { AppointmentConfirmation } from '@/features/appointments/services/client';
+import { Toast } from "@/components/ui/Toast";
+import type { AppointmentConfirmation } from "@/features/appointments/services/client";
 
 import {
   daysUntil,
   formatCountdownLabel,
   greetingForHour,
-} from '../lib/greeting';
+} from "../lib/greeting";
 
 export type PatientDashboardViewProps = {
   firstName: string;
@@ -32,28 +32,28 @@ export type PatientDashboardViewProps = {
 };
 
 const CARD =
-  'rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] shadow-[0px_4px_20px_rgba(26,107,114,0.08)]';
+  "rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] shadow-[0px_4px_20px_rgba(26,107,114,0.08)]";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function formatWeekdayDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
+    weekday: "long",
+    month: "short",
+    day: "numeric",
   });
 }
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
 
@@ -69,9 +69,9 @@ export function PatientDashboardView({
   const next = upcoming[0] ?? null;
   const greeting = greetingForHour(new Date().getHours());
   const todayLabel = new Date().toLocaleDateString(undefined, {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 
   const [emailOn, setEmailOn] = useState(true);
@@ -79,7 +79,7 @@ export function PatientDashboardView({
   const [toast, setToast] = useState<string | null>(null);
 
   const showReminderToast = () => {
-    setToast('Reminder settings updated successfully.');
+    setToast("Reminder settings updated successfully.");
   };
 
   const countdownDays = next ? daysUntil(new Date(next.startsAt)) : null;
@@ -87,7 +87,11 @@ export function PatientDashboardView({
   return (
     <>
       {toast && (
-        <Toast message={toast} variant="success" onClose={() => setToast(null)} />
+        <Toast
+          message={toast}
+          variant="success"
+          onClose={() => setToast(null)}
+        />
       )}
 
       <header className="mb-[var(--spacing-hm-xl)] flex flex-wrap items-center justify-between gap-3">
@@ -127,7 +131,7 @@ export function PatientDashboardView({
               Upcoming
             </p>
             <p className="font-dm-sans text-title-lg text-[var(--color-on-surface)]">
-              {next ? `Next: ${doctorName(next)}` : 'No visits scheduled'}
+              {next ? `Next: ${doctorName(next)}` : "No visits scheduled"}
             </p>
           </div>
 
@@ -396,8 +400,8 @@ export function PatientDashboardView({
                     aria-hidden
                   />
                   <p className="font-dm-sans text-label-sm">
-                    We&apos;ll send you a 24-hour and 2-hour reminder before every
-                    session. Preferences are preview-only for now.
+                    We&apos;ll send you a 24-hour and 2-hour reminder before
+                    every session. Preferences are preview-only for now.
                   </p>
                 </div>
               </div>

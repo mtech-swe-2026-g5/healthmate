@@ -1,6 +1,6 @@
-export { PatientDashboardView } from './components';
+export { PatientDashboardView } from "./components";
 export {
   greetingForHour,
   daysUntil,
   formatCountdownLabel,
-} from './lib/greeting';
+} from "./lib/greeting";

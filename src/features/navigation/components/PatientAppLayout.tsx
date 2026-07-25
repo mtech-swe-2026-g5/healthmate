@@ -1,9 +1,9 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-import { PatientPortalShell } from './PatientPortalShell';
+import { PatientPortalShell } from "./PatientPortalShell";
 
 type PatientAppLayoutProps = {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ type PatientAppLayoutProps = {
  */
 export async function PatientAppLayout({ children }: PatientAppLayoutProps) {
   const session = await auth();
-  if (!session?.user) redirect('/login');
+  if (!session?.user) redirect("/login");
 
   const patient = session.user.id
     ? await prisma.patient.findUnique({
@@ -28,10 +28,7 @@ export async function PatientAppLayout({ children }: PatientAppLayoutProps) {
     : null;
 
   return (
-    <PatientPortalShell
-      userEmail={session.user.email}
-      userName={userName}
-    >
+    <PatientPortalShell userEmail={session.user.email} userName={userName}>
       {children}
     </PatientPortalShell>
   );

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { MdCheck } from 'react-icons/md';
+import { MdCheck } from "react-icons/md";
 
-import { BOOKING_STEPS } from '../constants';
-import type { BookingStepId } from '../constants';
+import { BOOKING_STEPS } from "../constants";
+import type { BookingStepId } from "../constants";
 
 type StepIndicatorProps = {
   current: BookingStepId;
@@ -34,20 +34,20 @@ export function StepIndicator({ current }: StepIndicatorProps) {
               <span
                 className={`flex h-10 w-10 items-center justify-center rounded-full font-dm-sans text-label-md font-bold transition-colors duration-200 ${
                   isActive
-                    ? 'bg-[var(--color-primary)] text-white'
+                    ? "bg-[var(--color-primary)] text-white"
                     : isComplete
-                      ? 'bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)]'
-                      : 'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
+                      ? "bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)]"
+                      : "bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]"
                 }`}
-                aria-current={isActive ? 'step' : undefined}
+                aria-current={isActive ? "step" : undefined}
               >
                 {isComplete ? <MdCheck size={20} aria-hidden /> : index + 1}
               </span>
               <span
                 className={`font-dm-sans text-label-md ${
                   isActive || isComplete
-                    ? 'font-bold text-[var(--color-primary)]'
-                    : 'text-[var(--color-on-surface-variant)]'
+                    ? "font-bold text-[var(--color-primary)]"
+                    : "text-[var(--color-on-surface-variant)]"
                 }`}
               >
                 {step.label}

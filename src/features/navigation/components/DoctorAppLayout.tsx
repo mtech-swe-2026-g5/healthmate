@@ -1,8 +1,8 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
-import { auth } from '@/lib/auth';
+import { auth } from "@/lib/auth";
 
-import { DoctorPortalShell } from './DoctorPortalShell';
+import { DoctorPortalShell } from "./DoctorPortalShell";
 
 type DoctorAppLayoutProps = {
   children: React.ReactNode;
@@ -13,15 +13,12 @@ type DoctorAppLayoutProps = {
  */
 export async function DoctorAppLayout({ children }: DoctorAppLayoutProps) {
   const session = await auth();
-  if (!session?.user) redirect('/login');
+  if (!session?.user) redirect("/login");
 
-  const roleLabel = session.user.role === 'admin' ? 'Admin' : 'Doctor';
+  const roleLabel = session.user.role === "admin" ? "Admin" : "Doctor";
 
   return (
-    <DoctorPortalShell
-      userEmail={session.user.email}
-      roleLabel={roleLabel}
-    >
+    <DoctorPortalShell userEmail={session.user.email} roleLabel={roleLabel}>
       {children}
     </DoctorPortalShell>
   );

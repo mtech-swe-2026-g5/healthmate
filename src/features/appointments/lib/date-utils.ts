@@ -1,4 +1,4 @@
-import type { SlotStatus } from '../constants';
+import type { SlotStatus } from "../constants";
 
 export type TimeSlot = {
   startTime: string;
@@ -11,7 +11,7 @@ function parseDateParts(date: string): {
   month: number;
   day: number;
 } {
-  const [year, month, day] = date.split('-').map(Number);
+  const [year, month, day] = date.split("-").map(Number);
   return { year, month, day };
 }
 
@@ -27,14 +27,14 @@ export function dayOfWeekFromYmd(date: string): number {
 
 export function formatYmd(date: Date): string {
   const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
 export function combineDateAndTime(date: string, time: string): Date {
   const { year, month, day } = parseDateParts(date);
-  const [hours, minutes] = time.split(':').map(Number);
+  const [hours, minutes] = time.split(":").map(Number);
   return new Date(year, month - 1, day, hours, minutes, 0, 0);
 }
 
@@ -43,7 +43,7 @@ export function addMinutes(date: Date, minutes: number): Date {
 }
 
 export function formatHm(date: Date): string {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
 /**
@@ -56,8 +56,8 @@ export function buildSlotStarts(
   slotDurationMinutes: number,
 ): string[] {
   const starts: string[] = [];
-  let cursor = combineDateAndTime('2000-01-01', startTime);
-  const end = combineDateAndTime('2000-01-01', endTime);
+  let cursor = combineDateAndTime("2000-01-01", startTime);
+  const end = combineDateAndTime("2000-01-01", endTime);
 
   while (addMinutes(cursor, slotDurationMinutes) <= end) {
     starts.push(formatHm(cursor));

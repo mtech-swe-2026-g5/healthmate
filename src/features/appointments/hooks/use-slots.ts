@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
-import type { TimeSlot } from '../lib/date-utils';
-import { fetchSlots } from '../services/client';
+import type { TimeSlot } from "../lib/date-utils";
+import { fetchSlots } from "../services/client";
 
 export function useSlots(doctorId: string | null, date: string | null) {
   const [slots, setSlots] = useState<TimeSlot[]>([]);
@@ -46,7 +46,7 @@ export function useSlots(doctorId: string | null, date: string | null) {
       } catch (err) {
         if (cancelled) return;
         setSlots([]);
-        setError(err instanceof Error ? err.message : 'Failed to load slots');
+        setError(err instanceof Error ? err.message : "Failed to load slots");
       } finally {
         if (!cancelled) setLoading(false);
       }

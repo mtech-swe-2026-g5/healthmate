@@ -1,18 +1,23 @@
-'use client';
+"use client";
 
-import { MdArrowBack, MdArrowForward, MdLocationOn, MdPerson } from 'react-icons/md';
+import {
+  MdArrowBack,
+  MdArrowForward,
+  MdLocationOn,
+  MdPerson,
+} from "react-icons/md";
 
-import { PaymentStep } from '@/features/payments/components/PaymentStep';
+import { PaymentStep } from "@/features/payments/components/PaymentStep";
 
-import { useBookingWizard } from '../hooks/use-booking-wizard';
-import { useDoctors } from '../hooks/use-doctors';
-import { useSlots } from '../hooks/use-slots';
-import { AppointmentDetailsForm } from './AppointmentDetailsForm';
-import { ConfirmationView } from './ConfirmationView';
-import { DoctorCardGrid } from './DoctorCardGrid';
-import { SlotCalendar } from './SlotCalendar';
-import { SlotGrid } from './SlotGrid';
-import { StepIndicator } from './StepIndicator';
+import { useBookingWizard } from "../hooks/use-booking-wizard";
+import { useDoctors } from "../hooks/use-doctors";
+import { useSlots } from "../hooks/use-slots";
+import { AppointmentDetailsForm } from "./AppointmentDetailsForm";
+import { ConfirmationView } from "./ConfirmationView";
+import { DoctorCardGrid } from "./DoctorCardGrid";
+import { SlotCalendar } from "./SlotCalendar";
+import { SlotGrid } from "./SlotGrid";
+import { StepIndicator } from "./StepIndicator";
 
 type BookingWizardProps = {
   patientEmail?: string | null;
@@ -43,7 +48,11 @@ export function BookingWizard({
     payAndConfirm,
   } = useBookingWizard({ patientEmail, patientName });
 
-  const { doctors, loading: doctorsLoading, error: doctorsError } = useDoctors();
+  const {
+    doctors,
+    loading: doctorsLoading,
+    error: doctorsError,
+  } = useDoctors();
   const {
     slots,
     loading: slotsLoading,
@@ -52,9 +61,9 @@ export function BookingWizard({
 
   const selectedDateLabel = state.date
     ? new Date(`${state.date}T12:00:00`).toLocaleDateString(undefined, {
-        weekday: 'long',
-        month: 'short',
-        day: 'numeric',
+        weekday: "long",
+        month: "short",
+        day: "numeric",
       })
     : null;
 
@@ -62,7 +71,7 @@ export function BookingWizard({
     <div>
       <StepIndicator current={state.step} />
 
-      {state.step === 'doctor' && (
+      {state.step === "doctor" && (
         <section aria-labelledby="doctor-step-heading">
           <h2 id="doctor-step-heading" className="sr-only">
             Search for a doctor
@@ -77,7 +86,7 @@ export function BookingWizard({
         </section>
       )}
 
-      {state.step === 'slot' && state.doctor && (
+      {state.step === "slot" && state.doctor && (
         <section aria-labelledby="slot-step-heading">
           <h2 id="slot-step-heading" className="sr-only">
             Select date and time
@@ -87,7 +96,7 @@ export function BookingWizard({
               <div className="rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-lg)] shadow-sm">
                 <div className="mb-[var(--spacing-hm-md)] flex items-center gap-[var(--spacing-hm-md)]">
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]/15 font-dm-sans text-title-lg font-bold text-[var(--color-primary)]">
-                    {`${state.doctor.firstName[0] ?? ''}${state.doctor.lastName[0] ?? ''}`.toUpperCase() || (
+                    {`${state.doctor.firstName[0] ?? ""}${state.doctor.lastName[0] ?? ""}`.toUpperCase() || (
                       <MdPerson size={32} />
                     )}
                   </div>
@@ -160,7 +169,7 @@ export function BookingWizard({
         </section>
       )}
 
-      {state.step === 'details' &&
+      {state.step === "details" &&
         state.doctor &&
         state.date &&
         state.startTime &&
@@ -190,7 +199,7 @@ export function BookingWizard({
           </section>
         )}
 
-      {state.step === 'payment' &&
+      {state.step === "payment" &&
         state.doctor &&
         state.date &&
         state.startTime &&
@@ -210,7 +219,7 @@ export function BookingWizard({
           />
         )}
 
-      {state.step === 'confirmed' && state.confirmation && (
+      {state.step === "confirmed" && state.confirmation && (
         <ConfirmationView
           appointment={state.confirmation}
           patientEmail={patientEmail}

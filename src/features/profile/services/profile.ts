@@ -1,16 +1,16 @@
-import { prisma } from '@/lib/prisma';
-import { AppError } from '@/lib/errors';
-import { requireRole } from '@/features/auth/services/permissions';
+import { prisma } from "@/lib/prisma";
+import { AppError } from "@/lib/errors";
+import { requireRole } from "@/features/auth/services/permissions";
 
 import {
   updatePatientProfileSchema,
   type PatientProfile,
   type UpdatePatientProfileInput,
-} from '../types';
+} from "../types";
 
 export function assertPatientRole(role: string | undefined): void {
-  if (!role) throw new Error('Unauthorized');
-  requireRole(role, ['patient']);
+  if (!role) throw new Error("Unauthorized");
+  requireRole(role, ["patient"]);
 }
 
 /** Serialize a DATE column without local-TZ day shifts. */
@@ -18,22 +18,20 @@ function formatDateOnly(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function serializeProfile(
-  user: {
-    email: string;
-    emailVerified: boolean;
-    patient: {
-      firstName: string;
-      lastName: string;
-      dateOfBirth: Date;
-      gender: string | null;
-      phoneNumber: string | null;
-      bloodGroup: string | null;
-    } | null;
-  },
-): PatientProfile {
+function serializeProfile(user: {
+  email: string;
+  emailVerified: boolean;
+  patient: {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: Date;
+    gender: string | null;
+    phoneNumber: string | null;
+    bloodGroup: string | null;
+  } | null;
+}): PatientProfile {
   if (!user.patient) {
-    throw new AppError('Patient profile not found', 404);
+    throw new AppError("Patient profile not found", 404);
   }
 
   const { patient } = user;
@@ -75,7 +73,7 @@ export async function getPatientProfile(
   });
 
   if (!user) {
-    throw new AppError('Patient profile not found', 404);
+    throw new AppError("Patient profile not found", 404);
   }
 
   return serializeProfile(user);
@@ -87,7 +85,8 @@ export async function updatePatientProfile(
   input: unknown,
 ): Promise<PatientProfile> {
   assertPatientRole(role);
-  const data: UpdatePatientProfileInput = updatePatientProfileSchema.parse(input);
+  const data: UpdatePatientProfileInput =
+    updatePatientProfileSchema.parse(input);
 
   const patient = await prisma.patient.findUnique({
     where: { userId },
@@ -95,7 +94,7 @@ export async function updatePatientProfile(
   });
 
   if (!patient) {
-    throw new AppError('Patient profile not found', 404);
+    throw new AppError("Patient profile not found", 404);
   }
 
   await prisma.patient.update({

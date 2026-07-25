@@ -1,13 +1,13 @@
-import NextAuth from 'next-auth';
-import { NextResponse } from 'next/server';
+import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
 
 import {
   getRoleHome,
   isAuthOnlyRoute,
   isPublicRoute,
   matchRouteAccess,
-} from '@/config/routes';
-import { authConfig } from '@/lib/auth.config';
+} from "@/config/routes";
+import { authConfig } from "@/lib/auth.config";
 
 /**
  * Centralised route protection. Runs on the edge using the edge-safe config
@@ -28,18 +28,18 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth?.user;
   const role = req.auth?.user?.role;
 
-  if (pathname.startsWith('/api/auth')) {
+  if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
   // Razorpay webhooks are authenticated via signature, not session cookies.
-  if (pathname === '/api/payments/webhook') {
+  if (pathname === "/api/payments/webhook") {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith('/api')) {
+  if (pathname.startsWith("/api")) {
     if (!isLoggedIn) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.next();
   }
@@ -52,18 +52,18 @@ export default auth((req) => {
     if (isPublicRoute(pathname) || isAuthOnlyRoute(pathname)) {
       return NextResponse.next();
     }
-    const loginUrl = new URL('/login', nextUrl);
-    loginUrl.searchParams.set('callbackUrl', `${pathname}${nextUrl.search}`);
+    const loginUrl = new URL("/login", nextUrl);
+    loginUrl.searchParams.set("callbackUrl", `${pathname}${nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 
   const access = matchRouteAccess(pathname);
 
-  if (access === 'patient' && role !== 'patient') {
+  if (access === "patient" && role !== "patient") {
     return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
   }
 
-  if (access === 'doctor' && role !== 'doctor' && role !== 'admin') {
+  if (access === "doctor" && role !== "doctor" && role !== "admin") {
     return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
   }
 
@@ -71,5 +71,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

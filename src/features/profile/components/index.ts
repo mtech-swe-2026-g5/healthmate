@@ -1,1 +1,1 @@
-export { ProfileSettingsView } from './ProfileSettingsView';
+export { ProfileSettingsView } from "./ProfileSettingsView";

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { useMemo, useState } from "react";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
-import { formatYmd } from '../lib/date-utils';
+import { formatYmd } from "../lib/date-utils";
 
 type SlotCalendarProps = {
   selectedDate: string | null;
@@ -30,7 +30,10 @@ function isSelectable(date: Date, today: Date): boolean {
   return ymd >= todayYmd;
 }
 
-export function SlotCalendar({ selectedDate, onSelectDate }: SlotCalendarProps) {
+export function SlotCalendar({
+  selectedDate,
+  onSelectDate,
+}: SlotCalendarProps) {
   const today = useMemo(() => new Date(), []);
   const [viewMonth, setViewMonth] = useState(() => startOfMonth(today));
 
@@ -51,8 +54,8 @@ export function SlotCalendar({ selectedDate, onSelectDate }: SlotCalendarProps) 
   }, [viewMonth]);
 
   const monthLabel = viewMonth.toLocaleDateString(undefined, {
-    month: 'long',
-    year: 'numeric',
+    month: "long",
+    year: "numeric",
   });
 
   const canGoPrev =
@@ -103,7 +106,7 @@ export function SlotCalendar({ selectedDate, onSelectDate }: SlotCalendarProps) 
         role="grid"
         aria-label="Appointment calendar"
       >
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label) => (
+        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label) => (
           <div
             key={label}
             className="py-2 text-center font-dm-sans text-label-md text-[var(--color-on-surface-variant)] opacity-60"
@@ -127,7 +130,7 @@ export function SlotCalendar({ selectedDate, onSelectDate }: SlotCalendarProps) 
               <div
                 key={key}
                 className={`rounded-xl py-4 text-center font-dm-sans text-label-md ${
-                  isSunday ? 'cursor-not-allowed opacity-30' : 'opacity-20'
+                  isSunday ? "cursor-not-allowed opacity-30" : "opacity-20"
                 }`}
               >
                 {date.getDate()}
@@ -144,14 +147,14 @@ export function SlotCalendar({ selectedDate, onSelectDate }: SlotCalendarProps) 
               onClick={() => onSelectDate(ymd)}
               className={`relative rounded-xl py-4 text-center font-dm-sans text-label-md transition-all duration-200 ${
                 selected
-                  ? 'bg-[var(--color-primary-container)] text-white shadow-md ring-1 ring-[var(--color-primary)]'
-                  : 'hover:bg-[var(--color-surface-container)] text-[var(--color-on-surface)]'
+                  ? "bg-[var(--color-primary-container)] text-white shadow-md ring-1 ring-[var(--color-primary)]"
+                  : "hover:bg-[var(--color-surface-container)] text-[var(--color-on-surface)]"
               }`}
             >
               {date.getDate()}
               <span
                 className={`absolute bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full ${
-                  selected ? 'bg-white' : 'bg-[var(--color-primary)]'
+                  selected ? "bg-white" : "bg-[var(--color-primary)]"
                 }`}
                 aria-hidden
               />

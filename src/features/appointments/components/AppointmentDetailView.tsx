@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 import {
   MdArrowBack,
   MdCalendarMonth,
@@ -10,9 +10,9 @@ import {
   MdPerson,
   MdSchedule,
   MdTimer,
-} from 'react-icons/md';
+} from "react-icons/md";
 
-import type { AppointmentConfirmation } from '../services/client';
+import type { AppointmentConfirmation } from "../services/client";
 
 type AppointmentDetailViewProps = {
   appointment: AppointmentConfirmation;
@@ -20,16 +20,16 @@ type AppointmentDetailViewProps = {
 
 function formatDisplayTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -44,9 +44,9 @@ export function AppointmentDetailView({
 }: AppointmentDetailViewProps) {
   const doctor = appointment.doctor;
   const initials =
-    `${doctor.firstName[0] ?? ''}${doctor.lastName[0] ?? ''}`.toUpperCase();
+    `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
   const minutes = durationMinutes(appointment.startsAt, appointment.endsAt);
-  const isUpcoming = appointment.timing === 'upcoming';
+  const isUpcoming = appointment.timing === "upcoming";
 
   return (
     <div className="flex flex-col gap-[var(--spacing-hm-lg)] pb-8">
@@ -73,16 +73,16 @@ export function AppointmentDetailView({
               <span
                 className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-dm-sans text-label-sm ${
                   isUpcoming
-                    ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
-                    : 'bg-[var(--color-success-container)] text-[var(--color-success)]'
+                    ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                    : "bg-[var(--color-success-container)] text-[var(--color-success)]"
                 }`}
               >
                 <MdCheckCircle size={14} aria-hidden />
-                {isUpcoming ? 'Confirmed' : 'Completed'}
+                {isUpcoming ? "Confirmed" : "Completed"}
               </span>
             </div>
             <p className="font-dm-sans text-label-md text-[var(--color-on-surface-variant)]">
-              {doctor.specialization} · Booking Ref:{' '}
+              {doctor.specialization} · Booking Ref:{" "}
               <span className="font-bold text-[var(--color-on-surface)]">
                 {appointment.bookingReference}
               </span>
@@ -195,7 +195,7 @@ export function AppointmentDetailView({
               <p className="font-literata text-body-md leading-relaxed text-[var(--color-on-surface-variant)]">
                 {appointment.additionalNotes?.trim()
                   ? `“${appointment.additionalNotes.trim()}”`
-                  : 'No additional notes provided.'}
+                  : "No additional notes provided."}
               </p>
             </div>
           </section>
@@ -248,10 +248,12 @@ export function AppointmentDetailView({
 
           <section className="relative overflow-hidden rounded-xl bg-[var(--color-primary-container)] p-[var(--spacing-hm-lg)] text-[var(--color-on-primary-container)]">
             <div className="relative z-10">
-              <h3 className="mb-2 font-dm-sans text-title-lg">Need to prepare?</h3>
+              <h3 className="mb-2 font-dm-sans text-title-lg">
+                Need to prepare?
+              </h3>
               <p className="mb-[var(--spacing-hm-lg)] font-literata text-body-md opacity-90">
-                Arrive a few minutes early and bring any recent reports related to
-                your reason for visit.
+                Arrive a few minutes early and bring any recent reports related
+                to your reason for visit.
               </p>
               <p className="font-dm-sans text-label-md">
                 Slot ends at {formatDisplayTime(appointment.endsAt)}

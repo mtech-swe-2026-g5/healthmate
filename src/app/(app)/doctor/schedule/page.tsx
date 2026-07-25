@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Schedule — HealthMate',
-  description: 'Doctor schedule overview.',
+  title: "Schedule — HealthMate",
+  description: "Doctor schedule overview.",
 };
 
 export default function DoctorSchedulePage() {
