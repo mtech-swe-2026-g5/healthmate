@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.1.1...v1.2.0) (2026-07-25)
+
+
+### Features
+
+* doctor dashboard ([caa34e4](https://github.com/mtech-swe-2026-g5/healthmate/commit/caa34e4ffae44b4ebf7189123753641fe720a6cd))
+
 ## [1.1.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.1.0...v1.1.1) (2026-07-15)
 
 
