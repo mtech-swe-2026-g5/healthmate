@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-type ToastVariant = 'success' | 'error';
+type ToastVariant = "success" | "error";
 
 type ToastProps = {
   message: string;
@@ -13,14 +13,14 @@ type ToastProps = {
 
 const VARIANT_STYLES: Record<ToastVariant, string> = {
   success:
-    'bg-[var(--color-surface-container-lowest,#fff)] border-[var(--color-primary)] text-[var(--color-on-surface)]',
+    "bg-[var(--color-surface-container-lowest,#fff)] border-[var(--color-primary)] text-[var(--color-on-surface)]",
   error:
-    'bg-[var(--color-error-container)] border-[var(--color-error)] text-[var(--color-on-error-container,#93000a)]',
+    "bg-[var(--color-error-container)] border-[var(--color-error)] text-[var(--color-on-error-container,#93000a)]",
 };
 
 export function Toast({
   message,
-  variant = 'success',
+  variant = "success",
   duration = 4000,
   onClose,
 }: ToastProps) {
@@ -40,7 +40,7 @@ export function Toast({
       role="status"
       aria-live="polite"
       className={`fixed top-6 right-6 z-50 flex items-center gap-3 rounded-lg border px-5 py-3 shadow-sm transition-opacity duration-300 ${
-        visible ? 'opacity-100' : 'opacity-0'
+        visible ? "opacity-100" : "opacity-0"
       } ${VARIANT_STYLES[variant]}`}
     >
       <span className="text-body-md">{message}</span>

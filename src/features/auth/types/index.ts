@@ -3,11 +3,11 @@ export {
   registrationApiSchema,
   loginSchema,
   credentialsAuthorizeSchema,
-} from './schemas';
+} from "./schemas";
 
 export type {
   RegistrationInput,
   RegistrationApiInput,
   LoginInput,
   CredentialsAuthorizeInput,
-} from './schemas';
+} from "./schemas";

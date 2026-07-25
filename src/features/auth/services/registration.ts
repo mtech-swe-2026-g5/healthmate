@@ -1,11 +1,11 @@
-import { hash } from 'bcryptjs';
+import { hash } from "bcryptjs";
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
-import { registrationApiSchema } from '../types';
-import type { RegistrationApiInput } from '../types';
+import { registrationApiSchema } from "../types";
+import type { RegistrationApiInput } from "../types";
 
-const BCRYPT_SALT_ROUNDS = 10;
+export const BCRYPT_SALT_ROUNDS = 10;
 
 export async function registerPatient(data: RegistrationApiInput) {
   const validated = registrationApiSchema.parse(data);
@@ -13,11 +13,11 @@ export async function registerPatient(data: RegistrationApiInput) {
   const passwordHash = await hash(validated.password, BCRYPT_SALT_ROUNDS);
 
   const patientRole = await prisma.role.findUnique({
-    where: { name: 'patient' },
+    where: { name: "patient" },
   });
 
   if (!patientRole) {
-    throw new Error('Patient role not found. Run database seed first.');
+    throw new Error("Patient role not found. Run database seed first.");
   }
 
   const result = await prisma.$transaction(async (tx) => {

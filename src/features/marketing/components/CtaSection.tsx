@@ -1,12 +1,12 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-import { authRoutes, siteConfig } from '@/config/site';
+import { authRoutes, siteConfig } from "@/config/site";
 import {
   marketingButtonCtaFilled,
   marketingButtonCtaOutline,
-} from '@/features/marketing/constants/interaction-styles';
+} from "@/features/marketing/constants/interaction-styles";
 
-import { MarketingContainer } from './MarketingContainer';
+import { MarketingContainer } from "./MarketingContainer";
 
 export function CtaSection() {
   return (
@@ -17,11 +17,14 @@ export function CtaSection() {
             Ready to modernize your clinic?
           </h2>
           <p className="mx-auto mb-hm-xl max-w-3xl font-literata text-body-lg opacity-90">
-            Join hundreds of healthcare providers who trust {siteConfig.name} to handle their
-            most critical operations.
+            Join hundreds of healthcare providers who trust {siteConfig.name} to
+            handle their most critical operations.
           </p>
           <div className="flex flex-col justify-center gap-hm-md sm:flex-row">
-            <Link href={authRoutes.register} className={marketingButtonCtaFilled}>
+            <Link
+              href={authRoutes.register}
+              className={marketingButtonCtaFilled}
+            >
               Start Free Trial
             </Link>
             <Link href={authRoutes.login} className={marketingButtonCtaOutline}>

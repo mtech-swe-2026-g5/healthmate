@@ -1,13 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { BLOOD_GROUP_OPTIONS, GENDER_OPTIONS } from '../constants';
+import { BLOOD_GROUP_OPTIONS, GENDER_OPTIONS } from "../constants";
 
 const passwordSchema = z
   .string()
-  .min(8, 'Password must be at least 8 characters')
-  .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
-  .regex(/[0-9]/, 'Must contain at least one number')
-  .regex(/[^A-Za-z0-9]/, 'Must contain at least one special character');
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Must contain at least one special character");
 
 /**
  * Client-side registration schema — includes confirmPassword for the form.
@@ -16,38 +16,38 @@ export const registrationSchema = z
   .object({
     firstName: z
       .string()
-      .min(1, 'First name is required')
-      .max(100, 'First name must be 100 characters or fewer'),
+      .min(1, "First name is required")
+      .max(100, "First name must be 100 characters or fewer"),
     lastName: z
       .string()
-      .min(1, 'Last name is required')
-      .max(100, 'Last name must be 100 characters or fewer'),
-    email: z.string().email('Invalid email address'),
+      .min(1, "Last name is required")
+      .max(100, "Last name must be 100 characters or fewer"),
+    email: z.string().email("Invalid email address"),
     password: passwordSchema,
     confirmPassword: z.string(),
     dateOfBirth: z
       .string()
-      .min(1, 'Date of birth is required')
+      .min(1, "Date of birth is required")
       .refine(
         (val) => !isNaN(new Date(val).getTime()) && new Date(val) < new Date(),
-        { message: 'Date of birth must be a valid date in the past' },
+        { message: "Date of birth must be a valid date in the past" },
       ),
     gender: z.enum(GENDER_OPTIONS, {
-      error: 'Please select a gender',
+      error: "Please select a gender",
     }),
     phoneNumber: z
       .string()
-      .min(1, 'Phone number is required')
-      .regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number'),
+      .min(1, "Phone number is required")
+      .regex(/^\+?[0-9]{10,15}$/, "Invalid phone number"),
     bloodGroup: z
       .enum(BLOOD_GROUP_OPTIONS, {
-        error: 'Select a valid blood group',
+        error: "Select a valid blood group",
       })
       .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ['confirmPassword'],
+    path: ["confirmPassword"],
   });
 
 export type RegistrationInput = z.infer<typeof registrationSchema>;
@@ -58,31 +58,31 @@ export type RegistrationInput = z.infer<typeof registrationSchema>;
 export const registrationApiSchema = z.object({
   firstName: z
     .string()
-    .min(1, 'First name is required')
-    .max(100, 'First name must be 100 characters or fewer'),
+    .min(1, "First name is required")
+    .max(100, "First name must be 100 characters or fewer"),
   lastName: z
     .string()
-    .min(1, 'Last name is required')
-    .max(100, 'Last name must be 100 characters or fewer'),
-  email: z.string().email('Invalid email address'),
+    .min(1, "Last name is required")
+    .max(100, "Last name must be 100 characters or fewer"),
+  email: z.string().email("Invalid email address"),
   password: passwordSchema,
   dateOfBirth: z
     .string()
-    .min(1, 'Date of birth is required')
+    .min(1, "Date of birth is required")
     .refine(
       (val) => !isNaN(new Date(val).getTime()) && new Date(val) < new Date(),
-      { message: 'Date of birth must be a valid date in the past' },
+      { message: "Date of birth must be a valid date in the past" },
     ),
   gender: z.enum(GENDER_OPTIONS, {
-    error: 'Please select a gender',
+    error: "Please select a gender",
   }),
   phoneNumber: z
     .string()
-    .min(1, 'Phone number is required')
-    .regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number'),
+    .min(1, "Phone number is required")
+    .regex(/^\+?[0-9]{10,15}$/, "Invalid phone number"),
   bloodGroup: z
     .enum(BLOOD_GROUP_OPTIONS, {
-      error: 'Select a valid blood group',
+      error: "Select a valid blood group",
     })
     .optional(),
 });
@@ -96,11 +96,8 @@ export type RegistrationApiInput = z.infer<typeof registrationApiSchema>;
  * account after authentication, so it is not part of the login form.
  */
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().min(1, "Email is required").email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
   // Always supplied by the form (checkbox has a defaultValue), so it is
   // required here to keep the resolver input/output types aligned.
   rememberMe: z.boolean(),
@@ -119,7 +116,7 @@ export const credentialsAuthorizeSchema = z.object({
   rememberMe: z
     .union([z.boolean(), z.string()])
     .optional()
-    .transform((value) => value === true || value === 'true'),
+    .transform((value) => value === true || value === "true"),
 });
 
 export type CredentialsAuthorizeInput = z.infer<

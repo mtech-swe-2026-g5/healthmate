@@ -1,14 +1,19 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
-import { marketingContainerClass } from '@/features/marketing/constants/layout';
+import { marketingContainerClass } from "@/features/marketing/constants/layout";
 
 type MarketingContainerProps = {
   children: ReactNode;
   className?: string;
 };
 
-export function MarketingContainer({ children, className }: MarketingContainerProps) {
+export function MarketingContainer({
+  children,
+  className,
+}: MarketingContainerProps) {
   return (
-    <div className={`${marketingContainerClass} ${className ?? ''}`}>{children}</div>
+    <div className={`${marketingContainerClass} ${className ?? ""}`}>
+      {children}
+    </div>
   );
 }

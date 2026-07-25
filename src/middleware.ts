@@ -1,7 +1,7 @@
-import NextAuth from 'next-auth';
-import { NextResponse } from 'next/server';
+import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
 
-import { authConfig } from '@/lib/auth.config';
+import { authConfig } from "@/lib/auth.config";
 
 /**
  * Centralised route protection (the story's recommended approach). Runs on the
@@ -15,7 +15,7 @@ import { authConfig } from '@/lib/auth.config';
  */
 const { auth } = NextAuth(authConfig);
 
-const PUBLIC_PAGES = ['/', '/login', '/register'];
+const PUBLIC_PAGES = ["/", "/login", "/register"];
 
 export default auth((req) => {
   const { nextUrl } = req;
@@ -23,26 +23,26 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth?.user;
 
   // Auth.js endpoints + registration must stay open.
-  if (pathname.startsWith('/api/auth')) {
+  if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
   // Protected API routes answer with 401 rather than redirecting.
-  if (pathname.startsWith('/api')) {
+  if (pathname.startsWith("/api")) {
     if (!isLoggedIn) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.next();
   }
 
   // Signed-in users should not see the auth pages.
-  if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', nextUrl));
+  if (isLoggedIn && (pathname === "/login" || pathname === "/register")) {
+    return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
   // Unauthenticated users hitting a protected page go to login.
   if (!isLoggedIn && !PUBLIC_PAGES.includes(pathname)) {
-    return NextResponse.redirect(new URL('/login', nextUrl));
+    return NextResponse.redirect(new URL("/login", nextUrl));
   }
 
   return NextResponse.next();
@@ -50,5 +50,5 @@ export default auth((req) => {
 
 export const config = {
   // Run on everything except Next internals and static assets.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

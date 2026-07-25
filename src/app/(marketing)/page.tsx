@@ -1,5 +1,5 @@
-import { auth } from '@/lib/auth';
-import { LandingPage } from '@/features/marketing';
+import { auth } from "@/lib/auth";
+import { LandingPage } from "@/features/marketing";
 
 export default async function HomePage() {
   const session = await auth();

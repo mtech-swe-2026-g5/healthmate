@@ -1,0 +1,27 @@
+@import 'react-big-calendar';
+@import 'react-big-calendar/lib/sass/styles.scss';
+@import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
+
+@keyframes flash-opacity {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.loading .rbc-time-view,
+.loading .rbc-month-view {
+    animation: flash-opacity 1s infinite;
+}
+
+.app-calendar-slot-inactive {
+    background-color: var(--color-surface-variant);
+    border-color: var(--color-outline-variant);
+}
+
+.app-calendar-event-inactive {
+    background-color: var(--color-on-surface-variant);
+    opacity: 0.85;
+}

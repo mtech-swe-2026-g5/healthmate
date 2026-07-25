@@ -1,10 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-import { LoginForm } from '@/features/auth';
+import { LoginForm } from "@/features/auth";
 
 export const metadata: Metadata = {
-  title: 'Log In — HealthMate',
-  description: 'Log in to your HealthMate account.',
+  title: "Log In — HealthMate",
+  description: "Log in to your HealthMate account.",
 };
 
 export default function LoginPage() {

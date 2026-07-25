@@ -1,21 +1,21 @@
-import Link from 'next/link';
-import { FaHospital } from 'react-icons/fa';
+import Link from "next/link";
+import { FaHospital } from "react-icons/fa";
 
-import { siteConfig } from '@/config/site';
+import { siteConfig } from "@/config/site";
 
 type BrandMarkProps = {
-  variant?: 'inline' | 'badge';
+  variant?: "inline" | "badge";
   className?: string;
   href?: string;
 };
 
 export function BrandMark({
-  variant = 'inline',
+  variant = "inline",
   className,
-  href = '/',
+  href = "/",
 }: BrandMarkProps) {
   const content =
-    variant === 'badge' ? (
+    variant === "badge" ? (
       <div className="flex items-center gap-[var(--spacing-hm-sm)]">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-primary)]">
           <FaHospital className="text-white" size={20} aria-hidden />
@@ -34,7 +34,7 @@ export function BrandMark({
   return (
     <Link
       href={href}
-      className={`inline-block transition-opacity duration-200 ease-in-out hover:opacity-80 ${className ?? ''}`}
+      className={`inline-block transition-opacity duration-200 ease-in-out hover:opacity-80 ${className ?? ""}`}
       aria-label={`${siteConfig.name} home`}
     >
       {content}

@@ -1,4 +1,4 @@
-import { FieldError } from './FieldError';
+import { FieldError } from "./FieldError";
 
 type SelectFieldProps = {
   id: string;
@@ -24,7 +24,7 @@ export function SelectField({
         {label}
         {required && (
           <span className="text-[var(--color-error)]" aria-hidden="true">
-            {' '}
+            {" "}
             *
           </span>
         )}
