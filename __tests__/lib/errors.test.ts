@@ -122,6 +122,33 @@ describe("handleApiError", () => {
     consoleSpy.mockRestore();
   });
 
+  it("should map Razorpay SDK object errors to 4xx/502", async () => {
+    const response = handleApiError({
+      statusCode: 401,
+      error: { description: "Authentication failed" },
+    });
+    const json = await response.json();
+    expect(response.status).toBe(401);
+    expect(json.error).toBe("Authentication failed");
+  });
+
+  it("should map Razorpay 5xx-style object errors to 502", async () => {
+    const response = handleApiError({
+      statusCode: 500,
+      error: { code: "SERVER_ERROR" },
+    });
+    const json = await response.json();
+    expect(response.status).toBe(502);
+    expect(json.error).toBe("SERVER_ERROR");
+  });
+
+  it("should return 400 for SyntaxError JSON bodies", async () => {
+    const response = handleApiError(new SyntaxError("Unexpected token"));
+    const json = await response.json();
+    expect(response.status).toBe(400);
+    expect(json.error).toBe("Invalid JSON body");
+  });
+
   it("should return 500 for non-Error objects", async () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 

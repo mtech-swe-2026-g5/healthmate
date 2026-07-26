@@ -104,7 +104,7 @@ describe("AppCalendar", () => {
     expect(calendar).not.toBeNull();
     expect(calendar?.parentElement).toBe(container.firstElementChild);
     expect((calendar?.parentElement as HTMLElement | null)?.className).toBe(
-      "calendar-shell loading",
+      "calendar-shell loading relative",
     );
     const calendarProps = getCalendarProps();
 
@@ -141,7 +141,7 @@ describe("AppCalendar", () => {
     );
     const calendar = container.querySelector('[data-testid="app-calendar"]');
     expect((calendar?.parentElement as HTMLElement | null)?.className).toBe(
-      "calendar-shell ",
+      "calendar-shell relative",
     );
     expect(onSchedule).not.toHaveBeenCalled();
   });

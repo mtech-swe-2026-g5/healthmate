@@ -5,6 +5,7 @@ import { Calendar, Event, luxonLocalizer, Views } from "react-big-calendar";
 import { DateTime } from "luxon";
 import { useCallback, useEffect, useState } from "react";
 import Model from "@/components/ui/Model";
+import { LoadingState } from "@/components/ui/PageLoading";
 
 const localizer = luxonLocalizer(DateTime);
 
@@ -199,30 +200,52 @@ export default function AppCalendar(props: AppCalendarProps) {
     [props.events, props.allowOverlap, props.slotConfigurations, onSchedule],
   );
 
+  const rootClassName = [
+    props.className,
+    props.isLoading ? "loading" : null,
+    "relative",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={`${props.className} ${props.isLoading ? "loading" : ""}`}>
-      {hasMounted && (
-        <Calendar
-          localizer={localizer}
-          defaultView={Views.WEEK}
-          views={[Views.WEEK, Views.DAY]}
-          events={props.events}
-          onSelectEvent={props.onEventSelect}
-          onSelectSlot={props.allowEventCreation ? handleSelectSlot : undefined}
-          selectable={props.allowEventCreation}
-          scrollToTime={new Date()}
-          onRangeChange={handleOnRangeChange}
-          slotPropGetter={(date) =>
-            isSlotActive(date, props.slotConfigurations)
-              ? {}
-              : { className: "app-calendar-slot-inactive" }
-          }
-          eventPropGetter={(event, start) =>
-            isSlotActive(start, props.slotConfigurations)
-              ? {}
-              : { className: "app-calendar-event-inactive" }
-          }
-        />
+    <div
+      className={rootClassName}
+      aria-busy={props.isLoading || !hasMounted || undefined}
+    >
+      {!hasMounted ? (
+        <LoadingState label="Loading calendar…" />
+      ) : (
+        <>
+          {props.isLoading && (
+            <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center">
+              <LoadingState label="Refreshing schedule…" compact />
+            </div>
+          )}
+          <Calendar
+            localizer={localizer}
+            defaultView={Views.WEEK}
+            views={[Views.WEEK, Views.DAY]}
+            events={props.events}
+            onSelectEvent={props.onEventSelect}
+            onSelectSlot={
+              props.allowEventCreation ? handleSelectSlot : undefined
+            }
+            selectable={props.allowEventCreation}
+            scrollToTime={new Date()}
+            onRangeChange={handleOnRangeChange}
+            slotPropGetter={(date) =>
+              isSlotActive(date, props.slotConfigurations)
+                ? {}
+                : { className: "app-calendar-slot-inactive" }
+            }
+            eventPropGetter={(event, start) =>
+              isSlotActive(start, props.slotConfigurations)
+                ? {}
+                : { className: "app-calendar-event-inactive" }
+            }
+          />
+        </>
       )}
       <Model
         title="Unable to schedule"

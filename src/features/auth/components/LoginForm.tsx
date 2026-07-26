@@ -13,6 +13,7 @@ import {
 } from "react-icons/md";
 
 import { BrandMark } from "@/components/ui/BrandMark";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Toast } from "@/components/ui/Toast";
 
 import { loginSchema } from "../types";
@@ -145,9 +146,14 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting}
+          aria-busy={isSubmitting || undefined}
           className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] font-dm-sans text-label-md font-bold text-white transition-all hover:bg-[var(--color-primary-container)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <MdLogin size={20} aria-hidden />
+          {isSubmitting ? (
+            <LoadingSpinner size={18} onDark label="Logging in" />
+          ) : (
+            <MdLogin size={20} aria-hidden />
+          )}
           {isSubmitting ? "Logging in..." : "Log In"}
         </button>
       </form>

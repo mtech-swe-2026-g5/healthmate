@@ -11,6 +11,7 @@ import {
   getRazorpayKeyId,
   getRazorpayKeySecret,
   getRazorpayWebhookSecret,
+  toRazorpayAppError,
 } from "../lib/razorpay-client";
 import {
   verifyPaymentSignature,
@@ -81,17 +82,26 @@ export async function createPaymentOrder(
     ? input.additionalNotes.trim()
     : null;
 
-  const order = await razorpay.orders.create({
-    amount: amountInPaise,
-    currency: "INR",
-    receipt: `hm_${Date.now()}`.slice(0, 40),
-    notes: {
-      doctorId: input.doctorId,
-      date: input.date,
-      startTime: input.startTime,
-      patientId,
-    },
-  });
+  let order: { id: string };
+  try {
+    order = await razorpay.orders.create({
+      amount: amountInPaise,
+      currency: "INR",
+      receipt: `hm_${Date.now()}`.slice(0, 40),
+      notes: {
+        doctorId: input.doctorId,
+        date: input.date,
+        startTime: input.startTime,
+        patientId,
+      },
+    });
+  } catch (error) {
+    throw toRazorpayAppError(error);
+  }
+
+  if (!order.id) {
+    throw new AppError("Payment provider did not return an order id", 502);
+  }
 
   await prisma.payment.create({
     data: {
@@ -165,13 +175,36 @@ export async function verifyAndCompletePayment(
     payment.startTime,
   );
 
-  const appointment = await createAppointment(userId, role, {
-    doctorId: payment.doctorId,
-    date: payment.appointmentDate,
-    startTime: payment.startTime,
-    reasonForVisit: payment.reasonForVisit,
-    additionalNotes: payment.additionalNotes ?? undefined,
-  });
+  let appointment;
+  try {
+    appointment = await createAppointment(userId, role, {
+      doctorId: payment.doctorId,
+      date: payment.appointmentDate,
+      startTime: payment.startTime,
+      reasonForVisit: payment.reasonForVisit,
+      additionalNotes: payment.additionalNotes ?? undefined,
+    });
+  } catch (error) {
+    // Webhook may have created the appointment concurrently.
+    if (error instanceof AppError && error.status === 409) {
+      const refreshed = await prisma.payment.findUnique({
+        where: { id: payment.id },
+      });
+      if (refreshed?.status === "CAPTURED" && refreshed.appointmentId) {
+        const { getAppointmentForPatient } =
+          await import("@/features/appointments/services/appointments");
+        return {
+          appointment: await getAppointmentForPatient(
+            userId,
+            role,
+            refreshed.appointmentId,
+          ),
+          alreadyCaptured: true,
+        };
+      }
+    }
+    throw error;
+  }
 
   await prisma.payment.update({
     where: { id: payment.id },
@@ -212,6 +245,15 @@ async function fulfillCapturedPayment(razorpayOrderId: string) {
       payment.startTime,
     );
   } catch {
+    // Verify may have already booked the slot for this payment.
+    const refreshed = await prisma.payment.findUnique({
+      where: { id: payment.id },
+    });
+    if (refreshed?.status === "CAPTURED" && refreshed.appointmentId) {
+      return;
+    }
+
+    // Only mark FAILED when the slot is gone and we did not capture.
     await prisma.payment.update({
       where: { id: payment.id },
       data: { status: "FAILED" },
@@ -219,13 +261,26 @@ async function fulfillCapturedPayment(razorpayOrderId: string) {
     return;
   }
 
-  const appointment = await createAppointment(patient.userId, "patient", {
-    doctorId: payment.doctorId,
-    date: payment.appointmentDate,
-    startTime: payment.startTime,
-    reasonForVisit: payment.reasonForVisit,
-    additionalNotes: payment.additionalNotes ?? undefined,
-  });
+  let appointment;
+  try {
+    appointment = await createAppointment(patient.userId, "patient", {
+      doctorId: payment.doctorId,
+      date: payment.appointmentDate,
+      startTime: payment.startTime,
+      reasonForVisit: payment.reasonForVisit,
+      additionalNotes: payment.additionalNotes ?? undefined,
+    });
+  } catch (error) {
+    if (error instanceof AppError && error.status === 409) {
+      const refreshed = await prisma.payment.findUnique({
+        where: { id: payment.id },
+      });
+      if (refreshed?.status === "CAPTURED" && refreshed.appointmentId) {
+        return;
+      }
+    }
+    throw error;
+  }
 
   await prisma.payment.update({
     where: { id: payment.id },

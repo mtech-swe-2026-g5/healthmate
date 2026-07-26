@@ -3,9 +3,12 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { DateTime } from "luxon";
 
-const connectionString =
+import { normalizeDatabaseUrl } from "../src/lib/database-url";
+
+const connectionString = normalizeDatabaseUrl(
   process.env.DATABASE_URL ??
-  "postgresql://postgres@localhost:5432/healthmate?sslmode=disable";
+    "postgresql://postgres@localhost:5432/healthmate?sslmode=disable",
+);
 
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });

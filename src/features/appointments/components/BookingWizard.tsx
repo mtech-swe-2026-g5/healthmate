@@ -12,6 +12,7 @@ import { PaymentStep } from "@/features/payments/components/PaymentStep";
 import { useBookingWizard } from "../hooks/use-booking-wizard";
 import { useDoctors } from "../hooks/use-doctors";
 import { useSlots } from "../hooks/use-slots";
+import { formatClinicCalendarDate } from "../lib/date-utils";
 import { AppointmentDetailsForm } from "./AppointmentDetailsForm";
 import { ConfirmationView } from "./ConfirmationView";
 import { DoctorCardGrid } from "./DoctorCardGrid";
@@ -60,11 +61,7 @@ export function BookingWizard({
   } = useSlots(state.doctor?.id ?? null, state.date);
 
   const selectedDateLabel = state.date
-    ? new Date(`${state.date}T12:00:00`).toLocaleDateString(undefined, {
-        weekday: "long",
-        month: "short",
-        day: "numeric",
-      })
+    ? formatClinicCalendarDate(state.date)
     : null;
 
   return (

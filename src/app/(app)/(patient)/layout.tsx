@@ -1,6 +1,6 @@
 import { PatientAppLayout } from "@/features/navigation";
 
-export default function AppointmentsLayout({
+export default function PatientSegmentLayout({
   children,
 }: {
   children: React.ReactNode;

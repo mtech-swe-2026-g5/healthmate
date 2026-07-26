@@ -9,6 +9,7 @@ import {
 } from "react-icons/md";
 
 import type { AppointmentConfirmation } from "../services/client";
+import { formatAppointmentDateTime } from "../lib/date-utils";
 
 type ConfirmationViewProps = {
   appointment: AppointmentConfirmation;
@@ -19,14 +20,7 @@ export function ConfirmationView({
   appointment,
   patientEmail,
 }: ConfirmationViewProps) {
-  const starts = new Date(appointment.startsAt);
-  const dateTimeLabel = starts.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  const dateTimeLabel = formatAppointmentDateTime(appointment.startsAt);
 
   const initials =
     `${appointment.doctor.firstName[0] ?? ""}${appointment.doctor.lastName[0] ?? ""}`.toUpperCase();

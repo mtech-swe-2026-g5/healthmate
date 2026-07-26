@@ -18,6 +18,11 @@ import {
 
 import { Toast } from "@/components/ui/Toast";
 import type { AppointmentConfirmation } from "@/features/appointments/services/client";
+import {
+  formatAppointmentDate,
+  formatAppointmentTime,
+  formatAppointmentWeekdayDate,
+} from "@/features/appointments/lib/date-utils";
 
 import {
   daysUntil,
@@ -33,29 +38,6 @@ export type PatientDashboardViewProps = {
 
 const CARD =
   "rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] shadow-[0px_4px_20px_rgba(26,107,114,0.08)]";
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatWeekdayDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 function doctorName(appointment: AppointmentConfirmation): string {
   return `Dr. ${appointment.doctor.lastName}`;
@@ -260,10 +242,10 @@ export function PatientDashboardView({
                         </td>
                         <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-lg)]">
                           <p className="font-dm-sans text-label-md text-[var(--color-on-surface)]">
-                            {formatDate(appointment.startsAt)}
+                            {formatAppointmentDate(appointment.startsAt)}
                           </p>
                           <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-                            {formatTime(appointment.startsAt)}
+                            {formatAppointmentTime(appointment.startsAt)}
                           </p>
                         </td>
                         <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-lg)]">
@@ -313,9 +295,10 @@ export function PatientDashboardView({
                 <div className="flex items-center gap-[var(--spacing-hm-md)] rounded-lg border border-white/10 bg-white/10 p-[var(--spacing-hm-md)]">
                   <MdSchedule size={22} aria-hidden />
                   <div className="font-dm-sans text-label-md">
-                    <p>{formatWeekdayDate(next.startsAt)}</p>
+                    <p>{formatAppointmentWeekdayDate(next.startsAt)}</p>
                     <p className="opacity-70">
-                      {formatTime(next.startsAt)} with {doctorName(next)}
+                      {formatAppointmentTime(next.startsAt)} with{" "}
+                      {doctorName(next)}
                     </p>
                   </div>
                 </div>

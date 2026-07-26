@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   MdCalendarMonth,
@@ -10,6 +9,7 @@ import {
   MdPerson,
 } from "react-icons/md";
 
+import { PendingLink } from "@/components/ui/PendingLink";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
 type DoctorPortalShellProps = {
@@ -48,9 +48,9 @@ export function DoctorPortalShell({
     .join("");
 
   return (
-    <div className="flex min-h-screen bg-[var(--color-background)] text-[var(--color-on-surface)]">
+    <div className="hm-portal-shell flex min-h-screen bg-[var(--color-background)] text-[var(--color-on-surface)]">
       <aside className="fixed left-0 z-20 hidden h-screen w-64 flex-col gap-[var(--spacing-hm-md)] border-r border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)] px-[var(--spacing-hm-sm)] py-[var(--spacing-hm-lg)] md:flex">
-        <Link
+        <PendingLink
           href="/"
           className="mb-[var(--spacing-hm-xl)] flex items-center gap-2 px-[var(--spacing-hm-md)]"
         >
@@ -65,7 +65,7 @@ export function DoctorPortalShell({
               Doctor Portal
             </p>
           </div>
-        </Link>
+        </PendingLink>
 
         <nav
           className="flex flex-1 flex-col gap-1"
@@ -75,7 +75,7 @@ export function DoctorPortalShell({
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
             return (
-              <Link
+              <PendingLink
                 key={item.href}
                 href={item.href}
                 className={`flex items-center gap-[var(--spacing-hm-md)] rounded-lg px-[var(--spacing-hm-md)] py-2 transition-all duration-200 ${
@@ -86,7 +86,7 @@ export function DoctorPortalShell({
               >
                 <Icon size={22} aria-hidden />
                 <span className="font-dm-sans text-label-md">{item.label}</span>
-              </Link>
+              </PendingLink>
             );
           })}
         </nav>
@@ -112,17 +112,17 @@ export function DoctorPortalShell({
       <div className="flex min-h-screen min-w-0 flex-1 flex-col md:ml-64">
         <header className="sticky top-0 z-10 flex h-16 items-center border-b border-[var(--color-outline-variant)]/30 bg-[var(--color-surface)]/80 px-4 backdrop-blur-md md:px-8">
           <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
-            <Link
+            <PendingLink
               href="/"
               className="font-dm-sans text-headline-md font-bold text-[var(--color-primary)] md:hidden"
             >
               HealthMate
-            </Link>
+            </PendingLink>
             <nav
               className="hidden items-center gap-8 md:flex"
               aria-label="Section"
             >
-              <Link
+              <PendingLink
                 href="/doctor"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
                   pathname === "/doctor"
@@ -132,8 +132,8 @@ export function DoctorPortalShell({
               >
                 <MdDashboard size={18} aria-hidden />
                 Overview
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href="/doctor/schedule"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
                   pathname.startsWith("/doctor/schedule")
@@ -143,8 +143,8 @@ export function DoctorPortalShell({
               >
                 <MdCalendarMonth size={18} aria-hidden />
                 Schedule
-              </Link>
-              <Link
+              </PendingLink>
+              <PendingLink
                 href="/doctor/patients"
                 className={`inline-flex items-center gap-1.5 font-dm-sans text-label-md ${
                   pathname.startsWith("/doctor/patients")
@@ -154,15 +154,15 @@ export function DoctorPortalShell({
               >
                 <MdGroups size={18} aria-hidden />
                 Patients
-              </Link>
+              </PendingLink>
             </nav>
-            <Link
+            <PendingLink
               href="/doctor/schedule"
               className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-4 py-2 font-dm-sans text-label-md text-white transition-opacity hover:opacity-90 md:hidden"
             >
               <MdCalendarMonth size={16} aria-hidden />
               Schedule
-            </Link>
+            </PendingLink>
           </div>
         </header>
 
@@ -178,7 +178,7 @@ export function DoctorPortalShell({
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
             return (
-              <Link
+              <PendingLink
                 key={item.href}
                 href={item.href}
                 className={`flex flex-col items-center gap-1 transition-colors ${
@@ -189,7 +189,7 @@ export function DoctorPortalShell({
               >
                 <Icon size={22} aria-hidden />
                 <span className="font-dm-sans text-[10px]">{item.label}</span>
-              </Link>
+              </PendingLink>
             );
           })}
         </nav>

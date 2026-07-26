@@ -1,9 +1,11 @@
+import { DateTime } from "luxon";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildSlotStarts,
   generateSlots,
 } from "@/features/appointments/services/slots";
+import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
 
 const mockDoctorFindFirst = vi.fn();
 const mockWorkingHoursFindUnique = vi.fn();
@@ -20,6 +22,19 @@ vi.mock("@/lib/prisma", () => ({
     },
   },
 }));
+
+function clinicDate(
+  year: number,
+  month: number,
+  day: number,
+  hour = 0,
+  minute = 0,
+): Date {
+  return DateTime.fromObject(
+    { year, month, day, hour, minute, second: 0, millisecond: 0 },
+    { zone: CLINIC_TIMEZONE },
+  ).toJSDate();
+}
 
 describe("buildSlotStarts", () => {
   it("builds 1-hour slots from 11:00 to 19:00", () => {
@@ -61,19 +76,19 @@ describe("generateSlots", () => {
 
     // 2026-07-26 is a Sunday
     await expect(
-      generateSlots("doc-1", "2026-07-26", new Date(2026, 6, 20, 9, 0, 0)),
+      generateSlots("doc-1", "2026-07-26", clinicDate(2026, 7, 20, 9, 0)),
     ).rejects.toThrow(/working hours/i);
   });
 
   it("marks booked slots", async () => {
     mockAppointmentFindMany.mockResolvedValue([
-      { startsAt: new Date(2026, 6, 27, 14, 0, 0) },
+      { startsAt: clinicDate(2026, 7, 27, 14, 0) },
     ]);
 
     const slots = await generateSlots(
       "doc-1",
       "2026-07-27",
-      new Date(2026, 6, 20, 9, 0, 0),
+      clinicDate(2026, 7, 20, 9, 0),
     );
 
     const fourteen = slots.find((s) => s.startTime === "14:00");
@@ -84,8 +99,8 @@ describe("generateSlots", () => {
   });
 
   it("marks past times on today as unavailable", async () => {
-    // Monday 2026-07-27 at 15:30 — morning slots unavailable
-    const now = new Date(2026, 6, 27, 15, 30, 0);
+    // Monday 2026-07-27 at 15:30 clinic time — morning slots unavailable
+    const now = clinicDate(2026, 7, 27, 15, 30);
     const slots = await generateSlots("doc-1", "2026-07-27", now);
 
     expect(slots.find((s) => s.startTime === "11:00")?.status).toBe(
@@ -101,14 +116,14 @@ describe("generateSlots", () => {
 
   it("rejects past calendar dates", async () => {
     await expect(
-      generateSlots("doc-1", "2026-07-01", new Date(2026, 6, 20)),
+      generateSlots("doc-1", "2026-07-01", clinicDate(2026, 7, 20)),
     ).rejects.toThrow(/past/i);
   });
 
   it("throws when doctor is missing", async () => {
     mockDoctorFindFirst.mockResolvedValue(null);
     await expect(
-      generateSlots("missing", "2026-07-27", new Date(2026, 6, 20)),
+      generateSlots("missing", "2026-07-27", clinicDate(2026, 7, 20)),
     ).rejects.toThrow(/Doctor not found/);
   });
 });

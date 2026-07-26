@@ -66,6 +66,29 @@ export function handleApiError(error: unknown): NextResponse {
     }
   }
 
+  // Razorpay Node SDK throws plain `{ statusCode, error }` objects.
+  if (error && typeof error === "object" && "statusCode" in error) {
+    const razorpayError = error as {
+      statusCode?: number;
+      error?: { description?: string; code?: string; reason?: string };
+    };
+    const description =
+      razorpayError.error?.description ??
+      razorpayError.error?.reason ??
+      razorpayError.error?.code ??
+      "Payment provider rejected the request";
+    const statusCode = razorpayError.statusCode;
+    const status =
+      typeof statusCode === "number" && statusCode >= 400 && statusCode < 500
+        ? statusCode
+        : 502;
+    return NextResponse.json({ error: description }, { status });
+  }
+
+  if (error instanceof SyntaxError) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
   console.error("Unhandled error:", error);
   return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 }
