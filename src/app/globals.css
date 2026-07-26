@@ -422,3 +422,95 @@ button:disabled,
     opacity: 1;
   }
 }
+
+@keyframes hm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hm-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes hm-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(30%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.hm-spinner {
+  display: inline-block;
+  border-radius: 9999px;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  border-top-color: var(--color-primary);
+  animation: hm-spin 0.7s linear infinite;
+}
+
+.hm-spinner-on-dark {
+  border-color: rgb(255 255 255 / 0.3);
+  border-top-color: white;
+}
+
+.hm-skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container-high) 0%,
+    var(--color-surface-container-lowest) 50%,
+    var(--color-surface-container-high) 100%
+  );
+  background-size: 200% 100%;
+  animation: hm-shimmer 1.4s ease-in-out infinite;
+}
+
+.hm-route-progress {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 70;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.hm-route-progress::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: var(--color-primary);
+  animation: hm-progress 1.1s ease-in-out infinite;
+}
+
+.hm-route-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-background) 55%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+/* Offset overlay past the portal sidebar when the shell is present. */
+@media (min-width: 768px) {
+  body:has(.hm-portal-shell) .hm-route-overlay {
+    left: 16rem;
+  }
+}

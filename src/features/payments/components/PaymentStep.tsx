@@ -1,8 +1,10 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MdArrowBack,
   MdCalendarToday,
+  MdCheck,
   MdContentCopy,
   MdInfoOutline,
   MdLock,
@@ -11,6 +13,11 @@ import {
   MdSchedule,
 } from "react-icons/md";
 
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import {
+  formatClinicCalendarDate,
+  formatSlotLabel,
+} from "@/features/appointments/lib/date-utils";
 import type { DoctorListItem } from "@/features/appointments/types/doctor";
 
 type PaymentStepProps = {
@@ -40,13 +47,6 @@ const TEST_CARDS = [
   },
 ] as const;
 
-function formatDisplayTime(hm: string): string {
-  const [h, m] = hm.split(":").map(Number);
-  const period = (h ?? 0) >= 12 ? "PM" : "AM";
-  const hour12 = (h ?? 0) % 12 || 12;
-  return `${hour12}:${String(m ?? 0).padStart(2, "0")} ${period}`;
-}
-
 function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
   const initials =
     `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
@@ -57,13 +57,7 @@ function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
   );
 }
 
-async function copyCardNumber(number: string) {
-  try {
-    await navigator.clipboard.writeText(number.replace(/\s/g, ""));
-  } catch {
-    // Clipboard may be unavailable; ignore — number remains visible.
-  }
-}
+const COPIED_RESET_MS = 2000;
 
 export function PaymentStep({
   doctor,
@@ -76,12 +70,33 @@ export function PaymentStep({
   onBack,
   onPay,
 }: PaymentStepProps) {
-  const dateLabel = new Date(`${date}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const dateLabel = formatClinicCalendarDate(date);
+  const [copiedNumber, setCopiedNumber] = useState<string | null>(null);
+  const copiedResetRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copiedResetRef.current !== null) {
+        window.clearTimeout(copiedResetRef.current);
+      }
+    };
+  }, []);
+
+  const copyCardNumber = useCallback(async (number: string) => {
+    try {
+      await navigator.clipboard.writeText(number.replace(/\s/g, ""));
+      setCopiedNumber(number);
+      if (copiedResetRef.current !== null) {
+        window.clearTimeout(copiedResetRef.current);
+      }
+      copiedResetRef.current = window.setTimeout(() => {
+        setCopiedNumber(null);
+        copiedResetRef.current = null;
+      }, COPIED_RESET_MS);
+    } catch {
+      // Clipboard may be unavailable; ignore — number remains visible.
+    }
+  }, []);
 
   return (
     <div className="grid grid-cols-1 gap-[var(--spacing-hm-xl)] lg:grid-cols-12">
@@ -139,37 +154,48 @@ export function PaymentStep({
           </div>
 
           <ul className="divide-y divide-[var(--color-outline-variant)]/25 overflow-hidden rounded-xl border border-[var(--color-outline-variant)]/30">
-            {TEST_CARDS.map((card) => (
-              <li
-                key={card.number}
-                className="flex flex-wrap items-center justify-between gap-3 bg-[var(--color-surface-container-lowest)] px-[var(--spacing-hm-md)] py-3 sm:px-[var(--spacing-hm-lg)]"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                      {card.network}
-                    </span>
-                    <span className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-                      {card.type} · {card.subType}
-                    </span>
-                  </div>
-                  <p className="font-dm-sans text-body-md tracking-wider text-[var(--color-on-surface)] tabular-nums">
-                    {card.number}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void copyCardNumber(card.number);
-                  }}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 font-dm-sans text-label-sm text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary)]/5"
-                  aria-label={`Copy ${card.network} card number`}
+            {TEST_CARDS.map((card) => {
+              const copied = copiedNumber === card.number;
+              return (
+                <li
+                  key={card.number}
+                  className="flex flex-wrap items-center justify-between gap-3 bg-[var(--color-surface-container-lowest)] px-[var(--spacing-hm-md)] py-3 sm:px-[var(--spacing-hm-lg)]"
                 >
-                  <MdContentCopy size={16} aria-hidden />
-                  Copy
-                </button>
-              </li>
-            ))}
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <span className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
+                        {card.network}
+                      </span>
+                      <span className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
+                        {card.type} · {card.subType}
+                      </span>
+                    </div>
+                    <p className="font-dm-sans text-body-md tracking-wider text-[var(--color-on-surface)] tabular-nums">
+                      {card.number}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void copyCardNumber(card.number);
+                    }}
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 font-dm-sans text-label-sm text-[var(--color-primary)] transition-colors hover:bg-[var(--color-primary)]/5"
+                    aria-label={
+                      copied
+                        ? `${card.network} card number copied`
+                        : `Copy ${card.network} card number`
+                    }
+                  >
+                    {copied ? (
+                      <MdCheck size={16} aria-hidden />
+                    ) : (
+                      <MdContentCopy size={16} aria-hidden />
+                    )}
+                    {copied ? "Copied" : "Copy"}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -187,10 +213,15 @@ export function PaymentStep({
             type="button"
             onClick={onPay}
             disabled={paying}
+            aria-busy={paying || undefined}
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-[var(--spacing-hm-lg)] font-dm-sans text-label-md text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
           >
-            <MdPayment size={20} aria-hidden />
-            {paying ? "Opening checkout…" : `Pay ₹${feeInr}`}
+            {paying ? (
+              <LoadingSpinner size={18} onDark label="Processing payment" />
+            ) : (
+              <MdPayment size={20} aria-hidden />
+            )}
+            {paying ? "Processing…" : `Pay ₹${feeInr}`}
           </button>
           <button
             type="button"
@@ -245,7 +276,7 @@ export function PaymentStep({
                   Time
                 </p>
                 <p className="font-literata text-body-md font-bold text-[var(--color-on-surface)]">
-                  {formatDisplayTime(startTime)} — {formatDisplayTime(endTime)}
+                  {formatSlotLabel(startTime)} — {formatSlotLabel(endTime)}
                 </p>
               </div>
             </div>

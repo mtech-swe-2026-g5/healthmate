@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Literata } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
 
+import { AppProviders } from "@/components/providers/AppProviders";
 import { siteConfig } from "@/config/site";
 
 import "./globals.css";
@@ -39,7 +40,9 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${literata.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-dm-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-dm-sans">
+        <AppProviders>{children}</AppProviders>
+      </body>
     </html>
   );
 }

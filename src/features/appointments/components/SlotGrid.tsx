@@ -2,6 +2,10 @@
 
 import { MdWbSunny, MdWbTwilight } from "react-icons/md";
 
+import { LoadingState } from "@/components/ui/PageLoading";
+import { Skeleton } from "@/components/ui/Skeleton";
+
+import { formatSlotLabel } from "../lib/date-utils";
 import type { TimeSlot } from "../lib/date-utils";
 
 type SlotGridProps = {
@@ -12,13 +16,6 @@ type SlotGridProps = {
   error?: string | null;
   selectedDateLabel?: string | null;
 };
-
-function formatDisplayTime(hm: string): string {
-  const [h, m] = hm.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 || 12;
-  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
-}
 
 function isMorning(hm: string): boolean {
   const hour = Number(hm.split(":")[0]);
@@ -35,9 +32,14 @@ export function SlotGrid({
 }: SlotGridProps) {
   if (loading) {
     return (
-      <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
-        Loading slots…
-      </p>
+      <div className="space-y-4" aria-busy="true">
+        <LoadingState label="Loading slots…" compact />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="h-12 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -99,7 +101,7 @@ export function SlotGrid({
                           : "border border-[var(--color-outline-variant)] text-[var(--color-on-surface)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
                   }`}
                 >
-                  {formatDisplayTime(slot.startTime)}
+                  {formatSlotLabel(slot.startTime)}
                   {isBooked ? " · Booked" : ""}
                 </button>
               </li>

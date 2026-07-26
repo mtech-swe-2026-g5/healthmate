@@ -17,6 +17,7 @@ import {
   MdSms,
 } from "react-icons/md";
 
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Toast } from "@/components/ui/Toast";
 import {
   BLOOD_GROUP_OPTIONS,
@@ -257,9 +258,14 @@ export function ProfileSettingsView({
                       type="button"
                       onClick={saveChanges}
                       disabled={isPending}
+                      aria-busy={isPending || undefined}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-5 py-2 font-dm-sans text-label-md font-bold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
                     >
-                      <MdSave size={18} aria-hidden />
+                      {isPending ? (
+                        <LoadingSpinner size={16} onDark label="Saving" />
+                      ) : (
+                        <MdSave size={18} aria-hidden />
+                      )}
                       {isPending ? "Saving…" : "Save changes"}
                     </button>
                   </>

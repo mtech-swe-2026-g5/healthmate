@@ -8,6 +8,9 @@ import {
   MdSearch,
 } from "react-icons/md";
 
+import { LoadingState } from "@/components/ui/PageLoading";
+import { Skeleton } from "@/components/ui/Skeleton";
+
 import type { DoctorListItem } from "../types/doctor";
 
 type DoctorCardGridProps = {
@@ -62,9 +65,16 @@ export function DoctorCardGrid({
 
   if (loading) {
     return (
-      <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
-        Loading doctors…
-      </p>
+      <div className="space-y-[var(--spacing-hm-lg)]" aria-busy="true">
+        <LoadingState label="Loading doctors…" compact />
+        <ul className="grid grid-cols-1 gap-[var(--spacing-hm-xl)] md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <li key={index}>
+              <Skeleton className="h-56 w-full" />
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   }
 

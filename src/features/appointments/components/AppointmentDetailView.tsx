@@ -13,25 +13,14 @@ import {
 } from "react-icons/md";
 
 import type { AppointmentConfirmation } from "../services/client";
+import {
+  formatAppointmentDate,
+  formatAppointmentTime,
+} from "../lib/date-utils";
 
 type AppointmentDetailViewProps = {
   appointment: AppointmentConfirmation;
 };
-
-function formatDisplayTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 function durationMinutes(startsAt: string, endsAt: string): number {
   return Math.round(
@@ -47,6 +36,9 @@ export function AppointmentDetailView({
     `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
   const minutes = durationMinutes(appointment.startsAt, appointment.endsAt);
   const isUpcoming = appointment.timing === "upcoming";
+  const dateLabel = formatAppointmentDate(appointment.startsAt);
+  const timeLabel = formatAppointmentTime(appointment.startsAt);
+  const endsLabel = formatAppointmentTime(appointment.endsAt);
 
   return (
     <div className="flex flex-col gap-[var(--spacing-hm-lg)] pb-8">
@@ -116,7 +108,7 @@ export function AppointmentDetailView({
                     aria-hidden
                   />
                   <span className="font-dm-sans text-label-md font-bold">
-                    {formatDate(appointment.startsAt)}
+                    {dateLabel}
                   </span>
                 </div>
               </div>
@@ -131,7 +123,7 @@ export function AppointmentDetailView({
                     aria-hidden
                   />
                   <span className="font-dm-sans text-label-md font-bold">
-                    {formatDisplayTime(appointment.startsAt)}
+                    {timeLabel}
                   </span>
                 </div>
               </div>
@@ -256,7 +248,7 @@ export function AppointmentDetailView({
                 to your reason for visit.
               </p>
               <p className="font-dm-sans text-label-md">
-                Slot ends at {formatDisplayTime(appointment.endsAt)}
+                Slot ends at {endsLabel}
               </p>
             </div>
           </section>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSession, signIn } from "next-auth/react";
 
+import { signalRoutePending } from "@/components/ui/navigation-signal";
 import { resolvePostLoginRedirect } from "@/config/routes";
 import type { LoginInput } from "../types";
 
@@ -45,6 +46,7 @@ export function useLogin() {
         callbackUrl,
       );
 
+      signalRoutePending(destination);
       router.push(destination);
       router.refresh();
       return { success: true };

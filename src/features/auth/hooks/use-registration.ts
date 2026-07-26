@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { signalRoutePending } from "@/components/ui/navigation-signal";
 import type { RegistrationInput } from "../types";
 
 type ToastState = {
@@ -45,7 +46,10 @@ export function useRegistration() {
           message: "Account created successfully!",
           variant: "success",
         });
-        setTimeout(() => router.push("/login"), 1500);
+        setTimeout(() => {
+          signalRoutePending("/login");
+          router.push("/login");
+        }, 1500);
         return { success: true };
       }
 

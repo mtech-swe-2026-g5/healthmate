@@ -17,23 +17,14 @@ import {
   type AppointmentConfirmation,
   type AppointmentsListResponse,
 } from "../services/client";
+import {
+  formatAppointmentDate,
+  formatAppointmentTime,
+} from "../lib/date-utils";
+import { LoadingState } from "@/components/ui/PageLoading";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 type Tab = "upcoming" | "past";
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 function doctorInitials(appointment: AppointmentConfirmation): string {
   return `${appointment.doctor.firstName[0] ?? ""}${appointment.doctor.lastName[0] ?? ""}`.toUpperCase();
@@ -81,9 +72,20 @@ export function AppointmentsList() {
 
   if (loading) {
     return (
-      <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
-        Loading appointments…
-      </p>
+      <div className="space-y-[var(--spacing-hm-lg)]" aria-busy="true">
+        <LoadingState label="Loading appointments…" compact />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <Skeleton className="h-20 md:col-span-2" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </div>
+        <Skeleton className="h-14 w-full" />
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton key={index} className="h-24 w-full" />
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -246,10 +248,10 @@ export function AppointmentsList() {
                   >
                     <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
                       <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                        {formatDate(appointment.startsAt)}
+                        {formatAppointmentDate(appointment.startsAt)}
                       </p>
                       <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-                        {formatTime(appointment.startsAt)}
+                        {formatAppointmentTime(appointment.startsAt)}
                       </p>
                     </td>
                     <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">

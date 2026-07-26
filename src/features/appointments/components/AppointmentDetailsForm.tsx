@@ -9,8 +9,10 @@ import {
   MdSchedule,
 } from "react-icons/md";
 
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { FieldError } from "@/features/auth/components/FieldError";
 
+import { formatClinicCalendarDate, formatSlotLabel } from "../lib/date-utils";
 import type { DoctorListItem } from "../types/doctor";
 
 type AppointmentDetailsFormProps = {
@@ -29,13 +31,6 @@ type AppointmentDetailsFormProps = {
   onBack: () => void;
   onSubmit: () => void;
 };
-
-function formatDisplayTime(hm: string): string {
-  const [h, m] = hm.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 || 12;
-  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
-}
 
 function DoctorAvatar({ doctor }: { doctor: DoctorListItem }) {
   const initials =
@@ -63,12 +58,7 @@ export function AppointmentDetailsForm({
   onBack,
   onSubmit,
 }: AppointmentDetailsFormProps) {
-  const dateLabel = new Date(`${date}T12:00:00`).toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const dateLabel = formatClinicCalendarDate(date);
 
   return (
     <div className="grid grid-cols-1 gap-[var(--spacing-hm-xl)] lg:grid-cols-12">
@@ -167,8 +157,12 @@ export function AppointmentDetailsForm({
               type="button"
               onClick={onSubmit}
               disabled={submitting}
+              aria-busy={submitting || undefined}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-[var(--spacing-hm-lg)] font-dm-sans text-label-md text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
             >
+              {submitting ? (
+                <LoadingSpinner size={18} onDark label="Confirming" />
+              ) : null}
               {submitting ? "Confirming…" : submitLabel}
               {!submitting && <MdArrowForward size={18} aria-hidden />}
             </button>
@@ -225,7 +219,7 @@ export function AppointmentDetailsForm({
                   Time
                 </p>
                 <p className="font-literata text-body-md font-bold text-[var(--color-on-surface)]">
-                  {formatDisplayTime(startTime)} — {formatDisplayTime(endTime)}
+                  {formatSlotLabel(startTime)} — {formatSlotLabel(endTime)}
                 </p>
               </div>
             </div>
