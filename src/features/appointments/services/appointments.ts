@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/errors";
 import { requireRole } from "@/features/auth/services/permissions";
+import { scheduleAppointmentNotifications } from "@/features/notifications";
 
 import { createAppointmentSchema } from "../types";
 import type { CreateAppointmentInput } from "../types";
@@ -147,6 +148,10 @@ export async function createAppointment(
       },
       select: appointmentDetailSelect,
     });
+
+    // Booking is now final (CONFIRMED) — confirm to patient and doctor.
+    // Delivery runs after the response, so SMTP never blocks this call.
+    scheduleAppointmentNotifications("appointment.booked", appointment.id);
 
     return serializeAppointment(appointment);
   } catch (error) {

@@ -58,6 +58,13 @@ vi.mock("@/lib/prisma", () => {
   };
 });
 
+const mockScheduleWelcomeEmail = vi.fn();
+
+vi.mock("@/features/notifications", () => ({
+  scheduleWelcomeEmail: (...args: unknown[]) =>
+    mockScheduleWelcomeEmail(...args),
+}));
+
 async function getMockPrisma() {
   const { prisma } = await import("@/lib/prisma");
   return prisma as unknown as {
@@ -98,6 +105,24 @@ describe("registerPatient", () => {
     expect(storedHash).not.toBe(VALID_DATA.password);
     const isMatch = await compare(VALID_DATA.password, storedHash);
     expect(isMatch).toBe(true);
+  });
+
+  it("should schedule a welcome email with the lowercased sign-in address", async () => {
+    await registerPatient({ ...VALID_DATA, email: "Jane@Example.com" });
+
+    expect(mockScheduleWelcomeEmail).toHaveBeenCalledWith({
+      email: "jane@example.com",
+      firstName: "Jane",
+      role: "patient",
+    });
+  });
+
+  it("should not send a welcome email when registration fails", async () => {
+    const mockPrisma = await getMockPrisma();
+    mockPrisma.user.create.mockRejectedValue(new Error("duplicate email"));
+
+    await expect(registerPatient(VALID_DATA)).rejects.toThrow();
+    expect(mockScheduleWelcomeEmail).not.toHaveBeenCalled();
   });
 
   it("should look up the patient role", async () => {

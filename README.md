@@ -89,9 +89,25 @@ Edit `.env` and set at least:
 | `AUTH_SECRET` | Auth.js session/JWT signing secret — generate with `openssl rand -base64 32` |
 | `AUTH_URL` | Auth.js base URL (default: `http://localhost:3000`) |
 
-Optional (for reminders, when implemented):
+Optional:
 
-- SMTP / SMS variables — reminder delivery
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM`,
+  `EMAIL_FROM_NAME`, `EMAIL_NOTIFICATIONS_ENABLED` — booking confirmation emails.
+  Any SMTP provider works — Brevo, SendGrid, a Gmail app password, or a mail
+  sandbox. Leave `SMTP_HOST` empty to disable delivery; bookings and sign-ups
+  still succeed and every skipped notification is logged.
+- SMS variables — reminder delivery (not implemented)
+
+Verify SMTP settings without making a booking:
+
+```bash
+pnpm email:test you@example.com
+```
+
+Renders every template with sample data and sends them to one address. Pass a
+template name as a second argument to send just one: `booked-patient`,
+`booked-doctor`, `cancelled-patient`, `cancelled-doctor`, `rescheduled-patient`,
+`rescheduled-doctor`, or `welcome`.
 
 See `.env.sample` for the full template and comments.
 
@@ -241,15 +257,30 @@ src/
     `GET /api/appointments/[id]`
   - UI: `/appointments/book`, `/appointments`, `/appointments/[id]`
   - Seed doctors with password `Doctor@123` via `pnpm db:seed`
+- **Booking confirmation emails** (`src/features/notifications/`) — patient and
+  doctor are emailed when an appointment reaches `CONFIRMED`:
+  - Triggered once from `createAppointment()`, so direct booking, Razorpay
+    verification, and webhook fulfilment all fire exactly one notification
+  - Delivery runs after the HTTP response (`after()` from `next/server`), so SMTP
+    latency never blocks the booking API
+  - Nodemailer over SMTP with 3 retries and exponential backoff, then a critical
+    log; addresses are masked in logs
+  - Brand-styled HTML + plain-text templates per audience, each linking to the
+    appointment (see `src/features/notifications/README.md`)
+- **Registration welcome email** — sent after `registerPatient()` commits, using
+  the same layout, retry, and after-response delivery; links to the portal for
+  the account's role
 
 ### In progress / next up
 
 - Doctor dashboard and role-specific landing pages
-- Cancellations, reminders, analytics
+- Cancellations, reminders, analytics — the cancel/reschedule **emails** are
+  already written and registered; those flows only need to call
+  `scheduleAppointmentNotifications` (see `src/features/notifications/README.md`)
 
 ### Not yet implemented
 
-- SMS/email reminders and analytics
+- SMS reminders and analytics
 - Forgot-password and OAuth (deferred per auth rules)
 
 For more detail, see [`.ai-agent-rules/architecture-rules/tech-stack.md`](.ai-agent-rules/architecture-rules/tech-stack.md) and [`.ai-agent-rules/authentication-security-rules/auth-security.md`](.ai-agent-rules/authentication-security-rules/auth-security.md).
