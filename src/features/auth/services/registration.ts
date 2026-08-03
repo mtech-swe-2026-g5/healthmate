@@ -1,6 +1,7 @@
 import { hash } from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
+import { scheduleWelcomeEmail } from "@/features/notifications";
 
 import { registrationApiSchema } from "../types";
 import type { RegistrationApiInput } from "../types";
@@ -20,11 +21,13 @@ export async function registerPatient(data: RegistrationApiInput) {
     throw new Error("Patient role not found. Run database seed first.");
   }
 
+  const email = validated.email.toLowerCase();
+
   const result = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
         roleId: patientRole.id,
-        email: validated.email.toLowerCase(),
+        email,
         passwordHash,
         emailVerified: false,
         isActive: true,
@@ -44,6 +47,14 @@ export async function registerPatient(data: RegistrationApiInput) {
     });
 
     return { userId: user.id };
+  });
+
+  // Account is committed — welcome the new patient. Delivery runs after the
+  // response, so sign-up never waits on SMTP.
+  scheduleWelcomeEmail({
+    email,
+    firstName: validated.firstName,
+    role: "patient",
   });
 
   return result;

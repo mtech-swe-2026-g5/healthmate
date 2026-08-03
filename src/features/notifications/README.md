@@ -1,0 +1,108 @@
+# Notifications
+
+Outbound email for appointment and account lifecycle events.
+
+## Flow — appointments
+
+```
+createAppointment()                     ← booking becomes CONFIRMED
+  └─ scheduleAppointmentNotifications('appointment.booked', id)
+       └─ runAfterResponse()            ← next/server `after`, off the response path
+            └─ sendAppointmentNotifications()
+                 ├─ getAppointmentNotificationContext()   ← patient + doctor names/emails
+                 ├─ templates['appointment.booked'].patient → sendEmail()
+                 └─ templates['appointment.booked'].doctor  → sendEmail()
+```
+
+`sendEmail` retries transient SMTP failures up to `EMAIL_MAX_RETRIES` times
+(4 attempts total) with exponential backoff, then logs the failure at
+`severity: "critical"`. Nothing in this feature throws into its caller: a
+booking never fails because email did.
+
+## Flow — account registration
+
+```
+registerPatient()                       ← after the create transaction commits
+  └─ scheduleWelcomeEmail({ email, firstName, role })
+       └─ runAfterResponse()
+            └─ sendWelcomeEmail()  →  renderWelcomeEmail()  →  sendEmail()
+```
+
+Registration data is already in hand when the account is created, so this path
+skips the database round-trip the appointment path needs. It reuses the same
+layout, mailer, retry, and scheduling. `getRoleHome()` picks the portal the
+email links to, so a doctor sign-up flow works without template changes.
+
+## Trigger points
+
+| Event | Fires from |
+|---|---|
+| `appointment.booked` | `createAppointment()` in `features/appointments/services/appointments.ts` |
+| account registered | `registerPatient()` in `features/auth/services/registration.ts` |
+
+`createAppointment()` is the single place an appointment row is created, so it
+covers direct booking, Razorpay verification, and webhook fulfilment without
+duplicate sends. `scheduleWelcomeEmail` sits after the registration transaction
+commits, so a rolled-back sign-up sends nothing.
+
+## Wiring cancel and reschedule
+
+Templates for both are already written and registered. When those features are
+built, the notification work is a single call from the service that performs the
+transition — no changes in this feature.
+
+Cancellation, after the status update commits:
+
+```ts
+scheduleAppointmentNotifications('appointment.cancelled', appointment.id, {
+  cancelledBy: 'patient', // or 'doctor'; omit for neutral copy
+});
+```
+
+Reschedule, capturing the old slot **before** the update overwrites it:
+
+```ts
+const previous = await prisma.appointment.findUnique({
+  where: { id },
+  select: { startsAt: true, endsAt: true },
+});
+
+// … perform the reschedule …
+
+scheduleAppointmentNotifications('appointment.rescheduled', id, {
+  previousStartsAt: previous.startsAt,
+  previousEndsAt: previous.endsAt,
+});
+```
+
+`AppointmentEventDetails` carries what the appointment row can no longer supply
+once the transition has happened. Every field is optional: omit
+`previousStartsAt`/`previousEndsAt` and the reschedule emails drop the
+"Previous slot" row and fall back to neutral copy; omit `cancelledBy` and the
+cancellation emails do not attribute the cancellation to either party.
+
+## Adding a new event
+
+1. Add it to `AppointmentNotificationEvent` in `types/types.ts`.
+2. Create `templates/appointment-<event>-patient.ts` and
+   `templates/appointment-<event>-doctor.ts` using `renderEmailHtml` /
+   `renderEmailText` from `lib/email-layout.ts`.
+3. Register both in `APPOINTMENT_EMAIL_TEMPLATES` in `templates/index.ts`.
+4. Call `scheduleAppointmentNotifications('<event>', appointmentId, details)`.
+
+An event with no registered template is a no-op with an info log, so step 4 can
+land before the templates exist.
+
+## Configuration
+
+See `.env.sample` for `SMTP_*`, `EMAIL_FROM`, `EMAIL_FROM_NAME`, and
+`EMAIL_NOTIFICATIONS_ENABLED`. With `SMTP_HOST` unset, delivery is skipped and
+logged — the intended state for local development and CI.
+
+## Conventions
+
+- Brand tokens are inlined as literals in `lib/email-layout.ts`; email clients
+  strip `<style>` blocks and CSS variables.
+- All template copy is escaped in the layout — `reasonForVisit` and
+  `additionalNotes` are patient-supplied.
+- Logs carry masked addresses and the booking reference, never PHI.
