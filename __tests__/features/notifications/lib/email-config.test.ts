@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   getAppUrl,
@@ -99,17 +99,64 @@ describe("getSmtpConfig", () => {
 });
 
 describe("getAppUrl", () => {
+  beforeEach(() => {
+    for (const key of [
+      "NEXT_PUBLIC_APP_URL",
+      "AUTH_URL",
+      "VERCEL",
+      "VERCEL_URL",
+      "VERCEL_PROJECT_PRODUCTION_URL",
+    ]) {
+      vi.stubEnv(key, "");
+    }
+  });
+
   it("uses the public app URL without a trailing slash", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://healthmate.app/");
     expect(getAppUrl()).toBe("https://healthmate.app");
   });
 
   it("falls back to AUTH_URL then to localhost", () => {
-    vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
     vi.stubEnv("AUTH_URL", "https://auth.healthmate.app");
     expect(getAppUrl()).toBe("https://auth.healthmate.app");
 
     vi.stubEnv("AUTH_URL", "");
+    expect(getAppUrl()).toBe("http://localhost:3000");
+  });
+
+  it("detects the Vercel production domain with no configuration", () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "healthmate-vert.vercel.app");
+
+    expect(getAppUrl()).toBe("https://healthmate-vert.vercel.app");
+  });
+
+  it("falls back to the per-deployment host on previews", () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_URL", "healthmate-git-branch.vercel.app");
+
+    expect(getAppUrl()).toBe("https://healthmate-git-branch.vercel.app");
+  });
+
+  it("ignores a localhost override when deployed on Vercel", () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
+    vi.stubEnv("AUTH_URL", "http://127.0.0.1:3000");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "healthmate-vert.vercel.app");
+
+    expect(getAppUrl()).toBe("https://healthmate-vert.vercel.app");
+  });
+
+  it("still honours an explicit custom domain on Vercel", () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://app.healthmate.com");
+    vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "healthmate-vert.vercel.app");
+
+    expect(getAppUrl()).toBe("https://app.healthmate.com");
+  });
+
+  it("keeps localhost when running locally", () => {
+    vi.stubEnv("NEXT_PUBLIC_APP_URL", "http://localhost:3000");
     expect(getAppUrl()).toBe("http://localhost:3000");
   });
 });

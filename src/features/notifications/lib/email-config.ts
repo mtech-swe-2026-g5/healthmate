@@ -46,9 +46,48 @@ export function getSmtpConfig(): SmtpConfig | null {
   };
 }
 
-/** Absolute base URL used to build appointment links inside emails. */
+/** Vercel's system variables are bare hostnames with no scheme. */
+function toAbsoluteUrl(value: string): string {
+  const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  return withScheme.replace(/\/+$/, "");
+}
+
+function isLocalhost(url: string): boolean {
+  return /^(https?:\/\/)?(localhost|127\.0\.0\.1|0\.0\.0\.0)(:|\/|$)/i.test(
+    url,
+  );
+}
+
+/**
+ * Absolute base URL for links inside emails.
+ *
+ * Resolution order:
+ *  1. `NEXT_PUBLIC_APP_URL` — explicit override (ignored on Vercel when it
+ *     points at localhost, which happens when a local `.env` is copied up)
+ *  2. `VERCEL_PROJECT_PRODUCTION_URL` — the stable production domain, injected
+ *     by Vercel at runtime, so no rebuild is needed for it to take effect
+ *  3. `VERCEL_URL` — per-deployment host, the preview fallback
+ *  4. `AUTH_URL`
+ *  5. localhost
+ *
+ * Steps 2–3 mean a Vercel deployment links to itself with no configuration.
+ */
 export function getAppUrl(): string {
-  const url =
-    readEnv("NEXT_PUBLIC_APP_URL") ?? readEnv("AUTH_URL") ?? DEFAULT_APP_URL;
-  return url.replace(/\/+$/, "");
+  const isOnVercel = readEnv("VERCEL") === "1";
+  const explicit = readEnv("NEXT_PUBLIC_APP_URL");
+
+  if (explicit && !(isOnVercel && isLocalhost(explicit))) {
+    return toAbsoluteUrl(explicit);
+  }
+
+  const vercelHost =
+    readEnv("VERCEL_PROJECT_PRODUCTION_URL") ?? readEnv("VERCEL_URL");
+  if (vercelHost) return toAbsoluteUrl(vercelHost);
+
+  const authUrl = readEnv("AUTH_URL");
+  if (authUrl && !(isOnVercel && isLocalhost(authUrl))) {
+    return toAbsoluteUrl(authUrl);
+  }
+
+  return DEFAULT_APP_URL;
 }

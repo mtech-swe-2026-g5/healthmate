@@ -45,6 +45,41 @@ describe("renderEmailHtml", () => {
     expect(renderEmailHtml(layout)).toContain("background-color:#1a6b72");
   });
 
+  it("declares support for both colour schemes", () => {
+    const html = renderEmailHtml(layout);
+
+    expect(html).toContain('name="color-scheme" content="light dark"');
+    expect(html).toContain(
+      'name="supported-color-schemes" content="light dark"',
+    );
+    expect(html).toContain("@media (prefers-color-scheme: dark)");
+  });
+
+  it("pins the CTA label colour so dark mode cannot hide it", () => {
+    const html = renderEmailHtml(layout);
+    const cta = html.slice(html.indexOf("<a href="));
+
+    // Once on the anchor, once on the nested span — clients that override one
+    // rarely override both.
+    expect(cta.match(/color:#ffffff !important/g)).toHaveLength(2);
+  });
+
+  it("carries the CTA fill on both the cell and the anchor", () => {
+    const html = renderEmailHtml(layout);
+
+    expect(html).toContain('bgcolor="#1a6b72"');
+    expect(html).toContain("<a href=");
+  });
+
+  it("prints the raw link for clients that drop the button", () => {
+    const html = renderEmailHtml(layout);
+
+    expect(html).toContain("Button not working?");
+    expect(
+      html.match(/https:\/\/healthmate\.app\/appointments\/appt-1/g)?.length,
+    ).toBeGreaterThan(1);
+  });
+
   it("escapes user-supplied row values", () => {
     const html = renderEmailHtml({
       ...layout,
