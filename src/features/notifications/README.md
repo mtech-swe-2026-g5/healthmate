@@ -99,6 +99,23 @@ See `.env.sample` for `SMTP_*`, `EMAIL_FROM`, `EMAIL_FROM_NAME`, and
 `EMAIL_NOTIFICATIONS_ENABLED`. With `SMTP_HOST` unset, delivery is skipped and
 logged — the intended state for local development and CI.
 
+### Link host
+
+`getAppUrl()` resolves the base URL for every link in every template:
+
+1. `NEXT_PUBLIC_APP_URL` — explicit override, e.g. a custom domain. Ignored when
+   it points at localhost *and* `VERCEL=1`, which is what happens when a local
+   `.env` is pasted into Vercel.
+2. `VERCEL_PROJECT_PRODUCTION_URL` — the stable production domain. Vercel
+   injects it at runtime, so no rebuild is needed for it to apply.
+3. `VERCEL_URL` — per-deployment host, used on previews.
+4. `AUTH_URL`
+5. `http://localhost:3000`
+
+A Vercel deployment therefore links to itself with no configuration. Note that
+`NEXT_PUBLIC_*` is inlined at build time, so changing it always requires a
+redeploy — the Vercel variables do not.
+
 ## Conventions
 
 - Brand tokens are inlined as literals in `lib/email-layout.ts`; email clients
