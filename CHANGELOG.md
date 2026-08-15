@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.4.0...v1.4.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* some email template bugs ([#47](https://github.com/mtech-swe-2026-g5/healthmate/issues/47)) ([608eb31](https://github.com/mtech-swe-2026-g5/healthmate/commit/608eb3106172526d9c7100d6395c11ac0bb23a42))
+
 # [1.4.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.3.0...v1.4.0) (2026-08-03)
 
 
