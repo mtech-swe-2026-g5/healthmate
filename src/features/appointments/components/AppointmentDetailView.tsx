@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   MdArrowBack,
   MdCalendarMonth,
+  MdCancel,
   MdCheckCircle,
   MdDescription,
   MdEvent,
@@ -17,6 +18,8 @@ import {
   formatAppointmentDate,
   formatAppointmentTime,
 } from "../lib/date-utils";
+import { isCancelled } from "../lib/appointment-status";
+import { AppointmentActions } from "./AppointmentActions";
 
 type AppointmentDetailViewProps = {
   appointment: AppointmentConfirmation;
@@ -28,6 +31,15 @@ function durationMinutes(startsAt: string, endsAt: string): number {
   );
 }
 
+/**
+ * The detail page says "Confirmed" where lists say "Upcoming" — same state,
+ * but this view is about one booking rather than a schedule.
+ */
+function statusLabel(appointment: AppointmentConfirmation): string {
+  if (isCancelled(appointment)) return "Cancelled";
+  return appointment.timing === "upcoming" ? "Confirmed" : "Completed";
+}
+
 export function AppointmentDetailView({
   appointment,
 }: AppointmentDetailViewProps) {
@@ -35,7 +47,8 @@ export function AppointmentDetailView({
   const initials =
     `${doctor.firstName[0] ?? ""}${doctor.lastName[0] ?? ""}`.toUpperCase();
   const minutes = durationMinutes(appointment.startsAt, appointment.endsAt);
-  const isUpcoming = appointment.timing === "upcoming";
+  const cancelled = isCancelled(appointment);
+  const isUpcoming = !cancelled && appointment.timing === "upcoming";
   const dateLabel = formatAppointmentDate(appointment.startsAt);
   const timeLabel = formatAppointmentTime(appointment.startsAt);
   const endsLabel = formatAppointmentTime(appointment.endsAt);
@@ -52,6 +65,36 @@ export function AppointmentDetailView({
         </Link>
       </nav>
 
+      {cancelled && (
+        <div
+          role="status"
+          className="flex items-start gap-[var(--spacing-hm-md)] rounded-xl border border-[var(--color-error)] bg-[var(--color-error-container)] p-[var(--spacing-hm-lg)]"
+        >
+          <MdCancel
+            className="mt-0.5 shrink-0 text-[var(--color-error)]"
+            size={20}
+            aria-hidden
+          />
+          <div>
+            <p className="font-dm-sans text-label-md font-bold text-[var(--color-error)]">
+              This appointment was cancelled
+            </p>
+            <p className="mt-1 font-literata text-body-md text-[var(--color-on-surface-variant)]">
+              The {dateLabel} slot at {timeLabel} has been released. Book a new
+              appointment whenever you are ready.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {!cancelled && isUpcoming && !appointment.canBeChanged && (
+        <p className="rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)] p-[var(--spacing-hm-md)] font-literata text-body-md text-[var(--color-on-surface-variant)]">
+          This appointment is too close to its start time to be cancelled or
+          rescheduled online. Please contact the clinic if you need to change
+          it.
+        </p>
+      )}
+
       <div className="flex flex-col items-start justify-between gap-[var(--spacing-hm-md)] rounded-xl border border-[var(--color-outline-variant)]/20 bg-white p-[var(--spacing-hm-lg)] shadow-sm md:flex-row md:items-center">
         <div className="flex items-center gap-[var(--spacing-hm-lg)]">
           <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary-container)]/10 font-dm-sans text-headline-md font-bold text-[var(--color-primary)]">
@@ -64,13 +107,19 @@ export function AppointmentDetailView({
               </h1>
               <span
                 className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-dm-sans text-label-sm ${
-                  isUpcoming
-                    ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-                    : "bg-[var(--color-success-container)] text-[var(--color-success)]"
+                  cancelled
+                    ? "bg-[var(--color-error-container)] text-[var(--color-error)]"
+                    : isUpcoming
+                      ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                      : "bg-[var(--color-success-container)] text-[var(--color-success)]"
                 }`}
               >
-                <MdCheckCircle size={14} aria-hidden />
-                {isUpcoming ? "Confirmed" : "Completed"}
+                {cancelled ? (
+                  <MdCancel size={14} aria-hidden />
+                ) : (
+                  <MdCheckCircle size={14} aria-hidden />
+                )}
+                {statusLabel(appointment)}
               </span>
             </div>
             <p className="font-dm-sans text-label-md text-[var(--color-on-surface-variant)]">
@@ -232,7 +281,7 @@ export function AppointmentDetailView({
                   Status
                 </p>
                 <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                  {appointment.status}
+                  {statusLabel(appointment)}
                 </p>
               </div>
             </div>
@@ -272,6 +321,9 @@ export function AppointmentDetailView({
             All appointments
           </Link>
         </div>
+        {appointment.canBeChanged && (
+          <AppointmentActions appointment={appointment} />
+        )}
       </div>
     </div>
   );

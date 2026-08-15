@@ -10,3 +10,10 @@ export type BookingStepId = (typeof BOOKING_STEPS)[number]["id"];
 
 export const SLOT_STATUSES = ["available", "booked", "unavailable"] as const;
 export type SlotStatus = (typeof SLOT_STATUSES)[number];
+
+/**
+ * Hours before an appointment starts after which a patient can no longer cancel
+ * or reschedule it. Overridable per environment via
+ * `APPOINTMENT_CANCELLATION_CUTOFF_HOURS`.
+ */
+export const DEFAULT_CANCELLATION_CUTOFF_HOURS = 24;

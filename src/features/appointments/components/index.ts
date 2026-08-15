@@ -2,6 +2,8 @@ export { BookingWizard } from "./BookingWizard";
 export { AppointmentsList } from "./AppointmentsList";
 export { ConfirmationView } from "./ConfirmationView";
 export { AppointmentDetailView } from "./AppointmentDetailView";
+export { AppointmentActions } from "./AppointmentActions";
+export { RescheduleView } from "./RescheduleView";
 export { PatientPortalShell } from "@/features/navigation";
 export { DoctorCardGrid } from "./DoctorCardGrid";
 export { SlotCalendar } from "./SlotCalendar";

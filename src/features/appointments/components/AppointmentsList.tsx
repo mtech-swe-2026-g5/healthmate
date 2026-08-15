@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   MdAdd,
+  MdCancel,
   MdCheckCircle,
   MdChevronRight,
   MdEventAvailable,
@@ -21,6 +22,10 @@ import {
   formatAppointmentDate,
   formatAppointmentTime,
 } from "../lib/date-utils";
+import {
+  excludeCancelled,
+  getAppointmentPresentation,
+} from "../lib/appointment-status";
 import { LoadingState } from "@/components/ui/PageLoading";
 import { Skeleton } from "@/components/ui/Skeleton";
 
@@ -100,8 +105,12 @@ export function AppointmentsList() {
     );
   }
 
-  const upcomingCount = data?.upcoming.length ?? 0;
+  // Cancelled bookings stay listed for history but are not visits to come, so
+  // the headline stat and the "showing N of M" total count different things.
+  const upcomingCount = excludeCancelled(data?.upcoming ?? []).length;
   const pastCount = data?.past.length ?? 0;
+  const tabTotal =
+    tab === "upcoming" ? (data?.upcoming.length ?? 0) : pastCount;
 
   return (
     <div className="space-y-[var(--spacing-hm-lg)]">
@@ -241,67 +250,68 @@ export function AppointmentsList() {
                   </td>
                 </tr>
               ) : (
-                rows.map((appointment) => (
-                  <tr
-                    key={appointment.id}
-                    className="transition-colors hover:bg-[var(--color-surface-container-low)]"
-                  >
-                    <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
-                      <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                        {formatAppointmentDate(appointment.startsAt)}
-                      </p>
-                      <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-                        {formatAppointmentTime(appointment.startsAt)}
-                      </p>
-                    </td>
-                    <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary-fixed)] font-dm-sans text-xs font-bold text-[var(--color-primary)]">
-                          {doctorInitials(appointment) || (
-                            <MdPerson size={14} />
+                rows.map((appointment) => {
+                  const badge = getAppointmentPresentation(appointment);
+                  return (
+                    <tr
+                      key={appointment.id}
+                      className="transition-colors hover:bg-[var(--color-surface-container-low)]"
+                    >
+                      <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
+                        <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
+                          {formatAppointmentDate(appointment.startsAt)}
+                        </p>
+                        <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
+                          {formatAppointmentTime(appointment.startsAt)}
+                        </p>
+                      </td>
+                      <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary-fixed)] font-dm-sans text-xs font-bold text-[var(--color-primary)]">
+                            {doctorInitials(appointment) || (
+                              <MdPerson size={14} />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-dm-sans text-label-md text-[var(--color-on-surface)]">
+                              Dr. {appointment.doctor.firstName}{" "}
+                              {appointment.doctor.lastName}
+                            </p>
+                            <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
+                              {appointment.doctor.specialization}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
+                        <span className="inline-flex items-center gap-1 font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
+                          <MdPerson size={18} aria-hidden /> In-person
+                        </span>
+                      </td>
+                      <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-dm-sans text-label-sm font-semibold ${badge.badgeClassName}`}
+                        >
+                          {badge.cancelled ? (
+                            <MdCancel size={14} aria-hidden />
+                          ) : (
+                            <MdCheckCircle size={14} aria-hidden />
                           )}
-                        </div>
-                        <div>
-                          <p className="font-dm-sans text-label-md text-[var(--color-on-surface)]">
-                            Dr. {appointment.doctor.firstName}{" "}
-                            {appointment.doctor.lastName}
-                          </p>
-                          <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-                            {appointment.doctor.specialization}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
-                      <span className="inline-flex items-center gap-1 font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-                        <MdPerson size={18} aria-hidden /> In-person
-                      </span>
-                    </td>
-                    <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)]">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-dm-sans text-label-sm font-semibold ${
-                          appointment.timing === "upcoming"
-                            ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-                            : "bg-[var(--color-success-container)] text-[var(--color-success)]"
-                        }`}
-                      >
-                        <MdCheckCircle size={14} aria-hidden />
-                        {appointment.timing === "upcoming"
-                          ? "Upcoming"
-                          : "Completed"}
-                      </span>
-                    </td>
-                    <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)] text-right">
-                      <Link
-                        href={`/appointments/${appointment.id}`}
-                        className="inline-flex items-center gap-1 font-dm-sans text-label-md text-[var(--color-primary)] hover:underline"
-                      >
-                        View Details
-                        <MdChevronRight size={18} aria-hidden />
-                      </Link>
-                    </td>
-                  </tr>
-                ))
+                          {badge.label}
+                        </span>
+                      </td>
+                      <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-md)] text-right">
+                        <Link
+                          href={`/appointments/${appointment.id}`}
+                          className="inline-flex items-center gap-1 font-dm-sans text-label-md text-[var(--color-primary)] hover:underline"
+                        >
+                          View Details
+                          <MdChevronRight size={18} aria-hidden />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -309,8 +319,7 @@ export function AppointmentsList() {
 
         <div className="flex items-center justify-between gap-3 border-t border-[var(--color-outline-variant)] bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-lg)]">
           <p className="font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-            Showing {rows.length} of{" "}
-            {tab === "upcoming" ? upcomingCount : pastCount} results
+            Showing {rows.length} of {tabTotal} results
           </p>
         </div>
       </div>
