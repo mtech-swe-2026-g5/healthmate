@@ -11,6 +11,8 @@ export type AppointmentConfirmation = {
   additionalNotes: string | null;
   doctor: DoctorListItem;
   timing: "upcoming" | "past";
+  /** Server verdict on whether cancel/reschedule are still permitted. */
+  canBeChanged: boolean;
 };
 
 export type AppointmentsListResponse = {
@@ -78,4 +80,31 @@ export async function fetchAppointment(
 export async function fetchAppointments(): Promise<AppointmentsListResponse> {
   const response = await fetch("/api/appointments");
   return readJson<AppointmentsListResponse>(response);
+}
+
+export async function cancelAppointmentRequest(
+  id: string,
+): Promise<AppointmentConfirmation> {
+  const response = await fetch(`/api/appointments/${id}/cancel`, {
+    method: "PATCH",
+  });
+  const data = await readJson<{ appointment: AppointmentConfirmation }>(
+    response,
+  );
+  return data.appointment;
+}
+
+export async function rescheduleAppointmentRequest(
+  id: string,
+  body: { date: string; startTime: string },
+): Promise<AppointmentConfirmation> {
+  const response = await fetch(`/api/appointments/${id}/reschedule`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await readJson<{ appointment: AppointmentConfirmation }>(
+    response,
+  );
+  return data.appointment;
 }

@@ -127,3 +127,123 @@ describe("AppCalendar", () => {
     ).contains("hidden");
   });
 });
+
+describe("Model busy and variant props", () => {
+  const title = "Cancel this appointment?";
+  const content = "This cannot be undone.";
+  const onClose = vi.fn();
+  const noop = () => Promise.resolve();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("shows a spinner and the busy label while busy", () => {
+    const { container } = render(
+      <Model
+        title={title}
+        content={content}
+        isOpen
+        busy
+        busyLabel="Cancelling…"
+        confirmLabel="Yes, cancel it"
+        onClose={onClose}
+        onConfirm={noop}
+      />,
+    );
+
+    const confirm = container.querySelector("#confirmModalBtn");
+    expect(confirm?.textContent).toContain("Cancelling…");
+    expect(confirm?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByLabelText("Working")).toBeDefined();
+  });
+
+  it("falls back to the confirm label when no busy label is given", () => {
+    const { container } = render(
+      <Model
+        title={title}
+        content={content}
+        isOpen
+        busy
+        confirmLabel="Yes, cancel it"
+        onClose={onClose}
+        onConfirm={noop}
+      />,
+    );
+
+    expect(container.querySelector("#confirmModalBtn")?.textContent).toContain(
+      "Yes, cancel it",
+    );
+  });
+
+  it("disables both actions while busy so the request cannot be double-fired", async () => {
+    const onConfirm = vi.fn(() => Promise.resolve());
+    const onCancel = vi.fn(() => Promise.resolve());
+    const { container } = render(
+      <Model
+        title={title}
+        content={content}
+        isOpen
+        busy
+        onClose={onClose}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />,
+    );
+
+    const confirm = container.querySelector(
+      "#confirmModalBtn",
+    ) as HTMLButtonElement;
+    const cancel = container.querySelector(
+      "#cancelModalBtn",
+    ) as HTMLButtonElement;
+    const close = container.querySelector("#closeIconBtn") as HTMLButtonElement;
+
+    expect(confirm.disabled).toBe(true);
+    expect(cancel.disabled).toBe(true);
+    expect(close.disabled).toBe(true);
+
+    await userEvent.click(confirm);
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it("renders no spinner and stays enabled when not busy", () => {
+    const { container } = render(
+      <Model
+        title={title}
+        content={content}
+        isOpen
+        onClose={onClose}
+        onConfirm={noop}
+      />,
+    );
+
+    const confirm = container.querySelector(
+      "#confirmModalBtn",
+    ) as HTMLButtonElement;
+    expect(confirm.disabled).toBe(false);
+    expect(confirm.getAttribute("aria-busy")).toBeNull();
+    expect(screen.queryByLabelText("Working")).toBeNull();
+  });
+
+  it("applies the danger style for destructive confirmations", () => {
+    const { container } = render(
+      <Model
+        title={title}
+        content={content}
+        isOpen
+        confirmVariant="danger"
+        onClose={onClose}
+        onConfirm={noop}
+      />,
+    );
+
+    expect(container.querySelector("#confirmModalBtn")?.className).toContain(
+      "var(--color-error)",
+    );
+  });
+});

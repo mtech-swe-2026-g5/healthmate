@@ -13,10 +13,10 @@ import type {
 /**
  * Event → per-audience template registry.
  *
- * Every appointment event has templates. Only `appointment.booked` has a caller
- * so far; wiring the others means calling
+ * Every appointment event has templates and a caller. Adding another means
+ * registering it here and calling
  * `scheduleAppointmentNotifications('<event>', id, details)` from the service
- * that performs the transition — no changes are needed in this feature.
+ * that performs the transition.
  */
 const APPOINTMENT_EMAIL_TEMPLATES: Record<
   AppointmentNotificationEvent,

@@ -38,6 +38,8 @@ email links to, so a doctor sign-up flow works without template changes.
 | Event | Fires from |
 |---|---|
 | `appointment.booked` | `createAppointment()` in `features/appointments/services/appointments.ts` |
+| `appointment.cancelled` | `cancelAppointment()` in `features/appointments/services/appointment-transitions.ts` |
+| `appointment.rescheduled` | `rescheduleAppointment()` in `features/appointments/services/appointment-transitions.ts` |
 | account registered | `registerPatient()` in `features/auth/services/registration.ts` |
 
 `createAppointment()` is the single place an appointment row is created, so it
@@ -45,13 +47,12 @@ covers direct booking, Razorpay verification, and webhook fulfilment without
 duplicate sends. `scheduleWelcomeEmail` sits after the registration transaction
 commits, so a rolled-back sign-up sends nothing.
 
-## Wiring cancel and reschedule
+## Event details
 
-Templates for both are already written and registered. When those features are
-built, the notification work is a single call from the service that performs the
-transition — no changes in this feature.
+Each transition dispatches only after its transaction commits, so a rolled-back
+or lost-race change sends nothing.
 
-Cancellation, after the status update commits:
+Cancellation attributes the actor:
 
 ```ts
 scheduleAppointmentNotifications('appointment.cancelled', appointment.id, {
@@ -59,19 +60,13 @@ scheduleAppointmentNotifications('appointment.cancelled', appointment.id, {
 });
 ```
 
-Reschedule, capturing the old slot **before** the update overwrites it:
+Reschedule captures the old slot **before** the update overwrites it — the
+appointment row cannot supply it afterwards:
 
 ```ts
-const previous = await prisma.appointment.findUnique({
-  where: { id },
-  select: { startsAt: true, endsAt: true },
-});
-
-// … perform the reschedule …
-
-scheduleAppointmentNotifications('appointment.rescheduled', id, {
-  previousStartsAt: previous.startsAt,
-  previousEndsAt: previous.endsAt,
+scheduleAppointmentNotifications('appointment.rescheduled', appointment.id, {
+  previousStartsAt: appointment.startsAt,
+  previousEndsAt: appointment.endsAt,
 });
 ```
 

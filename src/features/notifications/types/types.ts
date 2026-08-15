@@ -16,9 +16,8 @@ export type WelcomeEmailInput = {
 
 /**
  * Appointment lifecycle events that can raise a notification.
- * All three have templates registered; `appointment.booked` is the only one
- * with a caller so far — cancel and reschedule need a dispatch call from the
- * services that perform those transitions.
+ * All three have templates registered and a caller: booking dispatches from
+ * `createAppointment`, the other two from the appointment transition services.
  */
 export type AppointmentNotificationEvent =
   "appointment.booked" | "appointment.cancelled" | "appointment.rescheduled";
