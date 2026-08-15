@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.4.1...v1.5.0) (2026-08-15)
+
+
+### Features
+
+* appointment rescheduling and cancellation features ([#59](https://github.com/mtech-swe-2026-g5/healthmate/issues/59)) ([cf44173](https://github.com/mtech-swe-2026-g5/healthmate/commit/cf44173b18fe548a5cbef4ed5ea0eec1c309b59d))
+
 ## [1.4.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.4.0...v1.4.1) (2026-08-15)
 
 
