@@ -22,10 +22,10 @@ export default function PatientAppointments({
 }: PatientAppointmentsProps) {
   const [isModelOpen, setModelOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date>(
-    DateTime.now().startOf("week").toJSDate(),
+    DateTime.now().startOf("week", { useLocaleWeeks: true }).toJSDate(),
   );
   const [endDate, setEndDate] = useState<Date>(
-    DateTime.now().endOf("week").toJSDate(),
+    DateTime.now().endOf("week", { useLocaleWeeks: true }).toJSDate(),
   );
   const query = useAppointments(doctorId, startDate, endDate);
   const slotQuery = useSlotConfigurations(doctorId, startDate, endDate);
