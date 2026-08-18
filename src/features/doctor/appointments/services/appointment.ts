@@ -31,6 +31,9 @@ async function getAppointmentsFor(
   return prisma.appointment.findMany({
     where: {
       doctorId: validatedRequest.doctorId,
+      // Cancelled bookings are retained for audit but must not occupy the
+      // doctor's calendar — the slot is free again the moment they cancel.
+      status: "CONFIRMED",
       startsAt: {
         gte: validatedRequest.startDate,
         lt: validatedRequest.endDate,

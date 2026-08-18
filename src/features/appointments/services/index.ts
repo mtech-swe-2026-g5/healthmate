@@ -18,3 +18,7 @@ export {
   generateBookingReference,
   serializeAppointment,
 } from "./appointments";
+export {
+  cancelAppointment,
+  rescheduleAppointment,
+} from "./appointment-transitions";

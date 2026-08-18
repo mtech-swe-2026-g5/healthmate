@@ -74,6 +74,7 @@ describe("getAppointmentsByDoctor", () => {
       expect(prisma.appointment.findMany).toHaveBeenCalledWith({
         where: {
           doctorId: validRequest.doctorId,
+          status: "CONFIRMED",
           startsAt: {
             gte: DateTime.fromJSDate(validRequest.startDate)
               .startOf("day")

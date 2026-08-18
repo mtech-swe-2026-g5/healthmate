@@ -2,8 +2,18 @@
 
 enum AppointmentStatus {
   CONFIRMED
+  CANCELLED
 
   @@map("appointment_status")
+}
+
+// Transitions worth auditing. Creation is already recorded by
+// `appointments.created_at`, so only post-booking changes are logged here.
+enum AppointmentHistoryEvent {
+  RESCHEDULED
+  CANCELLED
+
+  @@map("appointment_history_event")
 }
 
 enum PaymentStatus {
@@ -44,18 +54,49 @@ model Appointment {
   status           AppointmentStatus @default(CONFIRMED)
   reasonForVisit   String            @default("General consultation") @map("reason_for_visit") @db.VarChar(200)
   additionalNotes  String?           @map("additional_notes") @db.VarChar(500)
+  cancelledAt      DateTime?         @map("cancelled_at") @db.Timestamptz()
   createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz()
 
-  patient Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor  Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient Patient              @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor  Doctor               @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   payment Payment?
+  history AppointmentHistory[]
 
-  @@unique([doctorId, startsAt])
+  // Double-booking is prevented by the PARTIAL unique index
+  // `appointments_doctor_id_starts_at_confirmed_key` (`WHERE status = 'CONFIRMED'`),
+  // created in 20260815000000_add_appointment_cancellation_rescheduling. Prisma
+  // cannot express a filtered index, so it is not declared here — a plain
+  // `@@unique` would block reusing a slot freed by a cancellation, because
+  // cancelled rows are retained for audit.
   @@index([patientId, startsAt])
   @@index([doctorId, startsAt])
   @@index([status])
   @@map("appointments")
+}
+
+// ============================================
+// Appointment audit trail (cancellation + rescheduling)
+// One row per state transition; rows are never updated or deleted.
+// ============================================
+
+model AppointmentHistory {
+  id               String                  @id @default(uuid()) @db.Uuid
+  appointmentId    String                  @map("appointment_id") @db.Uuid
+  event            AppointmentHistoryEvent
+  previousStartsAt DateTime                @map("previous_starts_at") @db.Timestamptz()
+  previousEndsAt   DateTime                @map("previous_ends_at") @db.Timestamptz()
+  // Null for a cancellation — the appointment keeps its slot, it just frees up.
+  newStartsAt      DateTime?               @map("new_starts_at") @db.Timestamptz()
+  newEndsAt        DateTime?               @map("new_ends_at") @db.Timestamptz()
+  changedByUserId  String                  @map("changed_by_user_id") @db.Uuid
+  changedByRole    String                  @map("changed_by_role") @db.VarChar(20)
+  createdAt        DateTime                @default(now()) @map("created_at") @db.Timestamptz()
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId, createdAt])
+  @@map("appointment_history")
 }
 
 // ============================================

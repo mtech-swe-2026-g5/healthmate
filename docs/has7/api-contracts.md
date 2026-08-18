@@ -9,6 +9,11 @@ Patient role required for create/list/get appointment endpoints and payment crea
 Booking wizard flow: Search → Schedule → Details → **Payment (Razorpay)** → Confirm.
 Appointment `POST` still exists for internal/fulfillment use; the UI creates appointments via payment verify after Checkout succeeds.
 
+Post-booking changes: `PATCH /api/appointments/{id}/cancel` and
+`PATCH /api/appointments/{id}/reschedule`. Both obey the same cut-off window
+(`APPOINTMENT_CANCELLATION_CUTOFF_HOURS`, default `24`) and dispatch email to
+the patient and the doctor asynchronously after the response is flushed.
+
 ---
 
 ## GET `/api/doctors`
@@ -104,10 +109,17 @@ Create a confirmed appointment.
       "lastName": "Patel",
       "specialization": "General Physician"
     },
-    "timing": "upcoming"
+    "timing": "upcoming",
+    "canBeChanged": true
   }
 }
 ```
+
+| Field | Meaning |
+|-------|---------|
+| `status` | `CONFIRMED` \| `CANCELLED` |
+| `timing` | `upcoming` when `startsAt` is in the future |
+| `canBeChanged` | Server verdict: `CONFIRMED` **and** outside the cut-off window. The UI shows cancel/reschedule only when true, so the rule lives in one place. |
 
 **Errors:** `400` validation / unavailable slot, `403` non-patient, `404` doctor/patient, `409` slot already booked.
 
@@ -116,6 +128,10 @@ Create a confirmed appointment.
 ## GET `/api/appointments`
 
 List the authenticated patient’s appointments.
+
+Cancelled appointments are included — the record is retained for audit — and are
+distinguished by `status: "CANCELLED"`. They stay in the `upcoming` bucket while
+their original start time is still in the future.
 
 **Response `200`**
 
@@ -134,6 +150,78 @@ Booking confirmation / detail for an appointment owned by the patient.
 
 **Response `200`:** `{ "appointment": { ... } }`  
 **Errors:** `403`, `404`
+
+---
+
+## PATCH `/api/appointments/{id}/cancel`
+
+Cancel a confirmed appointment owned by the authenticated patient.
+
+No request body. The record is **never deleted**: `status` becomes `CANCELLED`,
+`cancelled_at` is stamped, and an `appointment_history` row is written in the
+same transaction. Because the double-booking index only covers `CONFIRMED` rows,
+the slot is bookable by anyone else the moment this commits.
+
+On success, cancellation email is dispatched asynchronously to both the patient
+and the doctor (`cancelledBy: "patient"`).
+
+> **Known gap — refunds.** The consultation fee is collected up front via
+> Razorpay. Cancelling does **not** refund it: the `payments` row stays
+> `CAPTURED` and keeps pointing at the now-cancelled appointment. Neither story
+> covers refunds, so this is deliberately deferred to a separate story (which
+> would add a `REFUNDED` payment status, a Razorpay refunds call, and refund
+> webhook handling).
+
+**Response `200`:** `{ "appointment": { …, "status": "CANCELLED", "canBeChanged": false } }`
+
+| Status | Cause |
+|--------|-------|
+| `400` | Inside the cut-off window (default: within 24 h of the start time) |
+| `401` | No session |
+| `403` | Non-patient role |
+| `404` | Appointment not found, or not owned by this patient |
+| `409` | Already cancelled, or a concurrent request changed it first |
+
+---
+
+## PATCH `/api/appointments/{id}/reschedule`
+
+Move a confirmed appointment to a different slot **with the same doctor**.
+
+**Body**
+
+```json
+{
+  "date": "2027-03-01",
+  "startTime": "14:00"
+}
+```
+
+| Field | Rules |
+|-------|--------|
+| date | `YYYY-MM-DD`, must exist on the calendar |
+| startTime | `HH:mm`, must be an `available` slot from `GET /api/doctors/{id}/slots` |
+
+The appointment keeps its id, booking reference, reason, notes, and `CONFIRMED`
+status; only `starts_at` / `ends_at` / `updated_at` change, and the move is
+recorded in `appointment_history`. The original slot is freed by the same
+update. Reschedule email is dispatched asynchronously to both parties and
+carries the previous slot.
+
+**Concurrency:** the update is guarded on the `status` and `starts_at` the
+request read (optimistic locking), and the partial unique index on
+`(doctor_id, starts_at) WHERE status = 'CONFIRMED'` rejects two patients landing
+on the same slot. Both raise `409`.
+
+**Response `200`:** `{ "appointment": { … } }`
+
+| Status | Cause |
+|--------|-------|
+| `400` | Validation, slot outside the doctor's schedule, slot not selectable, same slot as now, or inside the cut-off window |
+| `401` | No session |
+| `403` | Non-patient role |
+| `404` | Appointment not found, or not owned by this patient |
+| `409` | Target slot booked, appointment already cancelled, or a concurrent change won the race |
 
 ---
 

@@ -4,9 +4,14 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/errors";
 import { requireRole } from "@/features/auth/services/permissions";
+import { scheduleAppointmentNotifications } from "@/features/notifications";
 
 import { createAppointmentSchema } from "../types";
 import type { CreateAppointmentInput } from "../types";
+import {
+  getCancellationCutoffHours,
+  hasCancellationCutoffPassed,
+} from "../lib/cancellation-window";
 import { generateSlots, combineDateAndTime, addMinutes } from "./slots";
 import { getActiveDoctor } from "./doctors";
 
@@ -34,7 +39,7 @@ export function assertPatientRole(role: string | undefined): void {
   requireRole(role, ["patient"]);
 }
 
-const appointmentDetailSelect = {
+export const appointmentDetailSelect = {
   id: true,
   bookingReference: true,
   startsAt: true,
@@ -84,7 +89,10 @@ export function serializeAppointment(
     specialization: string;
   };
   timing: "upcoming" | "past";
+  canBeChanged: boolean;
 } {
+  const cutoffHours = getCancellationCutoffHours();
+
   return {
     id: appointment.id,
     bookingReference: appointment.bookingReference,
@@ -96,6 +104,11 @@ export function serializeAppointment(
     doctor: appointment.doctor,
     timing:
       appointment.startsAt.getTime() >= now.getTime() ? "upcoming" : "past",
+    // Mirrors the server-side guard so the UI only offers cancel/reschedule
+    // where the API would actually accept it.
+    canBeChanged:
+      appointment.status === "CONFIRMED" &&
+      !hasCancellationCutoffPassed(appointment.startsAt, cutoffHours, now),
   };
 }
 
@@ -147,6 +160,10 @@ export async function createAppointment(
       },
       select: appointmentDetailSelect,
     });
+
+    // Booking is now final (CONFIRMED) — confirm to patient and doctor.
+    // Delivery runs after the response, so SMTP never blocks this call.
+    scheduleAppointmentNotifications("appointment.booked", appointment.id);
 
     return serializeAppointment(appointment);
   } catch (error) {

@@ -43,12 +43,15 @@ export function handleApiError(error: unknown): NextResponse {
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === "P2002") {
-      const target = (error.meta?.target as string[]) ?? [];
-      if (
-        target.includes("doctor_id") ||
-        target.includes("starts_at") ||
-        target.some((t) => t.includes("doctorId") || t.includes("startsAt"))
-      ) {
+      const rawTarget = error.meta?.target;
+      // Postgres reports either the column list or the index name, depending on
+      // the driver — the slot constraint is a partial index, so match both.
+      const target = Array.isArray(rawTarget)
+        ? (rawTarget as string[])
+        : typeof rawTarget === "string"
+          ? [rawTarget]
+          : [];
+      if (target.some((t) => /doctor_?id|starts_?at/i.test(t))) {
         return NextResponse.json(
           { error: "Slot already booked" },
           { status: 409 },

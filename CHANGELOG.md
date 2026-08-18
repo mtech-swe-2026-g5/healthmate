@@ -1,3 +1,24 @@
+# [1.5.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.4.1...v1.5.0) (2026-08-15)
+
+
+### Features
+
+* appointment rescheduling and cancellation features ([#59](https://github.com/mtech-swe-2026-g5/healthmate/issues/59)) ([cf44173](https://github.com/mtech-swe-2026-g5/healthmate/commit/cf44173b18fe548a5cbef4ed5ea0eec1c309b59d))
+
+## [1.4.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.4.0...v1.4.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* some email template bugs ([#47](https://github.com/mtech-swe-2026-g5/healthmate/issues/47)) ([608eb31](https://github.com/mtech-swe-2026-g5/healthmate/commit/608eb3106172526d9c7100d6395c11ac0bb23a42))
+
+# [1.4.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.3.0...v1.4.0) (2026-08-03)
+
+
+### Features
+
+* **notifications:** email confirmations for booking and registration ([#46](https://github.com/mtech-swe-2026-g5/healthmate/issues/46)) ([b44d777](https://github.com/mtech-swe-2026-g5/healthmate/commit/b44d7776f0dabd72dd4645336728164283083cd1))
+
 # [1.3.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.2.0...v1.3.0) (2026-07-25)
 
 

@@ -1,5 +1,9 @@
 import { JSX } from "react";
 
+import { LoadingSpinner } from "./LoadingSpinner";
+
+export type ModelConfirmVariant = "primary" | "danger";
+
 export interface ModelProps {
   title: string;
   content: JSX.Element | string;
@@ -7,7 +11,20 @@ export interface ModelProps {
   onClose: () => void;
   onConfirm?: () => Promise<void>;
   onCancel?: () => Promise<void>;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  /** `danger` for destructive confirmations (e.g. cancelling an appointment). */
+  confirmVariant?: ModelConfirmVariant;
+  /** Disables both actions and shows a spinner while an in-flight request settles. */
+  busy?: boolean;
+  /** Confirm-button text while `busy`. Falls back to `confirmLabel`. */
+  busyLabel?: string;
 }
+
+const CONFIRM_VARIANT_STYLES: Record<ModelConfirmVariant, string> = {
+  primary: "bg-blue-600 hover:bg-blue-700",
+  danger: "bg-[var(--color-error)] hover:opacity-90",
+};
 
 export default function Model({
   title,
@@ -16,6 +33,11 @@ export default function Model({
   onConfirm,
   onCancel,
   onClose,
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  confirmVariant = "primary",
+  busy = false,
+  busyLabel,
 }: ModelProps) {
   return (
     <>
@@ -35,7 +57,8 @@ export default function Model({
             <button
               id="closeIconBtn"
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition cursor-pointer text-2xl font-bold"
+              disabled={busy}
+              className="text-gray-400 hover:text-gray-600 transition cursor-pointer text-2xl font-bold disabled:cursor-not-allowed disabled:opacity-50"
             >
               &times;
             </button>
@@ -49,18 +72,22 @@ export default function Model({
                 <button
                   id="cancelModalBtn"
                   onClick={() => onCancel().finally(onClose)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer"
+                  disabled={busy}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Cancel
+                  {cancelLabel}
                 </button>
               )}
               {onConfirm && (
                 <button
                   id="confirmModalBtn"
                   onClick={() => onConfirm().finally(onClose)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition cursor-pointer"
+                  disabled={busy}
+                  aria-busy={busy || undefined}
+                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${CONFIRM_VARIANT_STYLES[confirmVariant]}`}
                 >
-                  Confirm
+                  {busy && <LoadingSpinner size={14} onDark label="Working" />}
+                  {busy ? (busyLabel ?? confirmLabel) : confirmLabel}
                 </button>
               )}
             </div>

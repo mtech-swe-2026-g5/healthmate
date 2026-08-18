@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { listPatientAppointments } from "@/features/appointments/services/appointments";
+import { excludeCancelled } from "@/features/appointments/lib/appointment-status";
 import { PatientDashboardView } from "@/features/dashboard";
 import { prisma } from "@/lib/prisma";
 
@@ -26,11 +27,14 @@ export default async function DashboardPage() {
   const firstName =
     patient?.firstName || session.user.email?.split("@")[0] || "there";
 
+  // The dashboard is a forward-looking view: a cancelled booking is neither an
+  // upcoming visit nor a completed one, so it belongs in neither count. It
+  // stays visible on the appointments page, which is the history surface.
   return (
     <PatientDashboardView
       firstName={firstName}
-      upcoming={appointments.upcoming}
-      pastCount={appointments.past.length}
+      upcoming={excludeCancelled(appointments.upcoming)}
+      pastCount={excludeCancelled(appointments.past).length}
     />
   );
 }

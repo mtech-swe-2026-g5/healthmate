@@ -23,6 +23,7 @@ import {
   formatAppointmentTime,
   formatAppointmentWeekdayDate,
 } from "@/features/appointments/lib/date-utils";
+import { getAppointmentPresentation } from "@/features/appointments/lib/appointment-status";
 
 import {
   daysUntil,
@@ -255,8 +256,10 @@ export function PatientDashboardView({
                           </span>
                         </td>
                         <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-lg)]">
-                          <span className="inline-block rounded-full bg-[var(--color-primary)]/10 px-[var(--spacing-hm-md)] py-1 font-dm-sans text-label-sm text-[var(--color-primary)]">
-                            Confirmed
+                          <span
+                            className={`inline-block rounded-full px-[var(--spacing-hm-md)] py-1 font-dm-sans text-label-sm ${getAppointmentPresentation(appointment).badgeClassName}`}
+                          >
+                            {getAppointmentPresentation(appointment).label}
                           </span>
                         </td>
                         <td className="px-[var(--spacing-hm-lg)] py-[var(--spacing-hm-lg)]">
