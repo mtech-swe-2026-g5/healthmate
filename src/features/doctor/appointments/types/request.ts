@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { DateTime } from "luxon";
 
+import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
+
+function clinicDayBoundary(date: Date, boundary: "start" | "end"): Date {
+  const zoned = DateTime.fromJSDate(date).setZone(CLINIC_TIMEZONE);
+  return (boundary === "start" ? zoned.startOf("day") : zoned.endOf("day")).toJSDate();
+}
+
 /**
  * Schema for weekly calendar appointments request
  * Requests appointments for a specific week identified by year and ISO week number
@@ -23,8 +30,8 @@ export const getWeeklyAppointmentsSchema = z
   )
   .transform(({ doctorId, startDate, endDate }) => ({
     doctorId,
-    startDate: DateTime.fromJSDate(startDate).startOf("day").toJSDate(),
-    endDate: DateTime.fromJSDate(endDate).endOf("day").toJSDate(),
+    startDate: clinicDayBoundary(startDate, "start"),
+    endDate: clinicDayBoundary(endDate, "end"),
   }));
 
 export type GetWeeklyAppointmentsRequest = z.infer<
@@ -49,8 +56,8 @@ export const getAppointmentSlotSchema = z
   )
   .transform(({ doctorId, dateFrom, dateUntil }) => ({
     doctorId,
-    dateFrom: DateTime.fromJSDate(dateFrom).startOf("day").toJSDate(),
-    dateUntil: DateTime.fromJSDate(dateUntil).endOf("day").toJSDate(),
+    dateFrom: clinicDayBoundary(dateFrom, "start"),
+    dateUntil: clinicDayBoundary(dateUntil, "end"),
   }));
 
 export type GetAppointmentSlotRequest = z.infer<

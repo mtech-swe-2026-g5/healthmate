@@ -23,12 +23,14 @@ export function buildNotificationContext(
       ...overrides.appointment,
     },
     patient: {
+      userId: "patient-user-1",
       firstName: "Priya",
       lastName: "Sharma",
       email: "priya.sharma@example.com",
       ...overrides.patient,
     },
     doctor: {
+      userId: "doctor-user-1",
       firstName: "Ananya",
       lastName: "Patel",
       specialization: "General Physician",

@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="auth-body-bg flex min-h-screen items-center justify-center p-[var(--spacing-hm-md)] md:p-[var(--spacing-hm-lg)]">
+    <div className="auth-body-bg flex min-h-screen flex-col items-center justify-center p-[var(--spacing-hm-md)] md:p-[var(--spacing-hm-lg)]">
       <main className="auth-custom-shadow grid w-full max-w-[1100px] grid-cols-1 overflow-hidden rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] md:grid-cols-[2fr_3fr]">
         <section
           className="auth-pattern-bg relative hidden md:block"
@@ -35,7 +35,7 @@ export default function AuthLayout({
         </section>
       </main>
 
-      <footer className="fixed bottom-0 left-0 w-full p-[var(--spacing-hm-md)] text-center">
+      <footer className="mt-6 w-full p-[var(--spacing-hm-md)] text-center">
         <p className="text-label-sm text-[var(--color-on-surface-variant)]/60">
           &copy; {new Date().getFullYear()} HealthMate. HIPAA Compliant.
           Professional Medical Software.

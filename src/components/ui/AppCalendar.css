@@ -25,3 +25,62 @@
     background-color: var(--color-on-surface-variant);
     opacity: 0.85;
 }
+
+.app-calendar-event-blocked {
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(0, 0, 0, 0.04) 10px,
+        rgba(0, 0, 0, 0.04) 20px
+    ) !important;
+    border: 1px solid var(--color-outline-variant) !important;
+    color: var(--color-outline) !important;
+    font-style: italic;
+}
+
+.doctor-schedule-calendar .rbc-event {
+    border-left: 4px solid var(--color-primary);
+}
+
+@media (max-width: 767px) {
+    .rbc-header {
+        font-size: 0.625rem;
+        padding: 4px 2px;
+    }
+
+    .rbc-time-header-cell .rbc-header {
+        min-height: 32px;
+    }
+
+    .rbc-time-content .rbc-time-gutter .rbc-label {
+        font-size: 0.625rem;
+        padding: 0 4px;
+    }
+
+    .rbc-event {
+        font-size: 0.625rem;
+        padding: 2px 4px;
+    }
+
+    .rbc-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .rbc-toolbar button {
+        padding: 4px 8px;
+        font-size: 0.6875rem;
+    }
+}
+
+.striped-bg {
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(0, 0, 0, 0.03) 10px,
+        rgba(0, 0, 0, 0.03) 20px
+    );
+}

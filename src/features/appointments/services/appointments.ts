@@ -140,7 +140,7 @@ export async function createAppointment(
   }
 
   const startsAt = combineDateAndTime(input.date, input.startTime);
-  const endsAt = addMinutes(startsAt, 60);
+  const endsAt = combineDateAndTime(input.date, slot.endTime);
   const notes =
     input.additionalNotes && input.additionalNotes.trim().length > 0
       ? input.additionalNotes.trim()

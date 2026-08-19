@@ -15,6 +15,7 @@ const prisma = new PrismaClient({ adapter });
 
 const BCRYPT_SALT_ROUNDS = 10;
 const MVP_DOCTOR_PASSWORD = "Doctor@123";
+const MVP_ADMIN_PASSWORD = "Admin@123";
 
 const ROLES = [
   {
@@ -44,28 +45,44 @@ const WORKING_HOURS = [
 
 const DOCTORS = [
   {
-    email: "dr.patel@healthmate.local",
+    email: "dr.sharma@healthmate.in",
+    firstName: "Vikram",
+    lastName: "Sharma",
+    specialization: "General Physician",
+    gender: "male" as const,
+    phoneNumber: "+91-98100-10001",
+  },
+  {
+    email: "dr.patel@healthmate.in",
     firstName: "Ananya",
     lastName: "Patel",
     specialization: "General Physician",
+    gender: "female" as const,
+    phoneNumber: "+91-98100-10002",
   },
   {
-    email: "dr.singh@healthmate.local",
+    email: "dr.singh@healthmate.in",
     firstName: "Rohan",
     lastName: "Singh",
     specialization: "Cardiology",
+    gender: "male" as const,
+    phoneNumber: "+91-98100-10003",
   },
   {
-    email: "dr.mehta@healthmate.local",
+    email: "dr.mehta@healthmate.in",
     firstName: "Priya",
     lastName: "Mehta",
     specialization: "Dermatology",
+    gender: "female" as const,
+    phoneNumber: "+91-98100-10004",
   },
   {
-    email: "dr.khan@healthmate.local",
+    email: "dr.khan@healthmate.in",
     firstName: "Imran",
     lastName: "Khan",
     specialization: "Orthopedics",
+    gender: "male" as const,
+    phoneNumber: "+91-98100-10005",
   },
 ] as const;
 
@@ -77,6 +94,8 @@ const defaultSlotConfiguration = {
   startTime: new Date("2026-01-01T11:00:00.000Z"),
   endTime: new Date("2026-01-01T19:00:00.000Z"),
   timezone: "Asia/Kolkata",
+  slotDurationMinutes: 60,
+  bufferMinutes: 15,
 };
 const demoDoctor = {
   id: "23b391b6-eb6e-4f54-bf1a-aa0549f6fbc8",
@@ -85,6 +104,9 @@ const demoDoctor = {
 const demoPatient = {
   id: "7c7bf910-2fd8-44af-965b-e5e6a6a6b040",
   userId: "e50f9967-9762-4deb-8cea-96fdf1591b36",
+};
+const demoAdmin = {
+  userId: "a0000000-0000-4000-8000-000000000001",
 };
 const demoAppointment = {
   id: "e014086e-47b3-4c1f-8658-2aede4df8240",
@@ -125,6 +147,9 @@ async function createDefaultDoctor() {
         lastName: "Doe",
         specialization: "General Physician",
         isActive: true,
+        acceptingNewPatients: true,
+        bufferMinutes: defaultSlotConfiguration.bufferMinutes,
+        slotDurationMinutes: defaultSlotConfiguration.slotDurationMinutes,
         gender: "male",
         phoneNumber: "+1-555-0123",
       },
@@ -135,6 +160,9 @@ async function createDefaultDoctor() {
         lastName: "Doe",
         specialization: "General Physician",
         isActive: true,
+        acceptingNewPatients: true,
+        bufferMinutes: defaultSlotConfiguration.bufferMinutes,
+        slotDurationMinutes: defaultSlotConfiguration.slotDurationMinutes,
         gender: "male",
         phoneNumber: "+1-555-0123",
       },
@@ -142,34 +170,160 @@ async function createDefaultDoctor() {
   });
 }
 
-async function createDefaultSlotConfiguration() {
+async function upsertDoctorSchedule(
+  doctorId: string,
+  dayOfWeeks: number[],
+  options?: {
+    startTime?: Date;
+    endTime?: Date;
+    idPrefix?: string;
+    slotDurationMinutes?: number;
+    bufferMinutes?: number;
+  },
+) {
+  const startTime = options?.startTime ?? defaultSlotConfiguration.startTime;
+  const endTime = options?.endTime ?? defaultSlotConfiguration.endTime;
+  const idPrefix =
+    options?.idPrefix ?? defaultSlotConfiguration.id.slice(0, -1);
+  const slotDurationMinutes =
+    options?.slotDurationMinutes ??
+    defaultSlotConfiguration.slotDurationMinutes;
+  const bufferMinutes =
+    options?.bufferMinutes ?? defaultSlotConfiguration.bufferMinutes;
+
+  await prisma.doctor.update({
+    where: { id: doctorId },
+    data: {
+      acceptingNewPatients: true,
+      bufferMinutes,
+      slotDurationMinutes,
+    },
+  });
+
   await Promise.all(
-    defaultSlotConfiguration.dayOfWeeks.map(async (dayOfWeek) => {
-      const id = `${defaultSlotConfiguration.id.slice(0, -1)}${dayOfWeek}`;
+    dayOfWeeks.map((dayOfWeek) => {
+      const id = `${idPrefix}${dayOfWeek}`;
       return prisma.slotConfiguration.upsert({
         where: { id },
         update: {
           validFrom: defaultSlotConfiguration.validFrom,
           dayOfWeek,
-          startTime: defaultSlotConfiguration.startTime,
-          endTime: defaultSlotConfiguration.endTime,
+          startTime,
+          endTime,
           timezone: defaultSlotConfiguration.timezone,
           active: true,
-          doctorId: demoDoctor.id,
+          doctorId,
         },
         create: {
           id,
-          doctorId: demoDoctor.id,
+          doctorId,
           validFrom: defaultSlotConfiguration.validFrom,
           dayOfWeek,
-          startTime: defaultSlotConfiguration.startTime,
-          endTime: defaultSlotConfiguration.endTime,
+          startTime,
+          endTime,
           timezone: defaultSlotConfiguration.timezone,
           active: true,
         },
       });
     }),
   );
+}
+
+async function createDefaultSlotConfiguration() {
+  await upsertDoctorSchedule(
+    demoDoctor.id,
+    defaultSlotConfiguration.dayOfWeeks,
+  );
+}
+
+async function seedAllDoctorSchedules() {
+  const doctors = await prisma.doctor.findMany({
+    where: { isActive: true },
+    select: { id: true, lastName: true },
+  });
+
+  for (const doctor of doctors) {
+    if (doctor.id === demoDoctor.id) continue;
+    const prefix = doctor.id.slice(0, 35);
+    await upsertDoctorSchedule(doctor.id, [1, 2, 3, 4, 5, 6], {
+      idPrefix: prefix,
+      startTime: new Date("2026-01-01T10:00:00.000Z"),
+      endTime: new Date("2026-01-01T18:00:00.000Z"),
+    });
+  }
+}
+
+async function createDefaultAdmin() {
+  return prisma.$transaction(async (tx) => {
+    const adminRole = await tx.role.findUnique({ where: { name: "admin" } });
+    if (!adminRole) return;
+
+    await tx.user.upsert({
+      where: { email: "admin@healthmate.com" },
+      update: {
+        passwordHash: await hash(MVP_ADMIN_PASSWORD, BCRYPT_SALT_ROUNDS),
+        emailVerified: true,
+        isActive: true,
+        roleId: adminRole.id,
+      },
+      create: {
+        id: demoAdmin.userId,
+        email: "admin@healthmate.com",
+        passwordHash: await hash(MVP_ADMIN_PASSWORD, BCRYPT_SALT_ROUNDS),
+        emailVerified: true,
+        isActive: true,
+        roleId: adminRole.id,
+      },
+    });
+  });
+}
+
+async function seedHistoricalAppointments() {
+  const clinicNow = DateTime.now().setZone("Asia/Kolkata");
+  const rows: {
+    id: string;
+    bookingReference: string;
+    startsAt: Date;
+    endsAt: Date;
+    status: "CONFIRMED" | "CANCELLED";
+  }[] = [];
+
+  for (let dayOffset = -28; dayOffset <= 7; dayOffset += 1) {
+    const day = clinicNow.plus({ days: dayOffset }).startOf("day");
+    const slots = [10, 12, 15, 17];
+    for (let slotIndex = 0; slotIndex < slots.length; slotIndex += 1) {
+      const hour = slots[slotIndex]!;
+      const startsAt = day.set({ hour, minute: 0 }).toUTC().toJSDate();
+      const endsAt = day.set({ hour: hour + 1, minute: 0 }).toUTC().toJSDate();
+      const sequence = dayOffset + 28 + slotIndex;
+      const status: "CONFIRMED" | "CANCELLED" =
+        sequence % 7 === 0 ? "CANCELLED" : "CONFIRMED";
+
+      rows.push({
+        id: `b0000000-0000-4000-8000-${String(sequence).padStart(12, "0")}`,
+        bookingReference: `HM-SEED-${String(sequence).padStart(4, "0")}`,
+        startsAt,
+        endsAt,
+        status,
+      });
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.appointment.deleteMany({
+      where: { bookingReference: { startsWith: "HM-SEED-" } },
+    });
+
+    await tx.appointment.createMany({
+      data: rows.map((row) => ({
+        ...row,
+        doctorId: demoDoctor.id,
+        patientId: demoPatient.id,
+        reasonForVisit: "Seed analytics appointment",
+      })),
+      skipDuplicates: true,
+    });
+  });
 }
 
 async function createDefaultPatient() {
@@ -283,24 +437,25 @@ async function main() {
 
   for (const doctor of DOCTORS) {
     const email = doctor.email.toLowerCase();
+    const doctorProfile = {
+      firstName: doctor.firstName,
+      lastName: doctor.lastName,
+      specialization: doctor.specialization,
+      gender: doctor.gender,
+      phoneNumber: doctor.phoneNumber,
+      isActive: true,
+      acceptingNewPatients: true,
+      bufferMinutes: defaultSlotConfiguration.bufferMinutes,
+      slotDurationMinutes: defaultSlotConfiguration.slotDurationMinutes,
+    };
+
     const existing = await prisma.user.findUnique({ where: { email } });
 
     if (existing) {
       await prisma.doctor.upsert({
         where: { userId: existing.id },
-        update: {
-          firstName: doctor.firstName,
-          lastName: doctor.lastName,
-          specialization: doctor.specialization,
-          isActive: true,
-        },
-        create: {
-          userId: existing.id,
-          firstName: doctor.firstName,
-          lastName: doctor.lastName,
-          specialization: doctor.specialization,
-          isActive: true,
-        },
+        update: doctorProfile,
+        create: { userId: existing.id, ...doctorProfile },
       });
       continue;
     }
@@ -317,13 +472,7 @@ async function main() {
       });
 
       await tx.doctor.create({
-        data: {
-          userId: user.id,
-          firstName: doctor.firstName,
-          lastName: doctor.lastName,
-          specialization: doctor.specialization,
-          isActive: true,
-        },
+        data: { userId: user.id, ...doctorProfile },
       });
     });
   }
@@ -334,11 +483,18 @@ async function main() {
   await createDefaultDoctor();
   console.log("Seeded sample doctor (johndoe-doctor@healthmate.com).");
   await createDefaultSlotConfiguration();
-  console.log("Created default slot configuration.");
+  await seedAllDoctorSchedules();
+  console.log("Created doctor slot configurations for all active doctors.");
   await createDefaultPatient();
   console.log("Seeded sample patient (johndoe-patient@healthmate.com).");
+  await createDefaultAdmin();
+  console.log(
+    `Seeded clinic admin (admin@healthmate.com, password: ${MVP_ADMIN_PASSWORD}).`,
+  );
   await seedTestAppointments();
   console.log("Seeded sample appointments.");
+  await seedHistoricalAppointments();
+  console.log("Seeded historical appointments for admin analytics.");
 }
 
 main()

@@ -1,0 +1,398 @@
+.doctor-week-calendar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 420px;
+  background: var(--color-surface);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.doctor-week-calendar.is-loading .doctor-week-calendar__scroll {
+  opacity: 0.55;
+}
+
+.doctor-week-calendar__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 30%, transparent);
+  background: var(--color-surface-bright);
+}
+
+.doctor-week-calendar__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: 9999px;
+  color: var(--color-outline);
+  transition: color 0.2s ease;
+}
+
+.doctor-week-calendar__nav-btn:hover {
+  color: var(--color-primary);
+}
+
+.doctor-week-calendar__week-label {
+  min-width: 12rem;
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-on-surface);
+}
+
+.doctor-week-calendar__scroll {
+  overflow: auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.doctor-week-calendar__grid {
+  display: grid;
+  position: relative;
+}
+
+.doctor-week-calendar__corner,
+.doctor-week-calendar__day-header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
+  background: var(--color-surface);
+}
+
+.doctor-week-calendar__corner {
+  border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
+}
+
+.doctor-week-calendar__time-heading {
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-outline);
+}
+
+.doctor-week-calendar__day-header {
+  border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
+}
+
+.doctor-week-calendar__day-header.is-weekend {
+  background: var(--color-surface-container-low);
+}
+
+.doctor-week-calendar__day-header.is-today {
+  background: color-mix(in srgb, var(--color-primary-container) 8%, var(--color-surface));
+}
+
+.doctor-week-calendar__day-name {
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 0.75rem;
+  color: var(--color-outline);
+}
+
+.doctor-week-calendar__day-header.is-today .doctor-week-calendar__day-name {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.doctor-week-calendar__day-number {
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--color-on-surface);
+}
+
+.doctor-week-calendar__day-number.is-today-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
+}
+
+.doctor-week-calendar__day-header.is-closed {
+  background: color-mix(in srgb, var(--color-error-container) 35%, var(--color-surface));
+}
+
+.doctor-week-calendar__closed-badge {
+  display: block;
+  max-width: 100%;
+  margin-top: 0.15rem;
+  padding: 0 0.35rem;
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-error);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doctor-week-calendar__day-column.is-closed {
+  background: color-mix(in srgb, var(--color-error-container) 18%, transparent);
+}
+
+.doctor-week-calendar__time-column {
+  border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
+}
+
+.doctor-week-calendar__time-label {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.35rem;
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 0.75rem;
+  color: var(--color-outline);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 10%, transparent);
+}
+
+.doctor-week-calendar__day-column {
+  position: relative;
+  border-right: 1px solid color-mix(in srgb, var(--color-outline-variant) 10%, transparent);
+}
+
+.doctor-week-calendar__day-column.is-weekend {
+  background: color-mix(in srgb, var(--color-surface-container-low) 70%, transparent);
+}
+
+.doctor-week-calendar__day-column.is-today {
+  background: color-mix(in srgb, var(--color-primary-container) 5%, transparent);
+}
+
+.doctor-week-calendar__hour-cell {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 10%, transparent);
+}
+
+.doctor-week-calendar__hour-cell.is-inactive {
+  background: color-mix(in srgb, var(--color-surface-variant) 65%, transparent);
+}
+
+.doctor-week-calendar__event {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.65rem;
+  text-align: left;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.doctor-week-calendar__event.is-appointment {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  border-left: 4px solid var(--color-primary);
+  box-shadow: 0 1px 4px rgba(26, 107, 114, 0.15);
+}
+
+.doctor-week-calendar__event.is-appointment:hover {
+  transform: scale(1.02);
+}
+
+.doctor-week-calendar__event.is-blocked {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.04) 10px,
+    rgba(0, 0, 0, 0.04) 20px
+  );
+  border: 1px solid color-mix(in srgb, var(--color-outline-variant) 35%, transparent);
+  color: var(--color-outline);
+  font-style: italic;
+  cursor: not-allowed;
+}
+
+.doctor-week-calendar__event.is-all-day-closed {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: color-mix(in srgb, var(--color-error-container) 55%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--color-error) 35%, transparent);
+  color: var(--color-on-error-container);
+  font-style: normal;
+  z-index: 1;
+}
+
+.doctor-week-calendar__event.is-all-day-closed .doctor-week-calendar__event-title {
+  white-space: normal;
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+.doctor-week-calendar__day-header.is-weekend .doctor-week-calendar__day-number {
+  opacity: 0.65;
+}
+
+.doctor-week-calendar__event-title {
+  width: 100%;
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doctor-week-calendar__event-sub {
+  font-family: var(--font-literata, "Literata", serif);
+  font-size: 0.625rem;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doctor-week-calendar__event-icon {
+  display: inline-flex;
+  opacity: 0.85;
+}
+
+.doctor-week-calendar__now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 2px;
+  background: color-mix(in srgb, var(--color-error) 35%, transparent);
+  pointer-events: none;
+}
+
+.doctor-week-calendar__now-dot {
+  position: absolute;
+  left: -5px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: var(--color-error);
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.doctor-week-calendar__loading {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.doctor-week-calendar__mobile-day-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent);
+  background: var(--color-surface-bright);
+}
+
+.doctor-week-calendar__mobile-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: 9999px;
+  color: var(--color-outline);
+  transition: color 0.15s ease;
+}
+
+.doctor-week-calendar__mobile-nav-btn:hover:not(:disabled) {
+  color: var(--color-primary);
+}
+
+.doctor-week-calendar__mobile-nav-btn:disabled {
+  opacity: 0.3;
+}
+
+.doctor-week-calendar__mobile-day-range {
+  font-family: var(--font-dm-sans, "DM Sans", sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+@media (max-width: 767px) {
+  .doctor-week-calendar {
+    min-height: 320px;
+  }
+
+  .doctor-week-calendar__time-label {
+    font-size: 0.625rem;
+    padding-top: 0.2rem;
+  }
+
+  .doctor-week-calendar__day-name {
+    font-size: 0.625rem;
+  }
+
+  .doctor-week-calendar__day-number {
+    font-size: 0.875rem;
+  }
+
+  .doctor-week-calendar__day-number.is-today-badge {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+  }
+
+  .doctor-week-calendar__event {
+    padding: 0.25rem 0.35rem;
+    border-radius: 0.4rem;
+    left: 2px;
+    right: 2px;
+  }
+
+  .doctor-week-calendar__event-title {
+    font-size: 0.625rem;
+  }
+
+  .doctor-week-calendar__event.is-appointment {
+    border-left-width: 3px;
+  }
+
+  .doctor-week-calendar__week-label {
+    min-width: auto;
+    font-size: 0.8125rem;
+  }
+
+  .doctor-week-calendar__toolbar {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}

@@ -7,7 +7,9 @@
  *   pnpm email:test you@example.com booked-patient      # one template
  *
  * Names: booked-patient, booked-doctor, cancelled-patient, cancelled-doctor,
- *        rescheduled-patient, rescheduled-doctor, welcome
+ *        rescheduled-patient, rescheduled-doctor, reminder-8am-patient,
+ *        reminder-8am-doctor, reminder-60min-patient, reminder-60min-doctor,
+ *        reminder-30min-patient, reminder-30min-doctor, welcome
  *
  * Exits non-zero if any send fails, so CI or a shell check can rely on it.
  */
@@ -24,6 +26,12 @@ import {
   renderAppointmentBookedPatientEmail,
   renderAppointmentCancelledDoctorEmail,
   renderAppointmentCancelledPatientEmail,
+  renderAppointmentReminder30MinDoctorEmail,
+  renderAppointmentReminder30MinPatientEmail,
+  renderAppointmentReminder60MinDoctorEmail,
+  renderAppointmentReminder60MinPatientEmail,
+  renderAppointmentReminder8amDoctorEmail,
+  renderAppointmentReminder8amPatientEmail,
   renderAppointmentRescheduledDoctorEmail,
   renderAppointmentRescheduledPatientEmail,
   renderWelcomeEmail,
@@ -58,11 +66,13 @@ function buildSampleContext(recipient: string): AppointmentNotificationContext {
         "Sample note — this is a test message, not a real booking.",
     },
     patient: {
+      userId: "00000000-0000-4000-8000-000000000001",
       firstName: "Priya",
       lastName: "Sharma",
       email: recipient,
     },
     doctor: {
+      userId: "00000000-0000-4000-8000-000000000002",
       firstName: "Ananya",
       lastName: "Patel",
       specialization: "General Physician",
@@ -84,6 +94,18 @@ const TEMPLATES = {
     renderAppointmentRescheduledPatientEmail(buildSampleContext(recipient)),
   "rescheduled-doctor": (recipient: string) =>
     renderAppointmentRescheduledDoctorEmail(buildSampleContext(recipient)),
+  "reminder-8am-patient": (recipient: string) =>
+    renderAppointmentReminder8amPatientEmail(buildSampleContext(recipient)),
+  "reminder-8am-doctor": (recipient: string) =>
+    renderAppointmentReminder8amDoctorEmail(buildSampleContext(recipient)),
+  "reminder-60min-patient": (recipient: string) =>
+    renderAppointmentReminder60MinPatientEmail(buildSampleContext(recipient)),
+  "reminder-60min-doctor": (recipient: string) =>
+    renderAppointmentReminder60MinDoctorEmail(buildSampleContext(recipient)),
+  "reminder-30min-patient": (recipient: string) =>
+    renderAppointmentReminder30MinPatientEmail(buildSampleContext(recipient)),
+  "reminder-30min-doctor": (recipient: string) =>
+    renderAppointmentReminder30MinDoctorEmail(buildSampleContext(recipient)),
   welcome: (recipient: string) =>
     renderWelcomeEmail({
       email: recipient,

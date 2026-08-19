@@ -81,20 +81,24 @@ export function formatHm(date: Date): string {
 
 /**
  * Build fixed-duration slots from working-hours bounds.
- * start inclusive, end exclusive (11:00–19:00 → last start 18:00).
+ * Session length is `slotDurationMinutes`; the gap between starts is
+ * `intervalMinutes` (duration + buffer). A slot is included only when the
+ * session itself still finishes by `endTime`.
  */
 export function buildSlotStarts(
   startTime: string,
   endTime: string,
   slotDurationMinutes: number,
+  intervalMinutes: number = slotDurationMinutes,
 ): string[] {
   const starts: string[] = [];
   let cursor = combineDateAndTime("2000-01-01", startTime);
   const end = combineDateAndTime("2000-01-01", endTime);
+  const step = Math.max(intervalMinutes, slotDurationMinutes);
 
   while (addMinutes(cursor, slotDurationMinutes) <= end) {
     starts.push(formatHm(cursor));
-    cursor = addMinutes(cursor, slotDurationMinutes);
+    cursor = addMinutes(cursor, step);
   }
 
   return starts;

@@ -3,13 +3,17 @@ import { AppError } from "@/lib/errors";
 
 import {
   addMinutes,
-  buildSlotStarts,
   combineDateAndTime,
-  dayOfWeekFromYmd,
   formatHm,
   formatYmd,
   type TimeSlot,
 } from "../lib/date-utils";
+import {
+  buildBookableSlotStarts,
+  overlapsInterval,
+  resolveDoctorScheduleForDate,
+  slotInstantRange,
+} from "@/features/schedule/lib/availability";
 
 export type { TimeSlot } from "../lib/date-utils";
 export {
@@ -27,23 +31,19 @@ export async function generateSlots(
   date: string,
   now: Date = new Date(),
 ): Promise<TimeSlot[]> {
-  const doctor = await prisma.doctor.findFirst({
-    where: { id: doctorId, isActive: true },
-    select: { id: true },
-  });
+  const schedule = await resolveDoctorScheduleForDate(doctorId, date);
 
-  if (!doctor) {
+  if (!schedule) {
     throw new AppError("Doctor not found", 404);
   }
 
-  const dayOfWeek = dayOfWeekFromYmd(date);
-  const hours = await prisma.workingHours.findUnique({
-    where: { dayOfWeek },
-  });
+  if (!schedule.acceptingNewPatients) {
+    throw new AppError("Doctor is not accepting new appointments", 400);
+  }
 
-  if (!hours || !hours.isActive) {
+  if (!schedule.dayAvailability) {
     throw new AppError(
-      "No working hours for this date (Sundays and inactive days are closed)",
+      "No working hours for this date (closed days and time off are unavailable)",
       400,
     );
   }
@@ -56,35 +56,54 @@ export async function generateSlots(
   const dayStart = combineDateAndTime(date, "00:00");
   const dayEnd = addMinutes(combineDateAndTime(date, "23:59"), 1);
 
-  const bookings = await prisma.appointment.findMany({
-    where: {
-      doctorId,
-      status: "CONFIRMED",
-      startsAt: { gte: dayStart, lt: dayEnd },
-    },
-    select: { startsAt: true },
-  });
+  const [bookings, blocks] = await Promise.all([
+    prisma.appointment.findMany({
+      where: {
+        doctorId,
+        status: "CONFIRMED",
+        startsAt: { gte: dayStart, lt: dayEnd },
+      },
+      select: { startsAt: true, endsAt: true },
+    }),
+    prisma.scheduleBlock.findMany({
+      where: {
+        doctorId,
+        startsAt: { lt: dayEnd },
+        endsAt: { gt: dayStart },
+      },
+      select: { startsAt: true, endsAt: true },
+    }),
+  ]);
 
-  const bookedStarts = new Set(bookings.map((b) => formatHm(b.startsAt)));
-  const starts = buildSlotStarts(
-    hours.startTime,
-    hours.endTime,
-    hours.slotDurationMinutes,
-  );
+  const { slotDurationMinutes, dayAvailability } = schedule;
+  const starts = buildBookableSlotStarts(date, dayAvailability);
 
   return starts.map((startTime) => {
-    const startsAt = combineDateAndTime(date, startTime);
-    const endsAt = addMinutes(startsAt, hours.slotDurationMinutes);
-    const endTime = formatHm(endsAt);
+    const { startsAt, endsAt } = slotInstantRange(
+      date,
+      startTime,
+      slotDurationMinutes,
+    );
+    const endHm = formatHm(endsAt);
 
-    if (bookedStarts.has(startTime)) {
-      return { startTime, endTime, status: "booked" as const };
+    const booked = bookings.some((b) =>
+      overlapsInterval(startsAt, endsAt, b.startsAt, b.endsAt),
+    );
+    if (booked) {
+      return { startTime, endTime: endHm, status: "booked" as const };
+    }
+
+    const blocked = blocks.some((b) =>
+      overlapsInterval(startsAt, endsAt, b.startsAt, b.endsAt),
+    );
+    if (blocked) {
+      return { startTime, endTime: endHm, status: "unavailable" as const };
     }
 
     if (startsAt.getTime() <= now.getTime()) {
-      return { startTime, endTime, status: "unavailable" as const };
+      return { startTime, endTime: endHm, status: "unavailable" as const };
     }
 
-    return { startTime, endTime, status: "available" as const };
+    return { startTime, endTime: endHm, status: "available" as const };
   });
 }

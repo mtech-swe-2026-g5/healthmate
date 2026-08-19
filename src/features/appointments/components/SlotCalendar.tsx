@@ -24,7 +24,6 @@ function mondayFirstIndex(day: Date): number {
 }
 
 function isSelectable(date: Date, today: Date): boolean {
-  if (date.getDay() === 0) return false;
   const ymd = formatYmd(date);
   const todayYmd = formatYmd(today);
   return ymd >= todayYmd;
@@ -123,15 +122,12 @@ export function SlotCalendar({
           const ymd = formatYmd(date);
           const selectable = isSelectable(date, today);
           const selected = selectedDate === ymd;
-          const isSunday = date.getDay() === 0;
 
           if (!selectable) {
             return (
               <div
                 key={key}
-                className={`rounded-xl py-4 text-center font-dm-sans text-label-md ${
-                  isSunday ? "cursor-not-allowed opacity-30" : "opacity-20"
-                }`}
+                className="rounded-xl py-4 text-center font-dm-sans text-label-md opacity-20"
               >
                 {date.getDate()}
               </div>

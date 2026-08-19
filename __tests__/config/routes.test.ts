@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   canRoleAccessPath,
   getRoleHome,
+  isAdminRoute,
   isAuthOnlyRoute,
   isDoctorRoute,
   isPatientRoute,
@@ -17,9 +18,9 @@ describe("getRoleHome", () => {
     expect(getRoleHome("patient")).toBe("/dashboard");
   });
 
-  it("sends doctors and admins to the doctor portal", () => {
+  it("sends doctors and admins to their own portals", () => {
     expect(getRoleHome("doctor")).toBe("/doctor");
-    expect(getRoleHome("admin")).toBe("/doctor");
+    expect(getRoleHome("admin")).toBe("/admin");
   });
 
   it("falls back to the patient home for unknown roles", () => {
@@ -55,6 +56,13 @@ describe("route matchers", () => {
     expect(isDoctorRoute("/dashboard")).toBe(false);
     expect(matchRouteAccess("/doctor/schedule")).toBe("doctor");
   });
+
+  it("classifies admin portal routes", () => {
+    expect(isAdminRoute("/admin")).toBe(true);
+    expect(isAdminRoute("/admin/analytics")).toBe(true);
+    expect(isAdminRoute("/doctor")).toBe(false);
+    expect(matchRouteAccess("/admin/analytics")).toBe("admin");
+  });
 });
 
 describe("canRoleAccessPath", () => {
@@ -62,12 +70,21 @@ describe("canRoleAccessPath", () => {
     expect(canRoleAccessPath("patient", "/dashboard")).toBe(true);
     expect(canRoleAccessPath("patient", "/appointments")).toBe(true);
     expect(canRoleAccessPath("patient", "/doctor")).toBe(false);
+    expect(canRoleAccessPath("patient", "/admin")).toBe(false);
   });
 
-  it("allows doctors and admins on doctor routes only", () => {
+  it("allows doctors on doctor routes only", () => {
     expect(canRoleAccessPath("doctor", "/doctor")).toBe(true);
-    expect(canRoleAccessPath("admin", "/doctor/patients")).toBe(true);
+    expect(canRoleAccessPath("doctor", "/doctor/patients")).toBe(true);
+    expect(canRoleAccessPath("doctor", "/admin")).toBe(false);
     expect(canRoleAccessPath("doctor", "/appointments")).toBe(false);
+  });
+
+  it("allows admins on admin routes only", () => {
+    expect(canRoleAccessPath("admin", "/admin")).toBe(true);
+    expect(canRoleAccessPath("admin", "/admin/analytics")).toBe(true);
+    expect(canRoleAccessPath("admin", "/doctor")).toBe(false);
+    expect(canRoleAccessPath("admin", "/dashboard")).toBe(false);
   });
 
   it("allows anyone on public routes", () => {
@@ -94,11 +111,16 @@ describe("resolvePostLoginRedirect", () => {
     expect(resolvePostLoginRedirect("doctor", "/doctor/schedule")).toBe(
       "/doctor/schedule",
     );
+    expect(resolvePostLoginRedirect("admin", "/admin/analytics")).toBe(
+      "/admin/analytics",
+    );
   });
 
   it("rejects callbacks the role cannot access", () => {
     expect(resolvePostLoginRedirect("doctor", "/appointments")).toBe("/doctor");
     expect(resolvePostLoginRedirect("patient", "/doctor")).toBe("/dashboard");
+    expect(resolvePostLoginRedirect("admin", "/doctor")).toBe("/admin");
+    expect(resolvePostLoginRedirect("doctor", "/admin")).toBe("/doctor");
   });
 
   it("rejects absolute and protocol-relative callbacks", () => {
@@ -113,5 +135,6 @@ describe("resolvePostLoginRedirect", () => {
   it("falls back to role home when callback is missing", () => {
     expect(resolvePostLoginRedirect("patient")).toBe("/dashboard");
     expect(resolvePostLoginRedirect("doctor", null)).toBe("/doctor");
+    expect(resolvePostLoginRedirect("admin", null)).toBe("/admin");
   });
 });

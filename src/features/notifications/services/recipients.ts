@@ -24,6 +24,7 @@ export async function getAppointmentNotificationContext(
       additionalNotes: true,
       patient: {
         select: {
+          userId: true,
           firstName: true,
           lastName: true,
           user: { select: { email: true } },
@@ -31,6 +32,7 @@ export async function getAppointmentNotificationContext(
       },
       doctor: {
         select: {
+          userId: true,
           firstName: true,
           lastName: true,
           specialization: true,
@@ -56,11 +58,13 @@ export async function getAppointmentNotificationContext(
       additionalNotes: appointment.additionalNotes,
     },
     patient: {
+      userId: appointment.patient.userId,
       firstName: appointment.patient.firstName,
       lastName: appointment.patient.lastName,
       email: patientEmail,
     },
     doctor: {
+      userId: appointment.doctor.userId,
       firstName: appointment.doctor.firstName,
       lastName: appointment.doctor.lastName,
       specialization: appointment.doctor.specialization,

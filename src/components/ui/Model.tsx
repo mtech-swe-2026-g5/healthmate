@@ -50,7 +50,7 @@ export default function Model({
           className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         ></div>
 
-        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6 z-10 transform transition-all">
+        <div className="relative bg-white rounded-xl shadow-xl w-[calc(100%-2rem)] sm:max-w-md p-6 z-10 transform transition-all">
           <div className="flex items-center justify-between border-b border-gray-200 pb-3">
             <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
 

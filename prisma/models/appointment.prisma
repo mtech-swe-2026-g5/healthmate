@@ -16,6 +16,25 @@ enum AppointmentHistoryEvent {
   @@map("appointment_history_event")
 }
 
+enum AppointmentNotificationType {
+  ACTION_BOOKED
+  ACTION_CANCELLED
+  ACTION_RESCHEDULED
+  REMINDER_8AM
+  REMINDER_60MIN
+  REMINDER_30MIN
+
+  @@map("appointment_notification_type")
+}
+
+enum AppointmentNotificationStatus {
+  PENDING
+  SUCCESS
+  FAILED
+
+  @@map("appointment_notification_status")
+}
+
 enum PaymentStatus {
   CREATED
   CAPTURED
@@ -62,6 +81,7 @@ model Appointment {
   doctor  Doctor               @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   payment Payment?
   history AppointmentHistory[]
+  notifications AppointmentNotificationLog[]
 
   // Double-booking is prevented by the PARTIAL unique index
   // `appointments_doctor_id_starts_at_confirmed_key` (`WHERE status = 'CONFIRMED'`),
@@ -99,6 +119,27 @@ model AppointmentHistory {
   @@map("appointment_history")
 }
 
+model AppointmentNotificationLog {
+  id               String                        @id @default(uuid()) @db.Uuid
+  appointmentId    String                        @map("appointment_id") @db.Uuid
+  recipientUserId  String                        @map("recipient_user_id") @db.Uuid
+  notificationType AppointmentNotificationType   @map("notification_type")
+  dedupeKey        String                        @map("dedupe_key") @db.VarChar(120)
+  status           AppointmentNotificationStatus @default(PENDING)
+  errorMessage     String?                       @map("error_message") @db.VarChar(500)
+  sentAt           DateTime?                     @map("sent_at") @db.Timestamptz()
+  createdAt        DateTime                      @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime                      @updatedAt @map("updated_at") @db.Timestamptz()
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  recipient   User        @relation(fields: [recipientUserId], references: [id], onDelete: Cascade)
+
+  @@unique([appointmentId, recipientUserId, notificationType, dedupeKey], name: "appointment_notification_once")
+  @@index([notificationType, status, createdAt])
+  @@index([recipientUserId, createdAt])
+  @@map("appointment_notification_logs")
+}
+
 // ============================================
 // Payments (Razorpay) — booking draft until CAPTURED
 // ============================================
@@ -128,6 +169,32 @@ model Payment {
   @@map("payments")
 }
 
+enum ScheduleBlockType {
+  TIME_OFF
+  BREAK
+
+  @@map("schedule_block_type")
+}
+
+// ============================================
+// Doctor schedule blocks (time off, breaks, holidays)
+// ============================================
+
+model ScheduleBlock {
+  id        String            @id @default(uuid()) @db.Uuid
+  doctorId  String            @map("doctor_id") @db.Uuid
+  startsAt  DateTime          @map("starts_at") @db.Timestamptz()
+  endsAt    DateTime          @map("ends_at") @db.Timestamptz()
+  reason    String?           @db.VarChar(120)
+  blockType ScheduleBlockType @default(TIME_OFF) @map("block_type")
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz()
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId, startsAt, endsAt])
+  @@map("schedule_blocks")
+}
+
 // ============================================
 // Per-doctor slot configurations (doctor dashboard)
 // ============================================
@@ -139,6 +206,8 @@ model SlotConfiguration {
   dayOfWeek  Int       @map("day_of_week")
   startTime  DateTime  @map("start_time") @db.Time(0)
   endTime    DateTime  @map("end_time") @db.Time(0)
+  // Optional label for breaks or named sessions shown on the doctor calendar
+  label      String?   @db.VarChar(80)
   // IANA timezone identifier (e.g. "Asia/Kolkata") that startTime/endTime are
   // wall-clock times in. Required for accurate timezone conversion.
   timezone   String    @default("Asia/Kolkata") @map("timezone")

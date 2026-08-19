@@ -15,6 +15,8 @@ import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker/locale/en";
 import { DateTime } from "luxon";
 
+import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
+
 const errorDoctor = faker.string.uuid();
 
 vi.mock("@/lib/prisma", () => {
@@ -77,9 +79,11 @@ describe("getAppointmentsByDoctor", () => {
           status: "CONFIRMED",
           startsAt: {
             gte: DateTime.fromJSDate(validRequest.startDate)
+              .setZone(CLINIC_TIMEZONE)
               .startOf("day")
               .toJSDate(),
-            lt: DateTime.fromJSDate(validRequest.endDate)
+            lte: DateTime.fromJSDate(validRequest.endDate)
+              .setZone(CLINIC_TIMEZONE)
               .endOf("day")
               .toJSDate(),
           },
@@ -139,10 +143,10 @@ describe("getAppointmentsByDoctor", () => {
         "/api/doctor/appointments",
       );
       expect(result?._metadata.links.self).toContain(
-        `startDate=${DateTime.fromJSDate(validRequest.startDate).startOf("day").toJSDate().toISOString()}`,
+        `startDate=${DateTime.fromJSDate(validRequest.startDate).setZone(CLINIC_TIMEZONE).startOf("day").toJSDate().toISOString()}`,
       );
       expect(result?._metadata.links.self).toContain(
-        `endDate=${DateTime.fromJSDate(validRequest.endDate).endOf("day").toJSDate().toISOString()}`,
+        `endDate=${DateTime.fromJSDate(validRequest.endDate).setZone(CLINIC_TIMEZONE).endOf("day").toJSDate().toISOString()}`,
       );
     });
 

@@ -1,17 +1,17 @@
-import { useCallback, useState } from "react";
-import { DateTime } from "luxon";
+"use client";
+
+import { useCallback, useMemo, useState } from "react";
 import useAppointments from "@/features/doctor/appointments/hooks/use-appointments";
 import useSlotConfigurations from "@/features/doctor/appointments/hooks/use-slot-configurations";
+import { initialDoctorWeekRange } from "@/features/doctor/appointments/lib/dashboard-stats";
+import { DoctorWeekCalendar } from "@/features/doctor/calendar/components/DoctorWeekCalendar";
 import {
-  Appointment,
-  Patient,
-} from "@/features/doctor/appointments/types/response";
-import AppCalendar, {
-  AppCalendarEvent,
-  AppCalendarSlotConfiguration,
-} from "@/components/ui/AppCalendar";
+  mapAppointmentsToCalendarEvents,
+  mapSlotConfigurations,
+} from "@/features/doctor/calendar/lib/map-calendar-data";
+import type { DoctorCalendarEvent } from "@/features/doctor/calendar/types";
 import AppointmentModel from "@/features/doctor/appointments/components/AppointmentModel";
-import { SlotConfigurationModel } from "@/lib/prisma";
+import { Appointment, Patient } from "@/features/doctor/appointments/types/response";
 
 export interface PatientAppointmentsProps {
   doctorId: string;
@@ -20,53 +20,22 @@ export interface PatientAppointmentsProps {
 export default function PatientAppointments({
   doctorId,
 }: PatientAppointmentsProps) {
-  const [isModelOpen, setModelOpen] = useState(false);
-  const [startDate, setStartDate] = useState<Date>(
-    DateTime.now().startOf("week").toJSDate(),
-  );
-  const [endDate, setEndDate] = useState<Date>(
-    DateTime.now().endOf("week").toJSDate(),
-  );
+  const initialWeek = useMemo(() => initialDoctorWeekRange(), []);
+  const [startDate, setStartDate] = useState(initialWeek.start);
+  const [endDate, setEndDate] = useState(initialWeek.end);
   const query = useAppointments(doctorId, startDate, endDate);
   const slotQuery = useSlotConfigurations(doctorId, startDate, endDate);
   const [patientDetails, setPatientDetails] = useState<Patient | null>(null);
+  const [isModelOpen, setModelOpen] = useState(false);
 
-  const onRangeChange = useCallback((startDate: Date, endDate: Date) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
+  const onWeekChange = useCallback((nextStart: Date, nextEnd: Date) => {
+    setStartDate(nextStart);
+    setEndDate(nextEnd);
   }, []);
 
-  const toAppointmentEvents = useCallback(
-    (appointments: Appointment[] | undefined) =>
-      appointments?.map((appointment: Appointment): AppCalendarEvent => ({
-        id: appointment.id,
-        title: `${appointment.patient.firstName} ${appointment.patient.lastName}`,
-        start: new Date(appointment.start),
-        end: new Date(appointment.end),
-      })),
-    [],
-  );
-
-  const toSlotConfigurations = useCallback(
-    (
-      slots: Partial<SlotConfigurationModel>[] | undefined,
-    ): AppCalendarSlotConfiguration[] | undefined =>
-      slots?.map((slot): AppCalendarSlotConfiguration => ({
-        dayOfWeek: slot.dayOfWeek as number,
-        startTime: new Date(slot.startTime as Date),
-        endTime: new Date(slot.endTime as Date),
-        timezone: slot.timezone as string,
-        validFrom: slot.validFrom ? new Date(slot.validFrom) : undefined,
-        validUntil: slot.validUntil ? new Date(slot.validUntil) : null,
-      })),
-    [],
-  );
-
-  const onAppointmentClick = useCallback(
-    (event: AppCalendarEvent) => {
-      const appointment = query.data?.find(
-        (a: Appointment) => a.id === event.id,
-      );
+  const onEventSelect = useCallback(
+    (event: DoctorCalendarEvent) => {
+      const appointment = query.data?.find((a: Appointment) => a.id === event.id);
       if (appointment) {
         setPatientDetails(appointment.patient);
         setModelOpen(true);
@@ -82,13 +51,14 @@ export default function PatientAppointments({
 
   return (
     <>
-      <AppCalendar
-        className="h-[600]"
+      <DoctorWeekCalendar
+        weekStart={startDate}
+        events={mapAppointmentsToCalendarEvents(query.data)}
+        slotConfigurations={mapSlotConfigurations(slotQuery.data)}
         isLoading={!query.isFetched || !slotQuery.isFetched}
-        events={toAppointmentEvents(query.data)}
-        slotConfigurations={toSlotConfigurations(slotQuery.data)}
-        onRangeChange={onRangeChange}
-        onEventSelect={onAppointmentClick}
+        onEventSelect={onEventSelect}
+        onWeekChange={onWeekChange}
+        showNavigation
       />
       <AppointmentModel
         patient={patientDetails}

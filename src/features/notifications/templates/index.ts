@@ -4,6 +4,16 @@ import { renderAppointmentCancelledDoctorEmail } from "./appointment-cancelled-d
 import { renderAppointmentCancelledPatientEmail } from "./appointment-cancelled-patient";
 import { renderAppointmentRescheduledDoctorEmail } from "./appointment-rescheduled-doctor";
 import { renderAppointmentRescheduledPatientEmail } from "./appointment-rescheduled-patient";
+import {
+  renderAppointmentReminder30MinDoctorEmail,
+  renderAppointmentReminder60MinDoctorEmail,
+  renderAppointmentReminder8amDoctorEmail,
+} from "./appointment-reminder-doctor";
+import {
+  renderAppointmentReminder30MinPatientEmail,
+  renderAppointmentReminder60MinPatientEmail,
+  renderAppointmentReminder8amPatientEmail,
+} from "./appointment-reminder-patient";
 import { renderWelcomeEmail } from "./account-welcome";
 import type {
   AppointmentEmailTemplateSet,
@@ -34,6 +44,18 @@ const APPOINTMENT_EMAIL_TEMPLATES: Record<
     patient: renderAppointmentRescheduledPatientEmail,
     doctor: renderAppointmentRescheduledDoctorEmail,
   },
+  "appointment.reminder.8am": {
+    patient: renderAppointmentReminder8amPatientEmail,
+    doctor: renderAppointmentReminder8amDoctorEmail,
+  },
+  "appointment.reminder.60min": {
+    patient: renderAppointmentReminder60MinPatientEmail,
+    doctor: renderAppointmentReminder60MinDoctorEmail,
+  },
+  "appointment.reminder.30min": {
+    patient: renderAppointmentReminder30MinPatientEmail,
+    doctor: renderAppointmentReminder30MinDoctorEmail,
+  },
 };
 
 export function getAppointmentEmailTemplates(
@@ -49,5 +71,11 @@ export {
   renderAppointmentCancelledPatientEmail,
   renderAppointmentRescheduledDoctorEmail,
   renderAppointmentRescheduledPatientEmail,
+  renderAppointmentReminder8amDoctorEmail,
+  renderAppointmentReminder8amPatientEmail,
+  renderAppointmentReminder60MinDoctorEmail,
+  renderAppointmentReminder60MinPatientEmail,
+  renderAppointmentReminder30MinDoctorEmail,
+  renderAppointmentReminder30MinPatientEmail,
   renderWelcomeEmail,
 };

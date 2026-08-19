@@ -9,6 +9,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { DateTime } from "luxon";
+import { shiftCalendarWeek } from "@/lib/calendar-week";
 
 type AppointmentEntity = Prisma.AppointmentGetPayload<{
   include: {
@@ -36,7 +37,7 @@ async function getAppointmentsFor(
       status: "CONFIRMED",
       startsAt: {
         gte: validatedRequest.startDate,
-        lt: validatedRequest.endDate,
+        lte: validatedRequest.endDate,
       },
     },
     include: {
@@ -76,8 +77,8 @@ function toHateosResponse(
   mappedAppointments: Appointment[],
 ): AppointmentsResponse {
   const currentWeek = DateTime.fromJSDate(validatedRequest.startDate);
-  const prevWeek = currentWeek.minus({ week: 1 });
-  const nextWeek = currentWeek.plus({ week: 1 });
+  const prevWeek = shiftCalendarWeek(currentWeek, -1);
+  const nextWeek = shiftCalendarWeek(currentWeek, 1);
 
   const baseUrl = `/api/doctor/appointments`;
 
@@ -85,8 +86,8 @@ function toHateosResponse(
     _metadata: {
       links: {
         self: `${baseUrl}?startDate=${validatedRequest.startDate.toISOString()}&endDate=${validatedRequest.endDate.toISOString()}`,
-        prevWeek: `${baseUrl}?startDate=${prevWeek.startOf("week").toJSDate().toISOString()}&endDate=${prevWeek.endOf("week").toJSDate().toISOString()}`,
-        nextWeek: `${baseUrl}?startDate=${nextWeek.startOf("week").toJSDate().toISOString()}&endDate=${nextWeek.endOf("week").toJSDate().toISOString()}`,
+        prevWeek: `${baseUrl}?startDate=${prevWeek.start.toISOString()}&endDate=${prevWeek.end.toISOString()}`,
+        nextWeek: `${baseUrl}?startDate=${nextWeek.start.toISOString()}&endDate=${nextWeek.end.toISOString()}`,
       },
     },
     appointments: mappedAppointments,

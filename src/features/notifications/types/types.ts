@@ -20,7 +20,12 @@ export type WelcomeEmailInput = {
  * `createAppointment`, the other two from the appointment transition services.
  */
 export type AppointmentNotificationEvent =
-  "appointment.booked" | "appointment.cancelled" | "appointment.rescheduled";
+  | "appointment.booked"
+  | "appointment.cancelled"
+  | "appointment.rescheduled"
+  | "appointment.reminder.8am"
+  | "appointment.reminder.60min"
+  | "appointment.reminder.30min";
 
 /**
  * Event facts the appointment row cannot supply after the transition.
@@ -47,11 +52,13 @@ export type AppointmentNotificationContext = {
     additionalNotes: string | null;
   };
   patient: {
+    userId: string;
     firstName: string;
     lastName: string;
     email: string;
   };
   doctor: {
+    userId: string;
     firstName: string;
     lastName: string;
     specialization: string;

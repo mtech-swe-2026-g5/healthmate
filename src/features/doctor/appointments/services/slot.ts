@@ -4,7 +4,7 @@ import {
 } from "@/features/doctor/appointments/types/request";
 import { AppointmentSlotsResponse } from "@/features/doctor/appointments/types/response";
 import { prisma, SlotConfigurationModel } from "@/lib/prisma";
-import { DateTime } from "luxon";
+import { shiftCalendarWeek } from "@/lib/calendar-week";
 
 export async function getSlotConfigurationByDoctor(
   request: GetAppointmentSlotRequest,
@@ -60,11 +60,8 @@ function toHateosResponse(
   validatedRequest: GetAppointmentSlotRequest,
   slotConfiguration: SlotConfigurationModel[],
 ): AppointmentSlotsResponse {
-  const currentWeek = DateTime.fromJSDate(validatedRequest.dateFrom).startOf(
-    "week",
-  );
-  const prevWeek = currentWeek.minus({ week: 1 });
-  const nextWeek = currentWeek.plus({ week: 1 });
+  const prevWeek = shiftCalendarWeek(validatedRequest.dateFrom, -1);
+  const nextWeek = shiftCalendarWeek(validatedRequest.dateFrom, 1);
 
   const baseUrl = `/api/doctor/appointments/slots`;
 
@@ -72,8 +69,8 @@ function toHateosResponse(
     _metadata: {
       links: {
         self: `${baseUrl}?doctorId=${validatedRequest.doctorId}&dateFrom=${validatedRequest.dateFrom.toISOString()}&dateUntil=${validatedRequest.dateUntil.toISOString()}`,
-        prevWeek: `${baseUrl}?doctorId=${validatedRequest.doctorId}&dateFrom=${prevWeek.startOf("week").toJSDate().toISOString()}&dateUntil=${prevWeek.endOf("week").toJSDate().toISOString()}`,
-        nextWeek: `${baseUrl}?doctorId=${validatedRequest.doctorId}&dateFrom=${nextWeek.startOf("week").toJSDate().toISOString()}&dateUntil=${nextWeek.endOf("week").toJSDate().toISOString()}`,
+        prevWeek: `${baseUrl}?doctorId=${validatedRequest.doctorId}&dateFrom=${prevWeek.start.toISOString()}&dateUntil=${prevWeek.end.toISOString()}`,
+        nextWeek: `${baseUrl}?doctorId=${validatedRequest.doctorId}&dateFrom=${nextWeek.start.toISOString()}&dateUntil=${nextWeek.end.toISOString()}`,
       },
     },
     slots: slotConfiguration,

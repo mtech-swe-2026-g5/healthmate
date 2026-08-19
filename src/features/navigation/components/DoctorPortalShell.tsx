@@ -111,7 +111,7 @@ export function DoctorPortalShell({
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col md:ml-64">
         <header className="sticky top-0 z-10 flex h-16 items-center border-b border-[var(--color-outline-variant)]/30 bg-[var(--color-surface)]/80 px-4 backdrop-blur-md md:px-8">
-          <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
+          <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between">
             <PendingLink
               href="/"
               className="font-dm-sans text-headline-md font-bold text-[var(--color-primary)] md:hidden"
@@ -166,7 +166,7 @@ export function DoctorPortalShell({
           </div>
         </header>
 
-        <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-[var(--spacing-hm-lg)] p-4 md:p-8">
+        <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-[var(--spacing-hm-lg)] p-4 md:p-8">
           {children}
         </div>
 

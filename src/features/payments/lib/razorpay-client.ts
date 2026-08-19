@@ -2,39 +2,67 @@ import Razorpay from "razorpay";
 
 import { AppError } from "@/lib/errors";
 
-export function getRazorpayClient(): Razorpay {
-  const key_id =
-    process.env.RAZORPAY_KEY_ID ?? process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+/** Trim pasted values — Vercel dashboard pastes sometimes include trailing newlines. */
+function env(name: string): string | undefined {
+  const value = process.env[name]?.trim();
+  return value ? value : undefined;
+}
 
-  if (!key_id || !key_secret) {
-    throw new AppError("Razorpay keys are not configured", 503);
+export function getRazorpayClient(): Razorpay {
+  const key_id = env("RAZORPAY_KEY_ID") ?? env("NEXT_PUBLIC_RAZORPAY_KEY_ID");
+  const key_secret = env("RAZORPAY_KEY_SECRET");
+
+  if (!key_id && !key_secret) {
+    throw new AppError(
+      "Razorpay keys are not configured (set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET)",
+      503,
+    );
+  }
+  if (!key_id) {
+    throw new AppError(
+      "Razorpay key id is not configured (set RAZORPAY_KEY_ID or NEXT_PUBLIC_RAZORPAY_KEY_ID)",
+      503,
+    );
+  }
+  if (!key_secret) {
+    throw new AppError(
+      "Razorpay key secret is not configured (set RAZORPAY_KEY_SECRET)",
+      503,
+    );
   }
 
   return new Razorpay({ key_id, key_secret });
 }
 
 export function getRazorpayKeyId(): string {
-  const keyId =
-    process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? process.env.RAZORPAY_KEY_ID;
+  const keyId = env("NEXT_PUBLIC_RAZORPAY_KEY_ID") ?? env("RAZORPAY_KEY_ID");
   if (!keyId) {
-    throw new AppError("Razorpay key id is not configured", 503);
+    throw new AppError(
+      "Razorpay key id is not configured (set NEXT_PUBLIC_RAZORPAY_KEY_ID or RAZORPAY_KEY_ID)",
+      503,
+    );
   }
   return keyId;
 }
 
 export function getRazorpayKeySecret(): string {
-  const secret = process.env.RAZORPAY_KEY_SECRET;
+  const secret = env("RAZORPAY_KEY_SECRET");
   if (!secret) {
-    throw new AppError("Razorpay key secret is not configured", 503);
+    throw new AppError(
+      "Razorpay key secret is not configured (set RAZORPAY_KEY_SECRET)",
+      503,
+    );
   }
   return secret;
 }
 
 export function getRazorpayWebhookSecret(): string {
-  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  const secret = env("RAZORPAY_WEBHOOK_SECRET");
   if (!secret) {
-    throw new AppError("Razorpay webhook secret is not configured", 503);
+    throw new AppError(
+      "Razorpay webhook secret is not configured (set RAZORPAY_WEBHOOK_SECRET)",
+      503,
+    );
   }
   return secret;
 }
