@@ -230,13 +230,19 @@ export function AdminAnalyticsView() {
                     />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: "var(--color-on-surface-variant)", fontSize: 12 }}
+                      tick={{
+                        fill: "var(--color-on-surface-variant)",
+                        fontSize: 12,
+                      }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       allowDecimals={false}
-                      tick={{ fill: "var(--color-on-surface-variant)", fontSize: 12 }}
+                      tick={{
+                        fill: "var(--color-on-surface-variant)",
+                        fontSize: 12,
+                      }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -280,7 +286,17 @@ export function AdminAnalyticsView() {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={pieData.length ? pieData : [{ name: "No data", value: 1, fill: "var(--color-surface-container-highest)" }]}
+                      data={
+                        pieData.length
+                          ? pieData
+                          : [
+                              {
+                                name: "No data",
+                                value: 1,
+                                fill: "var(--color-surface-container-highest)",
+                              },
+                            ]
+                      }
                       dataKey="value"
                       nameKey="name"
                       innerRadius={60}

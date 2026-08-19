@@ -47,7 +47,10 @@ function buildDailyBuckets(weekStart: DateTime): PeriodBucket[] {
   });
 }
 
-function buildWeeklyBuckets(rangeStart: DateTime, rangeEnd: DateTime): PeriodBucket[] {
+function buildWeeklyBuckets(
+  rangeStart: DateTime,
+  rangeEnd: DateTime,
+): PeriodBucket[] {
   const buckets: PeriodBucket[] = [];
   let cursor = rangeStart.startOf("week");
   while (cursor < rangeEnd) {
@@ -64,7 +67,10 @@ function buildWeeklyBuckets(rangeStart: DateTime, rangeEnd: DateTime): PeriodBuc
   return buckets;
 }
 
-function buildMonthlyBuckets(rangeStart: DateTime, rangeEnd: DateTime): PeriodBucket[] {
+function buildMonthlyBuckets(
+  rangeStart: DateTime,
+  rangeEnd: DateTime,
+): PeriodBucket[] {
   const buckets: PeriodBucket[] = [];
   let cursor = rangeStart.startOf("month");
   while (cursor < rangeEnd) {

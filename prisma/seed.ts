@@ -294,7 +294,10 @@ async function seedHistoricalAppointments() {
     for (let slotIndex = 0; slotIndex < slots.length; slotIndex += 1) {
       const hour = slots[slotIndex]!;
       const startsAt = day.set({ hour, minute: 0 }).toUTC().toJSDate();
-      const endsAt = day.set({ hour: hour + 1, minute: 0 }).toUTC().toJSDate();
+      const endsAt = day
+        .set({ hour: hour + 1, minute: 0 })
+        .toUTC()
+        .toJSDate();
       const sequence = dayOffset + 28 + slotIndex;
       const status: "CONFIRMED" | "CANCELLED" =
         sequence % 7 === 0 ? "CANCELLED" : "CONFIRMED";

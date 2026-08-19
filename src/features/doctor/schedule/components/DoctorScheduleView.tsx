@@ -2,11 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { DateTime } from "luxon";
-import {
-  MdChevronLeft,
-  MdChevronRight,
-  MdLock,
-} from "react-icons/md";
+import { MdChevronLeft, MdChevronRight, MdLock } from "react-icons/md";
 
 import { Toast } from "@/components/ui/Toast";
 import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
@@ -136,8 +132,8 @@ export function DoctorScheduleView({ doctorId }: DoctorScheduleViewProps) {
     reason: string;
   }) => {
     const result = await createBlock.mutateAsync(input);
-    const cancelled = (result as { cancelledAppointments?: number })
-      .cancelledAppointments ?? 0;
+    const cancelled =
+      (result as { cancelledAppointments?: number }).cancelledAppointments ?? 0;
     const suffix =
       cancelled > 0
         ? ` ${cancelled} appointment${cancelled > 1 ? "s" : ""} auto-cancelled and patients notified.`
@@ -179,13 +175,18 @@ export function DoctorScheduleView({ doctorId }: DoctorScheduleViewProps) {
         <AvailabilitySettingsPanel
           schedule={scheduleQuery.data}
           isSaving={updateSchedule.isPending}
-          deletingBlockId={deleteBlock.isPending ? (deleteBlock.variables as string) : null}
+          deletingBlockId={
+            deleteBlock.isPending ? (deleteBlock.variables as string) : null
+          }
           onSave={handleSaveSettings}
           onAddBlock={handleAddBlock}
           onDeleteBlock={handleDeleteBlock}
         />
 
-        <section className="flex min-w-0 flex-col" aria-labelledby="week-calendar-heading">
+        <section
+          className="flex min-w-0 flex-col"
+          aria-labelledby="week-calendar-heading"
+        >
           <header className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-4">
               <h2

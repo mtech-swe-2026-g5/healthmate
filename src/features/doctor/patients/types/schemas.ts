@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-export const PATIENT_ROSTER_STATUS = ["all", "active", "inactive", "new"] as const;
+export const PATIENT_ROSTER_STATUS = [
+  "all",
+  "active",
+  "inactive",
+  "new",
+] as const;
 
 export type PatientRosterStatusFilter = (typeof PATIENT_ROSTER_STATUS)[number];
 
@@ -11,4 +16,6 @@ export const listDoctorPatientsQuerySchema = z.object({
   status: z.enum(PATIENT_ROSTER_STATUS).optional().default("all"),
 });
 
-export type ListDoctorPatientsQuery = z.infer<typeof listDoctorPatientsQuerySchema>;
+export type ListDoctorPatientsQuery = z.infer<
+  typeof listDoctorPatientsQuerySchema
+>;

@@ -1,10 +1,7 @@
 import type { AppointmentGranularity } from "./schemas";
 
 export type AppointmentMetricKey =
-  | "scheduled"
-  | "completed"
-  | "cancelled"
-  | "noShow";
+  "scheduled" | "completed" | "cancelled" | "noShow";
 
 export type AppointmentsSummaryTotals = {
   total: number;

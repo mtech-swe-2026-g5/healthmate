@@ -11,7 +11,10 @@ import {
 } from "@/features/doctor/calendar/lib/map-calendar-data";
 import type { DoctorCalendarEvent } from "@/features/doctor/calendar/types";
 import AppointmentModel from "@/features/doctor/appointments/components/AppointmentModel";
-import { Appointment, Patient } from "@/features/doctor/appointments/types/response";
+import {
+  Appointment,
+  Patient,
+} from "@/features/doctor/appointments/types/response";
 
 export interface PatientAppointmentsProps {
   doctorId: string;
@@ -35,7 +38,9 @@ export default function PatientAppointments({
 
   const onEventSelect = useCallback(
     (event: DoctorCalendarEvent) => {
-      const appointment = query.data?.find((a: Appointment) => a.id === event.id);
+      const appointment = query.data?.find(
+        (a: Appointment) => a.id === event.id,
+      );
       if (appointment) {
         setPatientDetails(appointment.patient);
         setModelOpen(true);

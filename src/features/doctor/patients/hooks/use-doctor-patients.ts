@@ -26,7 +26,9 @@ async function fetchDoctorPatients(
     searchParams.set("q", trimmed);
   }
 
-  const response = await fetch(`/api/doctor/patients?${searchParams.toString()}`);
+  const response = await fetch(
+    `/api/doctor/patients?${searchParams.toString()}`,
+  );
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as {
       error?: string;

@@ -6,12 +6,7 @@
 export type AppRole = "patient" | "doctor" | "admin";
 
 export type RouteAccess =
-  | "public"
-  | "authOnly"
-  | "patient"
-  | "doctor"
-  | "admin"
-  | "authenticated";
+  "public" | "authOnly" | "patient" | "doctor" | "admin" | "authenticated";
 
 export const roleHomes = {
   patient: "/dashboard",

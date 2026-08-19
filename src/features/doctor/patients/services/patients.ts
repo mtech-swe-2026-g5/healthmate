@@ -63,10 +63,7 @@ function buildStatusSql(status: ListDoctorPatientsQuery["status"]): Prisma.Sql {
   return Prisma.sql`patient_status = ${status}`;
 }
 
-function rankedPatientsCte(
-  doctorId: string,
-  search: string,
-): Prisma.Sql {
+function rankedPatientsCte(doctorId: string, search: string): Prisma.Sql {
   return Prisma.sql`
     WITH stats AS (
       SELECT
@@ -221,7 +218,9 @@ function mapVisit(
   },
   now: Date,
 ): DoctorPatientVisit {
-  const start = DateTime.fromJSDate(appointment.startsAt).setZone(CLINIC_TIMEZONE);
+  const start = DateTime.fromJSDate(appointment.startsAt).setZone(
+    CLINIC_TIMEZONE,
+  );
   return {
     id: appointment.id,
     bookingReference: appointment.bookingReference,

@@ -5,7 +5,9 @@ import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
 
 function clinicDayBoundary(date: Date, boundary: "start" | "end"): Date {
   const zoned = DateTime.fromJSDate(date).setZone(CLINIC_TIMEZONE);
-  return (boundary === "start" ? zoned.startOf("day") : zoned.endOf("day")).toJSDate();
+  return (
+    boundary === "start" ? zoned.startOf("day") : zoned.endOf("day")
+  ).toJSDate();
 }
 
 /**

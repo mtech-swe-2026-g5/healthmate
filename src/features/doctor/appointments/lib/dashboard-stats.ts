@@ -100,9 +100,7 @@ export function buildUpcomingWeekList(
   const list = appointments ?? [];
   return list
     .filter((a) => clinicDateTime(a.start) > now)
-    .sort(
-      (a, b) => asInstant(a.start).getTime() - asInstant(b.start).getTime(),
-    )
+    .sort((a, b) => asInstant(a.start).getTime() - asInstant(b.start).getTime())
     .slice(0, 5)
     .map((a) => {
       const start = clinicDateTime(a.start);
@@ -118,7 +116,10 @@ export function formatClinicTime(date: Date | string): string {
   return clinicDateTime(date).toFormat("h:mm a");
 }
 
-export function formatClinicTimeRange(start: Date | string, end: Date | string): string {
+export function formatClinicTimeRange(
+  start: Date | string,
+  end: Date | string,
+): string {
   return `${formatClinicTime(start)} – ${formatClinicTime(end)}`;
 }
 

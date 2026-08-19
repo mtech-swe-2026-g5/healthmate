@@ -65,8 +65,9 @@ describe("doctor dashboard stats", () => {
     expect(formatClinicTime(baseAppointment.start)).toMatch(/\d/);
     expect(formatHeaderDate(now.toJSDate())).toMatch(/Aug 18 · IST/);
     expect(
-      DateTime.fromJSDate(initialDoctorWeekRange().start).setZone("Asia/Kolkata")
-        .weekday % 7,
+      DateTime.fromJSDate(initialDoctorWeekRange().start).setZone(
+        "Asia/Kolkata",
+      ).weekday % 7,
     ).toBe(0);
   });
 

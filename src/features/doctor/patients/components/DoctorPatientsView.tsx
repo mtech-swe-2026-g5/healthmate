@@ -119,6 +119,7 @@ export function DoctorPatientsView() {
   const debouncedSearch = useDebouncedValue(search, 300);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
   }, [debouncedSearch, status]);
 
@@ -220,8 +221,13 @@ export function DoctorPatientsView() {
               </div>
             ))
           ) : isError ? (
-            <div className="px-4 py-8 text-center font-literata text-body-md text-[var(--color-error)]" role="alert">
-              {error instanceof Error ? error.message : "Failed to load patients"}
+            <div
+              className="px-4 py-8 text-center font-literata text-body-md text-[var(--color-error)]"
+              role="alert"
+            >
+              {error instanceof Error
+                ? error.message
+                : "Failed to load patients"}
             </div>
           ) : showEmpty ? (
             <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
@@ -229,7 +235,9 @@ export function DoctorPatientsView() {
                 <MdGroups size={24} aria-hidden />
               </div>
               <p className="font-dm-sans text-title-md text-[var(--color-on-surface)]">
-                {debouncedSearch.trim() || status !== "all" ? "No matching patients" : "No patients yet"}
+                {debouncedSearch.trim() || status !== "all"
+                  ? "No matching patients"
+                  : "No patients yet"}
               </p>
             </div>
           ) : (
@@ -247,11 +255,16 @@ export function DoctorPatientsView() {
                   <div className="mt-1 flex flex-wrap items-center gap-2">
                     <StatusBadge status={patient.status} />
                     <span className="font-literata text-[11px] text-[var(--color-on-surface-variant)]">
-                      {patient.visitCount} visit{patient.visitCount !== 1 ? "s" : ""}
+                      {patient.visitCount} visit
+                      {patient.visitCount !== 1 ? "s" : ""}
                     </span>
                   </div>
                 </div>
-                <MdChevronRight size={20} className="shrink-0 text-[var(--color-outline)]" aria-hidden />
+                <MdChevronRight
+                  size={20}
+                  className="shrink-0 text-[var(--color-outline)]"
+                  aria-hidden
+                />
               </Link>
             ))
           )}
@@ -418,7 +431,9 @@ export function DoctorPatientsView() {
               "Showing 0 patients"
             )}
             {isFetching && !isLoading ? (
-              <span className="ml-2 text-[var(--color-primary)]">Updating…</span>
+              <span className="ml-2 text-[var(--color-primary)]">
+                Updating…
+              </span>
             ) : null}
           </p>
 

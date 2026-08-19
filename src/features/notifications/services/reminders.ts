@@ -46,7 +46,11 @@ export async function sendDueAppointmentReminders(
   const plus60Utc = now.plus({ minutes: 60 }).toUTC().toJSDate();
 
   const todayStartUtc = now.startOf("day").toUTC().toJSDate();
-  const tomorrowStartUtc = now.plus({ days: 1 }).startOf("day").toUTC().toJSDate();
+  const tomorrowStartUtc = now
+    .plus({ days: 1 })
+    .startOf("day")
+    .toUTC()
+    .toJSDate();
 
   const [todayAppointments, appointments30Min, appointments60Min] =
     await Promise.all([

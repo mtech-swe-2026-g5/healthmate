@@ -33,8 +33,16 @@ describe("schedule time validation", () => {
 
 describe("schedule availability helpers", () => {
   it("detects break windows by label", () => {
-    expect(isBreakWindow({ startTime: "12:00", endTime: "13:00", label: "Lunch Break" })).toBe(true);
-    expect(isBreakWindow({ startTime: "09:00", endTime: "12:00", label: "Morning" })).toBe(false);
+    expect(
+      isBreakWindow({
+        startTime: "12:00",
+        endTime: "13:00",
+        label: "Lunch Break",
+      }),
+    ).toBe(true);
+    expect(
+      isBreakWindow({ startTime: "09:00", endTime: "12:00", label: "Morning" }),
+    ).toBe(false);
   });
 
   it("detects interval overlap", () => {

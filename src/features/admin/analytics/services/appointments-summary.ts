@@ -4,10 +4,7 @@ import { DateTime } from "luxon";
 import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
 import { prisma } from "@/lib/prisma";
 
-import {
-  findBucketForInstant,
-  resolvePeriodRange,
-} from "../lib/period-range";
+import { findBucketForInstant, resolvePeriodRange } from "../lib/period-range";
 import type { AppointmentGranularity } from "../types/schemas";
 import type {
   AppointmentMetricKey,
@@ -116,7 +113,10 @@ export async function getAppointmentsSummary(
     ]);
 
   const seriesMap = new Map<string, AppointmentsSeriesPoint>(
-    period.buckets.map((bucket) => [bucket.key, emptySeriesPoint(bucket.label)]),
+    period.buckets.map((bucket) => [
+      bucket.key,
+      emptySeriesPoint(bucket.label),
+    ]),
   );
   const summaryBase: Omit<
     AppointmentsSummaryTotals,

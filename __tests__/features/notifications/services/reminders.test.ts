@@ -90,7 +90,9 @@ describe("sendDueAppointmentReminders", () => {
 
     expect(mockAppointmentFindMany).toHaveBeenCalledTimes(2);
     expect(
-      result.summaries.find((summary) => summary.event === "appointment.reminder.8am"),
+      result.summaries.find(
+        (summary) => summary.event === "appointment.reminder.8am",
+      ),
     ).toEqual({
       event: "appointment.reminder.8am",
       appointmentsConsidered: 0,

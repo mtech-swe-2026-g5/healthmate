@@ -2,7 +2,12 @@ import "./DoctorWeekCalendar.css";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DateTime } from "luxon";
-import { MdChevronLeft, MdChevronRight, MdLock, MdPerson } from "react-icons/md";
+import {
+  MdChevronLeft,
+  MdChevronRight,
+  MdLock,
+  MdPerson,
+} from "react-icons/md";
 
 import { isSlotActive } from "@/components/ui/AppCalendar";
 import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
@@ -32,6 +37,7 @@ function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobile(mql.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mql.addEventListener("change", handler);
@@ -74,6 +80,7 @@ export function DoctorWeekCalendar({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMobileOffset(0);
   }, [weekStart]);
 
@@ -85,27 +92,40 @@ export function DoctorWeekCalendar({
 
   const visibleDays = useMemo(() => {
     if (!isMobile) return allDays;
-    const start = Math.max(0, Math.min(mobileOffset, allDays.length - MOBILE_VISIBLE_DAYS));
+    const start = Math.max(
+      0,
+      Math.min(mobileOffset, allDays.length - MOBILE_VISIBLE_DAYS),
+    );
     return allDays.slice(start, start + MOBILE_VISIBLE_DAYS);
   }, [isMobile, allDays, mobileOffset]);
 
   const visibleDayIndices = useMemo(() => {
     if (!isMobile) return allDays.map((_, i) => i);
-    const start = Math.max(0, Math.min(mobileOffset, allDays.length - MOBILE_VISIBLE_DAYS));
+    const start = Math.max(
+      0,
+      Math.min(mobileOffset, allDays.length - MOBILE_VISIBLE_DAYS),
+    );
     return Array.from({ length: MOBILE_VISIBLE_DAYS }, (_, i) => start + i);
   }, [isMobile, allDays, mobileOffset]);
 
   const numCols = visibleDays.length;
 
   const canShiftMobileLeft = mobileOffset > 0;
-  const canShiftMobileRight = mobileOffset < allDays.length - MOBILE_VISIBLE_DAYS;
+  const canShiftMobileRight =
+    mobileOffset < allDays.length - MOBILE_VISIBLE_DAYS;
 
-  const shiftMobile = useCallback((dir: -1 | 1) => {
-    setMobileOffset((prev) => {
-      const next = prev + dir;
-      return Math.max(0, Math.min(next, allDays.length - MOBILE_VISIBLE_DAYS));
-    });
-  }, [allDays.length]);
+  const shiftMobile = useCallback(
+    (dir: -1 | 1) => {
+      setMobileOffset((prev) => {
+        const next = prev + dir;
+        return Math.max(
+          0,
+          Math.min(next, allDays.length - MOBILE_VISIBLE_DAYS),
+        );
+      });
+    },
+    [allDays.length],
+  );
 
   const { startHour, endHour } = useMemo(
     () => resolveGridBounds(slotConfigurations),
@@ -173,7 +193,11 @@ export function DoctorWeekCalendar({
 
   const weekLabel = `${DateTime.fromJSDate(weekStart).setZone(CLINIC_TIMEZONE).toFormat("MMM d")} – ${DateTime.fromJSDate(weekEnd).setZone(CLINIC_TIMEZONE).toFormat("MMM d, yyyy")}`;
 
-  const rootClass = ["doctor-week-calendar", className, isLoading ? "is-loading" : null]
+  const rootClass = [
+    "doctor-week-calendar",
+    className,
+    isLoading ? "is-loading" : null,
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -226,7 +250,8 @@ export function DoctorWeekCalendar({
             <MdChevronLeft size={20} />
           </button>
           <span className="doctor-week-calendar__mobile-day-range">
-            {visibleDays[0]?.toFormat("EEE d")} – {visibleDays[visibleDays.length - 1]?.toFormat("EEE d")}
+            {visibleDays[0]?.toFormat("EEE d")} –{" "}
+            {visibleDays[visibleDays.length - 1]?.toFormat("EEE d")}
           </span>
           <button
             type="button"
@@ -258,7 +283,10 @@ export function DoctorWeekCalendar({
 
           {visibleDays.map((day, idx) => {
             const globalIndex = visibleDayIndices[idx]!;
-            const isToday = day.hasSame(DateTime.now().setZone(CLINIC_TIMEZONE), "day");
+            const isToday = day.hasSame(
+              DateTime.now().setZone(CLINIC_TIMEZONE),
+              "day",
+            );
             const weekend = isWeekendDay(day);
             const closedReason = closedByDayIndex.get(globalIndex);
             return (
@@ -275,7 +303,9 @@ export function DoctorWeekCalendar({
                     {day.day}
                   </span>
                 ) : (
-                  <span className="doctor-week-calendar__day-number">{day.day}</span>
+                  <span className="doctor-week-calendar__day-number">
+                    {day.day}
+                  </span>
                 )}
                 {closedReason && !isMobile ? (
                   <span
@@ -289,7 +319,10 @@ export function DoctorWeekCalendar({
             );
           })}
 
-          <div className="doctor-week-calendar__time-column" style={{ height: gridHeight }}>
+          <div
+            className="doctor-week-calendar__time-column"
+            style={{ height: gridHeight }}
+          >
             {hourLabels.map((hour) => (
               <div
                 key={hour}
@@ -304,7 +337,10 @@ export function DoctorWeekCalendar({
           {visibleDays.map((day, idx) => {
             const globalIndex = visibleDayIndices[idx]!;
             const weekend = isWeekendDay(day);
-            const isToday = day.hasSame(DateTime.now().setZone(CLINIC_TIMEZONE), "day");
+            const isToday = day.hasSame(
+              DateTime.now().setZone(CLINIC_TIMEZONE),
+              "day",
+            );
             const closedReason = closedByDayIndex.get(globalIndex);
             return (
               <div
@@ -313,7 +349,9 @@ export function DoctorWeekCalendar({
                 style={{ height: gridHeight }}
               >
                 {hourLabels.map((hour) => {
-                  const cellDate = day.set({ hour, minute: 0, second: 0, millisecond: 0 }).toJSDate();
+                  const cellDate = day
+                    .set({ hour, minute: 0, second: 0, millisecond: 0 })
+                    .toJSDate();
                   const active = isSlotActive(cellDate, slotConfigurations);
                   return (
                     <div
@@ -351,9 +389,13 @@ export function DoctorWeekCalendar({
                         style={{ top: eventTop, height: eventHeight }}
                         onClick={() => source && onEventSelect?.(source)}
                       >
-                        <p className="doctor-week-calendar__event-title">{event.title}</p>
+                        <p className="doctor-week-calendar__event-title">
+                          {event.title}
+                        </p>
                         {!isMobile && event.subtitle ? (
-                          <p className="doctor-week-calendar__event-sub">{event.subtitle}</p>
+                          <p className="doctor-week-calendar__event-sub">
+                            {event.subtitle}
+                          </p>
                         ) : null}
                         {!isMobile ? (
                           !isBlocked ? (

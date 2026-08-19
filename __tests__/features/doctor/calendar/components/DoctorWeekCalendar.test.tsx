@@ -16,7 +16,9 @@ describe("DoctorWeekCalendar", () => {
     vi.clearAllMocks();
   });
 
-  const weekStart = getCalendarWeekRange(new Date("2026-07-14T12:00:00Z")).start;
+  const weekStart = getCalendarWeekRange(
+    new Date("2026-07-14T12:00:00Z"),
+  ).start;
   const events: DoctorCalendarEvent[] = [
     {
       id: "apt-1",
@@ -41,9 +43,7 @@ describe("DoctorWeekCalendar", () => {
   });
 
   it("shows loading overlay when loading", () => {
-    render(
-      <DoctorWeekCalendar weekStart={weekStart} events={[]} isLoading />,
-    );
+    render(<DoctorWeekCalendar weekStart={weekStart} events={[]} isLoading />);
 
     expect(screen.getByText("Loading schedule…")).toBeDefined();
   });

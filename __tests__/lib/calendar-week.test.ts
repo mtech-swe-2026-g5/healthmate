@@ -9,7 +9,9 @@ import {
 } from "@/lib/calendar-week";
 
 function clinicDate(instant: Date): string {
-  return DateTime.fromJSDate(instant).setZone(CLINIC_TIMEZONE).toISODate() ?? "";
+  return (
+    DateTime.fromJSDate(instant).setZone(CLINIC_TIMEZONE).toISODate() ?? ""
+  );
 }
 
 describe("calendar-week", () => {

@@ -14,11 +14,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     }
 
     const { id } = await context.params;
-    await deleteDoctorScheduleBlock(
-      session.user.id,
-      session.user.role,
-      id,
-    );
+    await deleteDoctorScheduleBlock(session.user.id, session.user.role, id);
     return NextResponse.json({ ok: true });
   } catch (error) {
     return handleApiError(error);

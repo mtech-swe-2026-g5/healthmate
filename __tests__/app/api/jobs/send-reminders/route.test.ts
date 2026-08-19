@@ -20,29 +20,35 @@ describe("send-reminders job route", () => {
   });
 
   it("returns 401 when the shared secret is missing", async () => {
-    const response = await POST(new Request("http://localhost/api/jobs/send-reminders", {
-      method: "POST",
-    }));
+    const response = await POST(
+      new Request("http://localhost/api/jobs/send-reminders", {
+        method: "POST",
+      }),
+    );
 
     expect(response.status).toBe(401);
     expect(mockSendDueAppointmentReminders).not.toHaveBeenCalled();
   });
 
   it("returns 401 when the shared secret is invalid", async () => {
-    const response = await POST(new Request("http://localhost/api/jobs/send-reminders", {
-      method: "POST",
-      headers: { "x-job-secret": "nope" },
-    }));
+    const response = await POST(
+      new Request("http://localhost/api/jobs/send-reminders", {
+        method: "POST",
+        headers: { "x-job-secret": "nope" },
+      }),
+    );
 
     expect(response.status).toBe(401);
     expect(mockSendDueAppointmentReminders).not.toHaveBeenCalled();
   });
 
   it("executes the reminder job with the correct shared secret", async () => {
-    const response = await POST(new Request("http://localhost/api/jobs/send-reminders", {
-      method: "POST",
-      headers: { "x-job-secret": "secret-123" },
-    }));
+    const response = await POST(
+      new Request("http://localhost/api/jobs/send-reminders", {
+        method: "POST",
+        headers: { "x-job-secret": "secret-123" },
+      }),
+    );
 
     expect(response.status).toBe(200);
     expect(mockSendDueAppointmentReminders).toHaveBeenCalledTimes(1);

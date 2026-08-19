@@ -75,7 +75,12 @@ export function DoctorDashboardView({
           ),
         ),
       ),
-    [calendarQuery.data, scheduleQuery.data?.blocks, calendarStart, calendarEnd],
+    [
+      calendarQuery.data,
+      scheduleQuery.data?.blocks,
+      calendarStart,
+      calendarEnd,
+    ],
   );
 
   const stats = useMemo(
@@ -305,7 +310,11 @@ export function DoctorDashboardView({
             weekStart={calendarStart}
             events={calendarEvents}
             slotConfigurations={mapSlotConfigurations(slotQuery.data)}
-            isLoading={!calendarQuery.isFetched || !slotQuery.isFetched || !scheduleQuery.isFetched}
+            isLoading={
+              !calendarQuery.isFetched ||
+              !slotQuery.isFetched ||
+              !scheduleQuery.isFetched
+            }
             onEventSelect={onAppointmentClick}
             onWeekChange={onWeekChange}
             showNavigation

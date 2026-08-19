@@ -22,7 +22,8 @@ vi.mock("@/lib/prisma", () => ({
     },
     slotConfiguration: {
       findMany: (...args: unknown[]) => mockSlotConfigurationFindMany(...args),
-      findFirst: (...args: unknown[]) => mockSlotConfigurationFindFirst(...args),
+      findFirst: (...args: unknown[]) =>
+        mockSlotConfigurationFindFirst(...args),
     },
     scheduleBlock: {
       findMany: (...args: unknown[]) => mockScheduleBlockFindMany(...args),
@@ -109,7 +110,10 @@ describe("generateSlots", () => {
 
   it("marks booked slots", async () => {
     mockAppointmentFindMany.mockResolvedValue([
-      { startsAt: clinicDate(2026, 7, 27, 14, 0), endsAt: clinicDate(2026, 7, 27, 15, 0) },
+      {
+        startsAt: clinicDate(2026, 7, 27, 14, 0),
+        endsAt: clinicDate(2026, 7, 27, 15, 0),
+      },
     ]);
 
     const slots = await generateSlots(

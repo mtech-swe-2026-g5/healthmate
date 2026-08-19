@@ -20,7 +20,9 @@ export type PlacedEvent = {
 };
 
 export function getWeekDayColumns(weekStart: Date): DateTime[] {
-  const start = DateTime.fromJSDate(weekStart).setZone(CLINIC_TIMEZONE).startOf("day");
+  const start = DateTime.fromJSDate(weekStart)
+    .setZone(CLINIC_TIMEZONE)
+    .startOf("day");
   return Array.from({ length: 7 }, (_, index) => start.plus({ days: index }));
 }
 
@@ -60,7 +62,10 @@ function clinicDateTime(instant: Date | string): DateTime {
   return DateTime.fromJSDate(date).setZone(CLINIC_TIMEZONE);
 }
 
-export function minutesFromGridStart(instant: Date, gridStartHour: number): number {
+export function minutesFromGridStart(
+  instant: Date,
+  gridStartHour: number,
+): number {
   const zoned = clinicDateTime(instant);
   return (zoned.hour - gridStartHour) * 60 + zoned.minute;
 }
@@ -87,7 +92,7 @@ export function placeTimedEvents(
 
   for (const event of events) {
     const start = clinicDateTime(event.start);
-    const end = clinicDateTime(event.end);
+    const _end = clinicDateTime(event.end);
     const dayIndex = days.findIndex((day) => day.hasSame(start, "day"));
     if (dayIndex < 0) continue;
 
@@ -115,7 +120,10 @@ export function placeTimedEvents(
       id: event.id,
       dayIndex,
       top: (Math.max(topMinutes, 0) / 60) * ROW_HEIGHT_PX,
-      height: (Math.min(heightMinutes, gridHeightMinutes - Math.max(topMinutes, 0)) / 60) * ROW_HEIGHT_PX,
+      height:
+        (Math.min(heightMinutes, gridHeightMinutes - Math.max(topMinutes, 0)) /
+          60) *
+        ROW_HEIGHT_PX,
       title: event.title,
       variant: event.variant,
       subtitle: event.subtitle,
@@ -147,7 +155,10 @@ export function currentTimeIndicatorOffset(
 }
 
 export function formatHourLabel(hour: number): string {
-  const dt = DateTime.fromObject({ hour, minute: 0 }, { zone: CLINIC_TIMEZONE });
+  const dt = DateTime.fromObject(
+    { hour, minute: 0 },
+    { zone: CLINIC_TIMEZONE },
+  );
   return dt.toFormat("HH:mm");
 }
 

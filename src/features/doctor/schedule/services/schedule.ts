@@ -3,9 +3,7 @@ import { DateTime } from "luxon";
 import { requireRole } from "@/features/auth/services/permissions";
 import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
 import { scheduleAppointmentNotifications } from "@/features/notifications/services/dispatch";
-import {
-  formatBlockRange,
-} from "@/features/schedule/lib/availability";
+import { formatBlockRange } from "@/features/schedule/lib/availability";
 import { dbTimeToHm } from "@/features/schedule/lib/time";
 import { AppError } from "@/lib/errors";
 import { prisma } from "@/lib/prisma";
@@ -176,12 +174,11 @@ export async function createDoctorScheduleBlock(
   }
   const input: CreateTimeOffInput = parsed.data;
 
-  const todayYmd = DateTime.now().setZone(CLINIC_TIMEZONE).toFormat("yyyy-MM-dd");
+  const todayYmd = DateTime.now()
+    .setZone(CLINIC_TIMEZONE)
+    .toFormat("yyyy-MM-dd");
   if (input.dateFrom < todayYmd) {
-    throw new AppError(
-      "Closed dates must start today or in the future",
-      400,
-    );
+    throw new AppError("Closed dates must start today or in the future", 400);
   }
 
   const startsAt = DateTime.fromISO(input.dateFrom, { zone: CLINIC_TIMEZONE })

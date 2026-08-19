@@ -12,7 +12,7 @@ import {
   getCancellationCutoffHours,
   hasCancellationCutoffPassed,
 } from "../lib/cancellation-window";
-import { generateSlots, combineDateAndTime, addMinutes } from "./slots";
+import { generateSlots, combineDateAndTime } from "./slots";
 import { getActiveDoctor } from "./doctors";
 
 export function generateBookingReference(): string {

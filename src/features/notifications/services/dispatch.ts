@@ -138,7 +138,11 @@ export async function sendAppointmentNotifications(
         result.deliveries.push({ audience, status: "skipped", attempts: 0 });
         continue;
       }
-      logger.error("Appointment notification log claim failed", error, logContext);
+      logger.error(
+        "Appointment notification log claim failed",
+        error,
+        logContext,
+      );
       result.deliveries.push({ audience, status: "failed", attempts: 0 });
       continue;
     }
@@ -177,7 +181,8 @@ export async function sendAppointmentNotifications(
         },
         data: {
           status: AppointmentNotificationStatus.FAILED,
-          errorMessage: error instanceof Error ? error.message : "Unknown error",
+          errorMessage:
+            error instanceof Error ? error.message : "Unknown error",
           sentAt: null,
         },
       });

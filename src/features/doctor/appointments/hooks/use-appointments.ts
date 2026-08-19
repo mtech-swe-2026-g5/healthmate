@@ -8,7 +8,12 @@ export default function useAppointments(
   endDate: Date,
 ) {
   return useQuery({
-    queryKey: ["doctorAppointment", doctorId, startDate.toISOString(), endDate.toISOString()],
+    queryKey: [
+      "doctorAppointment",
+      doctorId,
+      startDate.toISOString(),
+      endDate.toISOString(),
+    ],
     queryFn: () => queryAppointments(doctorId, startDate, endDate),
   });
 }
