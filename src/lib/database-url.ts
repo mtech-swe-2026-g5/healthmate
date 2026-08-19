@@ -6,6 +6,12 @@
  * @see https://www.postgresql.org/docs/current/libpq-ssl.html
  */
 export function normalizeDatabaseUrl(url: string): string {
+  // Prisma expects the `postgresql://` scheme. Some providers (including
+  // some Vercel/Postgres integrations) may return `postgres://`.
+  if (url.startsWith("postgres://")) {
+    url = `postgresql://${url.slice("postgres://".length)}`;
+  }
+
   try {
     const parsed = new URL(url);
     const mode = parsed.searchParams.get("sslmode");
