@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
 import DoctorDashboard from "@/features/doctor/appointments/components/DoctorDashboard";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Doctor dashboard — HealthMate",
@@ -18,5 +19,20 @@ export default async function DoctorDashboardPage() {
     redirect("/login");
   }
 
-  return <DoctorDashboard doctorId={doctorId} />;
+  const doctor = await prisma.doctor.findUnique({
+    where: { id: doctorId },
+    select: { firstName: true, lastName: true, specialization: true },
+  });
+
+  const doctorName = doctor
+    ? `Dr. ${doctor.lastName}`
+    : (session.user.email ?? "Doctor");
+
+  return (
+    <DoctorDashboard
+      doctorId={doctorId}
+      doctorName={doctorName}
+      specialization={doctor?.specialization ?? "General Physician"}
+    />
+  );
 }

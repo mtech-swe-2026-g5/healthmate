@@ -5,7 +5,7 @@ import PatientAppointments from "@/features/doctor/appointments/components/Patie
 import { Appointment } from "@/features/doctor/appointments/types/response";
 import * as AppointmentsHookModule from "@/features/doctor/appointments/hooks/use-appointments";
 import * as SlotConfigurationsHookModule from "@/features/doctor/appointments/hooks/use-slot-configurations";
-import { AppCalendarEvent } from "@/components/ui/AppCalendar";
+import type { DoctorCalendarEvent } from "@/features/doctor/calendar/types";
 import { SlotConfigurationModel } from "@/lib/prisma";
 import { UseQueryResult } from "@tanstack/react-query";
 
@@ -58,6 +58,7 @@ const mockSlotConfigurations: SlotConfigurationModel[] = [
     validFrom: new Date("2026-01-01T00:00:00.000Z"),
     validUntil: null,
     active: true,
+    label: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -70,17 +71,17 @@ vi.mock("@/features/doctor/appointments/hooks/use-slot-configurations", () => ({
   })),
 }));
 
-vi.mock("@/components/ui/AppCalendar", () => ({
-  default: vi.fn(
+vi.mock("@/features/doctor/calendar/components/DoctorWeekCalendar", () => ({
+  DoctorWeekCalendar: vi.fn(
     ({
       events,
-      onRangeChange,
+      onWeekChange,
       onEventSelect,
       isLoading,
       className,
       slotConfigurations,
     }) => (
-      <div data-testid="app-calendar-mock" className={className}>
+      <div data-testid="doctor-week-calendar-mock" className={className}>
         <div data-testid="calendar-loading">
           {isLoading ? "Loading" : "Loaded"}
         </div>
@@ -97,11 +98,11 @@ vi.mock("@/components/ui/AppCalendar", () => ({
         <div data-testid="calendar-slot-configuration-valid-until">
           {slotConfigurations?.[0]?.validUntil ? "set" : "unset"}
         </div>
-        {events?.map((event: AppCalendarEvent) => (
+        {events?.map((event: DoctorCalendarEvent) => (
           <div
             key={event.id}
             data-testid={`calendar-event-${event.id}`}
-            onClick={() => onEventSelect(event)}
+            onClick={() => onEventSelect?.(event)}
           >
             {event.title}
           </div>
@@ -111,7 +112,7 @@ vi.mock("@/components/ui/AppCalendar", () => ({
           onClick={() => {
             const newStart = new Date("2026-07-15");
             const newEnd = new Date("2026-07-16");
-            onRangeChange(newStart, newEnd);
+            onWeekChange?.(newStart, newEnd);
           }}
         >
           Change Range
@@ -119,11 +120,12 @@ vi.mock("@/components/ui/AppCalendar", () => ({
         <button
           data-testid="select-unknown-event-btn"
           onClick={() =>
-            onEventSelect({
+            onEventSelect?.({
               id: "non-existent-id",
               title: "Unknown",
               start: new Date(),
               end: new Date(),
+              variant: "appointment",
             })
           }
         >
@@ -159,10 +161,10 @@ describe("PatientAppointments", () => {
     cleanup();
   });
 
-  it("should render AppCalendar component", () => {
+  it("should render DoctorWeekCalendar component", () => {
     render(<PatientAppointments doctorId="doc123" />);
 
-    expect(screen.getByTestId("app-calendar-mock")).toBeDefined();
+    expect(screen.getByTestId("doctor-week-calendar-mock")).toBeDefined();
   });
 
   it("should render AppointmentModel component", () => {
@@ -180,6 +182,14 @@ describe("PatientAppointments", () => {
       expect.any(Date),
       expect.any(Date),
     );
+
+    const [, startDate, endDate] = useAppointmentsMock.mock.calls[0] as [
+      string,
+      Date,
+      Date,
+    ];
+    expect(startDate).toBeInstanceOf(Date);
+    expect(endDate.getTime()).toBeGreaterThan(startDate.getTime());
   });
 
   it("should call useSlotConfigurations hook with correct parameters", () => {

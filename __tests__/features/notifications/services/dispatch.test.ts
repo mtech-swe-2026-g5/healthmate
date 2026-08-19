@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Prisma } from "@prisma/client";
 
 import {
   scheduleAppointmentNotifications,
@@ -11,6 +12,8 @@ import { buildNotificationContext } from "../notification.mock";
 const mockSendEmail = vi.fn();
 const mockGetContext = vi.fn();
 const mockRunAfterResponse = vi.fn();
+const mockLogCreate = vi.fn();
+const mockLogUpdateMany = vi.fn();
 const mockLogger = vi.hoisted(() => ({
   debug: vi.fn(),
   info: vi.fn(),
@@ -31,12 +34,23 @@ vi.mock("@/features/notifications/lib/scheduler", () => ({
   runAfterResponse: (task: () => Promise<void>) => mockRunAfterResponse(task),
 }));
 
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    appointmentNotificationLog: {
+      create: (...args: unknown[]) => mockLogCreate(...args),
+      updateMany: (...args: unknown[]) => mockLogUpdateMany(...args),
+    },
+  },
+}));
+
 vi.mock("@/lib/logger", () => ({ logger: mockLogger }));
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockGetContext.mockResolvedValue(buildNotificationContext());
   mockSendEmail.mockResolvedValue({ status: "sent", attempts: 1 });
+  mockLogCreate.mockResolvedValue({});
+  mockLogUpdateMany.mockResolvedValue({ count: 1 });
 });
 
 describe("sendAppointmentNotifications", () => {
@@ -51,6 +65,8 @@ describe("sendAppointmentNotifications", () => {
       { audience: "patient", status: "sent", attempts: 1 },
       { audience: "doctor", status: "sent", attempts: 1 },
     ]);
+    expect(mockLogCreate).toHaveBeenCalledTimes(2);
+    expect(mockLogUpdateMany).toHaveBeenCalledTimes(2);
 
     const recipients = mockSendEmail.mock.calls.map((call) => call[0].to);
     expect(recipients).toEqual([
@@ -88,6 +104,60 @@ describe("sendAppointmentNotifications", () => {
     ]);
   });
 
+  it("skips duplicate notifications already claimed in the log", async () => {
+    mockLogCreate.mockRejectedValueOnce(
+      new Prisma.PrismaClientKnownRequestError("duplicate", {
+        code: "P2002",
+        clientVersion: "7.9.0",
+      }),
+    );
+
+    const result = await sendAppointmentNotifications(
+      "appointment.booked",
+      "appt-1",
+    );
+
+    expect(result.deliveries).toEqual([
+      { audience: "patient", status: "skipped", attempts: 0 },
+      { audience: "doctor", status: "sent", attempts: 1 },
+    ]);
+  });
+
+  it("records a failed delivery when the log claim itself fails", async () => {
+    mockLogCreate.mockRejectedValueOnce(new Error("db offline"));
+
+    const result = await sendAppointmentNotifications(
+      "appointment.booked",
+      "appt-1",
+    );
+
+    expect(result.deliveries).toEqual([
+      { audience: "patient", status: "failed", attempts: 0 },
+      { audience: "doctor", status: "sent", attempts: 1 },
+    ]);
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      "Appointment notification log claim failed",
+      expect.any(Error),
+      expect.objectContaining({ audience: "patient" }),
+    );
+  });
+
+  it("marks skipped mailer deliveries as failed in the notification log", async () => {
+    mockSendEmail.mockResolvedValueOnce({ status: "skipped", attempts: 0 });
+
+    await sendAppointmentNotifications("appointment.booked", "appt-1");
+
+    expect(mockLogUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: "FAILED",
+          errorMessage: "Email delivery skipped or failed.",
+          sentAt: null,
+        }),
+      }),
+    );
+  });
+
   it("records a failure when rendering or sending throws", async () => {
     mockSendEmail.mockRejectedValue(new Error("render failed"));
 
@@ -123,6 +193,53 @@ describe("sendAppointmentNotifications", () => {
     const patientEmail = mockSendEmail.mock.calls[0][0];
     expect(patientEmail.subject).toContain("Appointment cancelled");
     expect(patientEmail.text).toContain("as requested");
+  });
+
+  it("uses the previous slot in the reschedule dedupe key", async () => {
+    const previousStartsAt = new Date("2026-08-01T05:30:00.000Z");
+    const previousEndsAt = new Date("2026-08-01T06:30:00.000Z");
+
+    await sendAppointmentNotifications("appointment.rescheduled", "appt-1", {
+      previousStartsAt,
+      previousEndsAt,
+    });
+
+    expect(mockLogCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          dedupeKey: `${previousStartsAt.toISOString()}->2026-08-03T08:30:00.000Z`,
+        }),
+      }),
+    );
+  });
+
+  it("uses date-based dedupe keys for 8am reminders and start-time keys for lead reminders", async () => {
+    await sendAppointmentNotifications("appointment.reminder.8am", "appt-1");
+    await sendAppointmentNotifications("appointment.reminder.30min", "appt-1");
+    await sendAppointmentNotifications("appointment.reminder.60min", "appt-1");
+
+    expect(mockLogCreate).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        data: expect.objectContaining({ dedupeKey: "2026-08-03" }),
+      }),
+    );
+    expect(mockLogCreate).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          dedupeKey: "2026-08-03T08:30:00.000Z",
+        }),
+      }),
+    );
+    expect(mockLogCreate).toHaveBeenNthCalledWith(
+      5,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          dedupeKey: "2026-08-03T08:30:00.000Z",
+        }),
+      }),
+    );
   });
 
   it("skips delivery when the appointment context cannot be resolved", async () => {

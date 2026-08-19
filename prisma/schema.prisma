@@ -38,11 +38,12 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
-  role                    Role                     @relation(fields: [roleId], references: [id])
-  patient                 Patient?
-  doctor                  Doctor?
-  emailVerificationTokens EmailVerificationToken[]
-  refreshTokens           RefreshToken[]
+  role                     Role                         @relation(fields: [roleId], references: [id])
+  patient                  Patient?
+  doctor                   Doctor?
+  appointmentNotifications AppointmentNotificationLog[]
+  emailVerificationTokens  EmailVerificationToken[]
+  refreshTokens            RefreshToken[]
 
   @@index([email])
   @@index([roleId])
@@ -79,21 +80,25 @@ model Patient {
 // ============================================
 
 model Doctor {
-  id                String   @id @default(uuid()) @db.Uuid
-  userId            String   @unique @map("user_id") @db.Uuid
-  firstName         String   @map("first_name") @db.VarChar(100)
-  lastName          String   @map("last_name") @db.VarChar(100)
-  specialization    String   @default("General Physician") @db.VarChar(120)
-  isActive          Boolean  @default(true) @map("is_active")
-  gender            String?  @db.VarChar(20)
-  phoneNumber       String?  @map("phone_number") @db.VarChar(20)
-  profilePictureUrl String?  @map("profile_picture_url")
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  id                   String   @id @default(uuid()) @db.Uuid
+  userId               String   @unique @map("user_id") @db.Uuid
+  firstName            String   @map("first_name") @db.VarChar(100)
+  lastName             String   @map("last_name") @db.VarChar(100)
+  specialization       String   @default("General Physician") @db.VarChar(120)
+  isActive             Boolean  @default(true) @map("is_active")
+  acceptingNewPatients Boolean  @default(true) @map("accepting_new_patients")
+  bufferMinutes        Int      @default(15) @map("buffer_minutes") @db.SmallInt
+  slotDurationMinutes  Int      @default(60) @map("slot_duration_minutes") @db.SmallInt
+  gender               String?  @db.VarChar(20)
+  phoneNumber          String?  @map("phone_number") @db.VarChar(20)
+  profilePictureUrl    String?  @map("profile_picture_url")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
   user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   appointments       Appointment[]
   slotConfigurations SlotConfiguration[]
+  scheduleBlocks     ScheduleBlock[]
 
   @@index([userId])
   @@index([specialization])

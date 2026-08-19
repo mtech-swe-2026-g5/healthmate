@@ -182,10 +182,15 @@ describe("AppCalendar", () => {
     },
   ])(
     "calls onRangeChange when the calendar range changes and %s",
-    ({ range, expectedStart, expectedEnd }) => {
+    async ({ range, expectedStart, expectedEnd }) => {
       const onRangeChange = vi.fn();
 
       render(<AppCalendar isLoading onRangeChange={onRangeChange} />);
+
+      await waitFor(() => {
+        expect(onRangeChange).toHaveBeenCalled();
+      });
+      onRangeChange.mockClear();
 
       act(() => {
         getCalendarProps().onRangeChange?.(range);
@@ -212,6 +217,21 @@ describe("AppCalendar", () => {
     }).not.toThrow();
 
     expect(mockState.prompt).not.toHaveBeenCalled();
+  });
+
+  it("syncs the visible week to onRangeChange after mount", async () => {
+    const onRangeChange = vi.fn();
+
+    render(<AppCalendar isLoading={false} onRangeChange={onRangeChange} />);
+
+    await waitFor(() => {
+      expect(onRangeChange).toHaveBeenCalledTimes(1);
+    });
+
+    const [start, end] = onRangeChange.mock.calls[0] as [Date, Date];
+    expect(start).toBeInstanceOf(Date);
+    expect(end).toBeInstanceOf(Date);
+    expect(end.getTime()).toBeGreaterThan(start.getTime());
   });
 
   it("allows overlapping appointments when overlap is enabled", async () => {

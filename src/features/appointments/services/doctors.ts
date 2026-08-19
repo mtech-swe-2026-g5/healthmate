@@ -6,7 +6,7 @@ export type { DoctorListItem } from "../types/doctor";
 
 export async function listActiveDoctors(): Promise<DoctorListItem[]> {
   const doctors = await prisma.doctor.findMany({
-    where: { isActive: true },
+    where: { isActive: true, acceptingNewPatients: true },
     orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     select: {
       id: true,

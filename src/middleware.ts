@@ -37,6 +37,21 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
+  // Cron-like jobs authenticate via shared secret headers, not sessions.
+  if (pathname === "/api/jobs/send-reminders") {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/api/admin")) {
+    if (!isLoggedIn) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
   if (pathname.startsWith("/api")) {
     if (!isLoggedIn) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -63,7 +78,11 @@ export default auth((req) => {
     return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
   }
 
-  if (access === "doctor" && role !== "doctor" && role !== "admin") {
+  if (access === "doctor" && role !== "doctor") {
+    return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
+  }
+
+  if (access === "admin" && role !== "admin") {
     return NextResponse.redirect(new URL(getRoleHome(role), nextUrl));
   }
 

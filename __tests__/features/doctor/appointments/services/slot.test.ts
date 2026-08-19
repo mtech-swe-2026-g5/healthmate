@@ -12,6 +12,7 @@ import { DefaultArgs } from "@prisma/client/runtime/client";
 import { prisma } from "@/lib/prisma";
 import { faker } from "@faker-js/faker/locale/en";
 import { DateTime } from "luxon";
+import { CLINIC_TIMEZONE } from "@/features/appointments/lib/timezone";
 
 const errorDoctorId = faker.string.uuid();
 
@@ -97,6 +98,7 @@ describe("getSlotConfigurationByDoctor", () => {
             {
               validFrom: {
                 lte: DateTime.fromJSDate(validRequest.dateFrom)
+                  .setZone(CLINIC_TIMEZONE)
                   .startOf("day")
                   .toJSDate(),
               },
@@ -106,6 +108,7 @@ describe("getSlotConfigurationByDoctor", () => {
                 {
                   validUntil: {
                     gte: DateTime.fromJSDate(validRequest.dateUntil)
+                      .setZone(CLINIC_TIMEZONE)
                       .endOf("day")
                       .toJSDate(),
                   },

@@ -1,6 +1,7 @@
 export {
   scheduleAppointmentNotifications,
   sendAppointmentNotifications,
+  sendDueAppointmentReminders,
   getAppointmentNotificationContext,
   scheduleWelcomeEmail,
   sendWelcomeEmail,
@@ -21,8 +22,8 @@ export type {
   EmailDeliveryResult,
   EmailDeliveryStatus,
   EmailMessage,
-  NotificationAudience,
   NotificationDispatchResult,
+  NotificationAudience,
   SmtpConfig,
   WelcomeEmailInput,
 } from "./types";

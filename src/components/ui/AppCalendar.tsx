@@ -3,11 +3,17 @@
 import "./AppCalendar.css";
 import { Calendar, Event, luxonLocalizer, Views } from "react-big-calendar";
 import { DateTime } from "luxon";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Model from "@/components/ui/Model";
 import { LoadingState } from "@/components/ui/PageLoading";
+import {
+  CALENDAR_FIRST_DAY_OF_WEEK,
+  getCalendarWeekRange,
+} from "@/lib/calendar-week";
 
-const localizer = luxonLocalizer(DateTime);
+const localizer = luxonLocalizer(DateTime, {
+  firstDayOfWeek: CALENDAR_FIRST_DAY_OF_WEEK,
+});
 
 type OnScheduleCallback = (startDate: Date, endDate: Date) => void;
 type OnRangeChangeCallback = (startDate: Date, endDate: Date) => void;
@@ -44,6 +50,8 @@ export interface AppCalendarProps {
   onEventSelect?: OnEventSelectCallback;
   onRangeChange?: OnRangeChangeCallback;
   className?: string;
+  /** Extra CSS classes for calendar events (e.g. blocked-time styling). */
+  getEventClassName?: (event: AppCalendarEvent) => string | undefined;
 }
 
 function isWithinValidityWindow(
@@ -140,6 +148,8 @@ export default function AppCalendar(props: AppCalendarProps) {
   // a client-only render (after mount) avoids that entirely.
   const [hasMounted, setHasMounted] = useState(false);
 
+  const hasSyncedInitialRange = useRef(false);
+
   useEffect(() => {
     // Intentional client-only-mount detection: this is the standard pattern
     // for deferring hydration-unsafe rendering to after mount, so the single
@@ -148,6 +158,18 @@ export default function AppCalendar(props: AppCalendarProps) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasMounted(true);
   }, []);
+
+  // react-big-calendar does not fire onRangeChange on first paint. Sync the
+  // parent's fetch window to the visible Sunday–Saturday week so appointments
+  // appear without requiring prev/next navigation.
+  useEffect(() => {
+    if (!hasMounted || !onRangeChange || hasSyncedInitialRange.current) {
+      return;
+    }
+    hasSyncedInitialRange.current = true;
+    const { start, end } = getCalendarWeekRange(new Date());
+    onRangeChange(start, end);
+  }, [hasMounted, onRangeChange]);
 
   const handleOnRangeChange = useCallback(
     (range: Date[] | { start: Date; end: Date }) => {
@@ -239,11 +261,14 @@ export default function AppCalendar(props: AppCalendarProps) {
                 ? {}
                 : { className: "app-calendar-slot-inactive" }
             }
-            eventPropGetter={(event, start) =>
-              isSlotActive(start, props.slotConfigurations)
-                ? {}
-                : { className: "app-calendar-event-inactive" }
-            }
+            eventPropGetter={(event, start) => {
+              const inactive = !isSlotActive(start, props.slotConfigurations)
+                ? "app-calendar-event-inactive"
+                : undefined;
+              const extra = props.getEventClassName?.(event);
+              const className = [inactive, extra].filter(Boolean).join(" ");
+              return className ? { className } : {};
+            }}
           />
         </>
       )}

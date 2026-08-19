@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 import { DoctorPortalShell } from "./DoctorPortalShell";
 
@@ -15,10 +16,25 @@ export async function DoctorAppLayout({ children }: DoctorAppLayoutProps) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const roleLabel = session.user.role === "admin" ? "Admin" : "Doctor";
+  const roleLabel = "Doctor";
+
+  const doctorProfile = session.user.doctor?.id
+    ? await prisma.doctor.findUnique({
+        where: { id: session.user.doctor.id },
+        select: { firstName: true, lastName: true, specialization: true },
+      })
+    : null;
+
+  const userName = doctorProfile
+    ? `Dr. ${doctorProfile.lastName}`
+    : session.user.email;
 
   return (
-    <DoctorPortalShell userEmail={session.user.email} roleLabel={roleLabel}>
+    <DoctorPortalShell
+      userEmail={session.user.email}
+      userName={userName}
+      roleLabel={doctorProfile?.specialization ?? roleLabel}
+    >
       {children}
     </DoctorPortalShell>
   );

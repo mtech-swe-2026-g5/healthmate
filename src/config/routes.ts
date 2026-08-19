@@ -6,12 +6,12 @@
 export type AppRole = "patient" | "doctor" | "admin";
 
 export type RouteAccess =
-  "public" | "authOnly" | "patient" | "doctor" | "authenticated";
+  "public" | "authOnly" | "patient" | "doctor" | "admin" | "authenticated";
 
 export const roleHomes = {
   patient: "/dashboard",
   doctor: "/doctor",
-  admin: "/doctor",
+  admin: "/admin",
 } as const satisfies Record<AppRole, string>;
 
 export const publicRoutes = ["/"] as const;
@@ -21,13 +21,15 @@ export const authOnlyRoutes = ["/login", "/register"] as const;
 /** Exact patient paths plus prefix rules handled in matchers. */
 export const patientHome = "/dashboard";
 export const doctorHome = "/doctor";
+export const adminHome = "/admin";
 
 /**
  * Returns the default landing path after login for a role.
  * Unknown roles fall back to the patient home.
  */
 export function getRoleHome(role: string | undefined | null): string {
-  if (role === "doctor" || role === "admin") return roleHomes[role];
+  if (role === "doctor") return roleHomes.doctor;
+  if (role === "admin") return roleHomes.admin;
   return roleHomes.patient;
 }
 
@@ -51,10 +53,17 @@ export function isPatientRoute(pathname: string): boolean {
 }
 
 /**
- * Doctor portal under /doctor.
+ * Doctor portal under /doctor — doctors only (not admins).
  */
 export function isDoctorRoute(pathname: string): boolean {
   return pathname === "/doctor" || pathname.startsWith("/doctor/");
+}
+
+/**
+ * Clinic admin portal under /admin — admins only.
+ */
+export function isAdminRoute(pathname: string): boolean {
+  return pathname === "/admin" || pathname.startsWith("/admin/");
 }
 
 /**
@@ -65,6 +74,7 @@ export function matchRouteAccess(pathname: string): RouteAccess {
   if (isPublicRoute(pathname)) return "public";
   if (isAuthOnlyRoute(pathname)) return "authOnly";
   if (isPatientRoute(pathname)) return "patient";
+  if (isAdminRoute(pathname)) return "admin";
   if (isDoctorRoute(pathname)) return "doctor";
   return "authenticated";
 }
@@ -75,10 +85,10 @@ export function canRoleAccessPath(
 ): boolean {
   const access = matchRouteAccess(pathname);
   if (access === "public") return true;
-  if (access === "authOnly") return false; // logged-in users should leave these
+  if (access === "authOnly") return false;
   if (access === "patient") return role === "patient";
-  if (access === "doctor") return role === "doctor" || role === "admin";
-  // authenticated: any logged-in role
+  if (access === "doctor") return role === "doctor";
+  if (access === "admin") return role === "admin";
   return !!role;
 }
 

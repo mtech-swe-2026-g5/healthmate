@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
+import DoctorSchedule from "@/features/doctor/schedule/components/DoctorSchedule";
+import { auth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Schedule — HealthMate",
-  description: "Doctor schedule overview.",
+  description: "Manage your clinic schedule and availability.",
 };
 
-export default function DoctorSchedulePage() {
-  return (
-    <div className="rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-lowest)] p-[var(--spacing-hm-xl)] auth-custom-shadow">
-      <h1 className="font-dm-sans text-headline-lg text-[var(--color-on-surface)]">
-        Schedule
-      </h1>
-      <p className="mt-[var(--spacing-hm-md)] font-literata text-body-md text-[var(--color-on-surface-variant)]">
-        Your clinic schedule tools are coming soon. You will be able to review
-        upcoming visits and availability here.
-      </p>
-    </div>
-  );
+export default async function DoctorSchedulePage() {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+
+  const doctorId = session.user.doctor?.id;
+  if (!doctorId) redirect("/login");
+
+  return <DoctorSchedule doctorId={doctorId} />;
 }

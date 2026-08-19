@@ -62,33 +62,30 @@ export function MarketingNav({
         )}
 
         <div className="flex items-center gap-hm-md">
-          {isLoggedIn ? (
-            <>
-              <Link href={portalHref} className={marketingButtonContainer}>
-                Open portal
-              </Link>
-              <LogoutButton
-                className={`${marketingButtonLogin} hidden sm:inline-flex`}
-              />
-            </>
-          ) : (
-            <>
-              <Link
-                href={authRoutes.login}
-                className={`${marketingButtonLogin} hidden sm:inline-flex`}
-              >
-                <span className="relative z-10 transition-all duration-200 ease-in-out group-hover:tracking-wide">
-                  Log in
-                </span>
-              </Link>
-              <Link
-                href={authRoutes.register}
-                className={marketingButtonContainer}
-              >
-                Get Started
-              </Link>
-            </>
-          )}
+          <div className="hidden items-center gap-hm-md lg:flex">
+            {isLoggedIn ? (
+              <>
+                <Link href={portalHref} className={marketingButtonContainer}>
+                  Open portal
+                </Link>
+                <LogoutButton className={marketingButtonLogin} />
+              </>
+            ) : (
+              <>
+                <Link href={authRoutes.login} className={marketingButtonLogin}>
+                  <span className="relative z-10 transition-all duration-200 ease-in-out group-hover:tracking-wide">
+                    Log in
+                  </span>
+                </Link>
+                <Link
+                  href={authRoutes.register}
+                  className={marketingButtonContainer}
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
+          </div>
 
           <button
             type="button"
@@ -155,6 +152,13 @@ export function MarketingNav({
                     className={`${marketingButtonLogin} mt-2 w-full justify-center`}
                   >
                     Log in
+                  </Link>
+                  <Link
+                    href={authRoutes.register}
+                    onClick={() => setMenuOpen(false)}
+                    className={`${marketingButtonContainer} mt-2 w-full justify-center`}
+                  >
+                    Get Started
                   </Link>
                 </>
               )}

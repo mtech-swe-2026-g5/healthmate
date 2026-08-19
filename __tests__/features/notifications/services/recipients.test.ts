@@ -26,11 +26,13 @@ function appointmentRow(overrides: Record<string, unknown> = {}) {
     reasonForVisit: "General consultation",
     additionalNotes: null,
     patient: {
+      userId: "patient-user-1",
       firstName: "Priya",
       lastName: "Sharma",
       user: { email: "priya.sharma@example.com" },
     },
     doctor: {
+      userId: "doctor-user-1",
       firstName: "Ananya",
       lastName: "Patel",
       specialization: "General Physician",
@@ -51,11 +53,13 @@ describe("getAppointmentNotificationContext", () => {
     const context = await getAppointmentNotificationContext("appt-1");
 
     expect(context?.patient).toEqual({
+      userId: "patient-user-1",
       firstName: "Priya",
       lastName: "Sharma",
       email: "priya.sharma@example.com",
     });
     expect(context?.doctor).toEqual({
+      userId: "doctor-user-1",
       firstName: "Ananya",
       lastName: "Patel",
       specialization: "General Physician",
