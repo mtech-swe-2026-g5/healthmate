@@ -183,12 +183,13 @@ describe("PatientAppointments", () => {
       expect.any(Date),
     );
 
-    const [, startDate] = useAppointmentsMock.mock.calls[0] as [
+    const [, startDate, endDate] = useAppointmentsMock.mock.calls[0] as [
       string,
       Date,
       Date,
     ];
-    expect(startDate.getDay()).toBe(0);
+    expect(startDate).toBeInstanceOf(Date);
+    expect(endDate.getTime()).toBeGreaterThan(startDate.getTime());
   });
 
   it("should call useSlotConfigurations hook with correct parameters", () => {

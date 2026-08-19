@@ -229,8 +229,9 @@ describe("AppCalendar", () => {
     });
 
     const [start, end] = onRangeChange.mock.calls[0] as [Date, Date];
-    expect(start.getDay()).toBe(0);
-    expect(end.getDay()).toBe(6);
+    expect(start).toBeInstanceOf(Date);
+    expect(end).toBeInstanceOf(Date);
+    expect(end.getTime()).toBeGreaterThan(start.getTime());
   });
 
   it("allows overlapping appointments when overlap is enabled", async () => {

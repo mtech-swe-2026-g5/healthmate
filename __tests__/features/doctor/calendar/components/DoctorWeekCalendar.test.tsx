@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { DoctorWeekCalendar } from "@/features/doctor/calendar/components/DoctorWeekCalendar";
 import type { DoctorCalendarEvent } from "@/features/doctor/calendar/types";
@@ -9,6 +9,22 @@ import { getCalendarWeekRange } from "@/lib/calendar-week";
 vi.mock("@/components/ui/AppCalendar", () => ({
   isSlotActive: vi.fn(() => true),
 }));
+
+beforeAll(() => {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+});
 
 describe("DoctorWeekCalendar", () => {
   afterEach(() => {
