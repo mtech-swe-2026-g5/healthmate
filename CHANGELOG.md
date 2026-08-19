@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.5.0...v1.6.0) (2026-08-19)
+
+
+### Features
+
+* [Sprint 2] — Admin portal, doctor enhancements, notifications, schedule management & mobile responsive overhaul ([#61](https://github.com/mtech-swe-2026-g5/healthmate/issues/61)) ([3fc6e9f](https://github.com/mtech-swe-2026-g5/healthmate/commit/3fc6e9f3cd978aaa74625819508709ffe68209ea))
+
 # [1.5.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.4.1...v1.5.0) (2026-08-15)
 
 
