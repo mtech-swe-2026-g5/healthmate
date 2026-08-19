@@ -38,12 +38,12 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
-  role                    Role                     @relation(fields: [roleId], references: [id])
-  patient                 Patient?
-  doctor                  Doctor?
+  role                     Role                         @relation(fields: [roleId], references: [id])
+  patient                  Patient?
+  doctor                   Doctor?
   appointmentNotifications AppointmentNotificationLog[]
-  emailVerificationTokens EmailVerificationToken[]
-  refreshTokens           RefreshToken[]
+  emailVerificationTokens  EmailVerificationToken[]
+  refreshTokens            RefreshToken[]
 
   @@index([email])
   @@index([roleId])

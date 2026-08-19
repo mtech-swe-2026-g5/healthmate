@@ -77,10 +77,10 @@ model Appointment {
   createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz()
 
-  patient Patient              @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  doctor  Doctor               @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  payment Payment?
-  history AppointmentHistory[]
+  patient       Patient                      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor        Doctor                       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  payment       Payment?
+  history       AppointmentHistory[]
   notifications AppointmentNotificationLog[]
 
   // Double-booking is prevented by the PARTIAL unique index
