@@ -1,22 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   MdArrowForward,
   MdEventAvailable,
   MdHistory,
-  MdInfo,
   MdLocationOn,
-  MdMail,
   MdMedicalServices,
   MdPendingActions,
   MdSchedule,
-  MdSms,
   MdWavingHand,
 } from "react-icons/md";
 
-import { Toast } from "@/components/ui/Toast";
 import type { AppointmentConfirmation } from "@/features/appointments/services/client";
 import {
   formatAppointmentDate,
@@ -57,26 +52,10 @@ export function PatientDashboardView({
     year: "numeric",
   });
 
-  const [emailOn, setEmailOn] = useState(true);
-  const [smsOn, setSmsOn] = useState(true);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const showReminderToast = () => {
-    setToast("Reminder settings updated successfully.");
-  };
-
   const countdownDays = next ? daysUntil(new Date(next.startsAt)) : null;
 
   return (
     <>
-      {toast && (
-        <Toast
-          message={toast}
-          variant="success"
-          onClose={() => setToast(null)}
-        />
-      )}
-
       <header className="mb-[var(--spacing-hm-xl)] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <MdWavingHand
@@ -323,75 +302,6 @@ export function PatientDashboardView({
                 </Link>
               </div>
             )}
-
-            <div className={`${CARD} p-[var(--spacing-hm-lg)]`}>
-              <h3 className="mb-[var(--spacing-hm-lg)] font-dm-sans text-title-lg text-[var(--color-on-surface)]">
-                Reminders
-              </h3>
-              <div className="space-y-[var(--spacing-hm-md)]">
-                <label className="flex cursor-pointer items-center justify-between gap-3">
-                  <span className="flex items-center gap-[var(--spacing-hm-md)]">
-                    <MdMail
-                      size={20}
-                      className="text-[var(--color-primary)]"
-                      aria-hidden
-                    />
-                    <span className="font-dm-sans text-label-md text-[var(--color-on-surface-variant)]">
-                      Email Notifications
-                    </span>
-                  </span>
-                  <span className="relative inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={emailOn}
-                      onChange={(e) => {
-                        setEmailOn(e.target.checked);
-                        showReminderToast();
-                      }}
-                    />
-                    <span className="h-6 w-11 rounded-full bg-[var(--color-surface-container-highest)] after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[var(--color-primary)] peer-checked:after:translate-x-full" />
-                  </span>
-                </label>
-                <label className="flex cursor-pointer items-center justify-between gap-3">
-                  <span className="flex items-center gap-[var(--spacing-hm-md)]">
-                    <MdSms
-                      size={20}
-                      className="text-[var(--color-primary)]"
-                      aria-hidden
-                    />
-                    <span className="font-dm-sans text-label-md text-[var(--color-on-surface-variant)]">
-                      SMS Notifications
-                    </span>
-                  </span>
-                  <span className="relative inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="peer sr-only"
-                      checked={smsOn}
-                      onChange={(e) => {
-                        setSmsOn(e.target.checked);
-                        showReminderToast();
-                      }}
-                    />
-                    <span className="h-6 w-11 rounded-full bg-[var(--color-surface-container-highest)] after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[var(--color-primary)] peer-checked:after:translate-x-full" />
-                  </span>
-                </label>
-              </div>
-              <div className="mt-[var(--spacing-hm-lg)] border-t border-[var(--color-outline-variant)]/30 pt-[var(--spacing-hm-lg)]">
-                <div className="flex items-start gap-[var(--spacing-hm-md)] text-[var(--color-on-surface-variant)]">
-                  <MdInfo
-                    size={20}
-                    className="shrink-0 text-[var(--color-secondary)]"
-                    aria-hidden
-                  />
-                  <p className="font-dm-sans text-label-sm">
-                    We&apos;ll send you a 24-hour and 2-hour reminder before
-                    every session. Preferences are preview-only for now.
-                  </p>
-                </div>
-              </div>
-            </div>
 
             <div className="rounded-xl border-l-4 border-[var(--color-primary)] bg-[var(--color-surface-variant)]/30 p-[var(--spacing-hm-lg)]">
               <p className="mb-1 font-dm-sans text-label-md font-bold text-[var(--color-primary)]">
