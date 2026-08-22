@@ -6,7 +6,9 @@ import {
   MdBadge,
   MdCall,
   MdCampaign,
+  MdChevronRight,
   MdClose,
+  MdDeleteOutline,
   MdEdit,
   MdLock,
   MdMail,
@@ -56,13 +58,6 @@ const INPUT =
 
 const LABEL =
   "mb-1.5 block font-dm-sans text-label-md text-[var(--color-on-surface-variant)]";
-
-const COMING_SOON =
-  "inline-flex shrink-0 items-center rounded-md bg-[var(--color-secondary-container)] px-2 py-0.5 font-dm-sans text-[10px] font-bold tracking-wide text-[var(--color-primary)] uppercase";
-
-function ComingSoonTag() {
-  return <span className={COMING_SOON}>Coming soon</span>;
-}
 
 function Field({
   label,
@@ -454,25 +449,19 @@ export function ProfileSettingsView({
                 )}
               </div>
 
-              <div className="rounded-xl border border-dashed border-[var(--color-outline-variant)]/50 bg-[var(--color-surface-container-low)]/50 p-[var(--spacing-hm-md)]">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                    Known allergies
-                  </p>
-                  <ComingSoonTag />
-                </div>
+              <div className="rounded-xl border border-[var(--color-outline-variant)]/40 bg-[var(--color-surface-container-low)]/50 p-[var(--spacing-hm-md)]">
+                <p className="mb-2 font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
+                  Known allergies
+                </p>
                 <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
-                  Allergy tracking will appear here in a future update.
+                  None recorded
                 </p>
               </div>
 
-              <div className="rounded-xl border border-dashed border-[var(--color-outline-variant)]/50 bg-[var(--color-surface-container-low)]/50 p-[var(--spacing-hm-md)] md:col-span-2">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
-                    Emergency contact
-                  </p>
-                  <ComingSoonTag />
-                </div>
+              <div className="rounded-xl border border-[var(--color-outline-variant)]/40 bg-[var(--color-surface-container-low)]/50 p-[var(--spacing-hm-md)] md:col-span-2">
+                <p className="mb-2 font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
+                  Emergency contact
+                </p>
                 <p className="mb-2 font-literata text-body-md text-[var(--color-on-surface-variant)]">
                   Add a contact for clinic staff in an emergency.
                 </p>
@@ -494,7 +483,6 @@ export function ProfileSettingsView({
               >
                 Notifications
               </h2>
-              <ComingSoonTag />
             </div>
             <ul className="space-y-4">
               {(
@@ -503,27 +491,30 @@ export function ProfileSettingsView({
                     icon: MdMail,
                     title: "Email reminders",
                     description: "Reminder 24h before your appointment.",
+                    defaultOn: true,
                   },
                   {
                     icon: MdSms,
                     title: "SMS reminders",
                     description: "Texts for booking changes.",
+                    defaultOn: true,
                   },
                   {
                     icon: MdCampaign,
                     title: "Promotional updates",
                     description: "Clinic news and health tips.",
+                    defaultOn: false,
                   },
                 ] as const
               ).map((item) => (
                 <li
                   key={item.title}
-                  className="flex gap-3 rounded-xl bg-[var(--color-surface-container-low)]/70 p-3"
+                  className="flex items-center gap-3 rounded-xl bg-[var(--color-surface-container-low)]/70 p-3"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
                     <item.icon size={18} aria-hidden />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="font-dm-sans text-label-md font-bold text-[var(--color-on-surface)]">
                       {item.title}
                     </p>
@@ -531,12 +522,18 @@ export function ProfileSettingsView({
                       {item.description}
                     </p>
                   </div>
+                  <label className="relative inline-flex shrink-0 cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      className="peer sr-only"
+                      defaultChecked={item.defaultOn}
+                      aria-label={item.title}
+                    />
+                    <span className="h-6 w-11 rounded-full bg-[var(--color-surface-container-highest)] after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[var(--color-primary)] peer-checked:after:translate-x-full" />
+                  </label>
                 </li>
               ))}
             </ul>
-            <p className="mt-4 font-dm-sans text-label-sm text-[var(--color-on-surface-variant)]">
-              Preference controls will unlock when delivery is available.
-            </p>
           </section>
 
           <section className={CARD} aria-labelledby="security-heading">
@@ -547,37 +544,63 @@ export function ProfileSettingsView({
               >
                 Security & Account
               </h2>
-              <ComingSoonTag />
             </div>
             <ul className="space-y-2">
-              <li className="flex items-center gap-3 rounded-xl bg-[var(--color-surface-container-low)]/70 p-3">
-                <MdLock
-                  size={20}
-                  className="shrink-0 text-[var(--color-on-surface-variant)]"
-                  aria-hidden
-                />
-                <span className="font-dm-sans text-label-md text-[var(--color-on-surface)]">
-                  Change password
-                </span>
+              <li>
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-xl bg-[var(--color-surface-container-low)]/70 p-3 text-left transition-colors hover:bg-[var(--color-surface-container-highest)]"
+                >
+                  <MdLock
+                    size={20}
+                    className="shrink-0 text-[var(--color-on-surface-variant)]"
+                    aria-hidden
+                  />
+                  <span className="flex-1 font-dm-sans text-label-md text-[var(--color-on-surface)]">
+                    Change password
+                  </span>
+                  <MdChevronRight
+                    size={20}
+                    className="shrink-0 text-[var(--color-on-surface-variant)]"
+                    aria-hidden
+                  />
+                </button>
               </li>
-              <li className="flex items-center gap-3 rounded-xl bg-[var(--color-surface-container-low)]/70 p-3">
-                <MdShield
-                  size={20}
-                  className="shrink-0 text-[var(--color-on-surface-variant)]"
-                  aria-hidden
-                />
-                <span className="font-dm-sans text-label-md text-[var(--color-on-surface)]">
-                  Two-factor authentication
-                </span>
+              <li>
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-3 rounded-xl bg-[var(--color-surface-container-low)]/70 p-3 text-left transition-colors hover:bg-[var(--color-surface-container-highest)]"
+                >
+                  <MdShield
+                    size={20}
+                    className="shrink-0 text-[var(--color-on-surface-variant)]"
+                    aria-hidden
+                  />
+                  <span className="flex-1 font-dm-sans text-label-md text-[var(--color-on-surface)]">
+                    Two-factor authentication
+                  </span>
+                  <MdChevronRight
+                    size={20}
+                    className="shrink-0 text-[var(--color-on-surface-variant)]"
+                    aria-hidden
+                  />
+                </button>
               </li>
             </ul>
             <div className="mt-6 border-t border-[var(--color-outline-variant)]/25 pt-5">
               <p className="mb-2 font-dm-sans text-label-sm font-bold tracking-wide text-[var(--color-error)] uppercase">
                 Danger zone
               </p>
-              <p className="font-literata text-body-md text-[var(--color-on-surface-variant)]">
-                Account deletion will be available in a later release.
+              <p className="mb-3 font-literata text-body-md text-[var(--color-on-surface-variant)]">
+                Permanently delete your account and all associated data.
               </p>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-error)]/40 px-4 py-2 font-dm-sans text-label-md font-bold text-[var(--color-error)] transition-colors hover:bg-[var(--color-error-container)]/30"
+              >
+                <MdDeleteOutline size={18} aria-hidden />
+                Delete account
+              </button>
             </div>
           </section>
         </div>

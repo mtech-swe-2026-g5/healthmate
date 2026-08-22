@@ -91,9 +91,9 @@ export function AdminPortalShell({
           })}
         </nav>
 
-        <div className="mt-auto border-t border-[var(--color-outline-variant)]/30 pt-[var(--spacing-hm-md)]">
-          <div className="mb-[var(--spacing-hm-md)] flex items-center gap-3 px-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-secondary-container)] font-dm-sans text-label-md font-bold text-[var(--color-primary)]">
+        <div className="mt-auto rounded-xl border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container)] p-[var(--spacing-hm-md)]">
+          <div className="mb-[var(--spacing-hm-md)] flex items-center gap-[var(--spacing-hm-md)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary-container)]/15 font-dm-sans text-label-md font-bold text-[var(--color-primary)]">
               {initials || <MdPerson size={20} aria-hidden />}
             </div>
             <div className="min-w-0">
@@ -105,7 +105,7 @@ export function AdminPortalShell({
               </p>
             </div>
           </div>
-          <LogoutButton className="w-full" />
+          <LogoutButton className="w-full justify-center rounded-lg border border-[var(--color-outline-variant)] px-3 py-2 font-dm-sans text-label-md text-[var(--color-on-surface-variant)]" />
         </div>
       </aside>
 
