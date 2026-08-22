@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.6.0...v1.6.1) (2026-08-22)
+
+
+### Bug Fixes
+
+* UI tweaks for final presentation ([#63](https://github.com/mtech-swe-2026-g5/healthmate/issues/63)) ([02102fa](https://github.com/mtech-swe-2026-g5/healthmate/commit/02102fa0594e4ad15129f426462f9416515ba9f7))
+
 # [1.6.0](https://github.com/mtech-swe-2026-g5/healthmate/compare/v1.5.0...v1.6.0) (2026-08-19)
 
 
